@@ -1,0 +1,11 @@
+2015-12-11  Oliver Cordes  <ocordes@.astro.uni-bonn.de>
+
+	* arctic 1.1.1 released
+	* implement the clocking mode, unlock=0 via config and command line
+	* fix a BUG when using express > 1 configurations
+
+2015-12-02  Oliver Cordes  <ocordes@astro.uni-bonn.de>
+
+	* arctic 1.1.0 released
+	* first version of arctic -> adopted from acs-cte project version 0.9.11
+

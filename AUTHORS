@@ -1,0 +1,12 @@
+Oliver Cordes	implementation of the acs-cte and arctic code from IDL
+                development of different speed up codes
+
+Ole Marggarf    update of the julian.cc implementation
+                tests
+
+
+Holger Israel   tests and power user for Euclid
+
+
+Ricahrd Massey  he wrote the original code of the CTE algorithm in IDL and is
+                the father of all implementations

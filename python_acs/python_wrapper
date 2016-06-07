@@ -1,0 +1,13 @@
+#!/bin/sh
+
+prefix=/Users/ocordes/software
+exec_prefix=${prefix}
+
+if test -z "${PYTHONPATH}"; then
+   PYTHONPATH=${exec_prefix}/lib/python
+else
+    PYTHONPATH=${exec_prefix}/lib/python:${PYTHONPATH}
+fi
+
+export PYTHONPATH
+exec ${exec_prefix}/lib/python/`basename $0`.py "$@"

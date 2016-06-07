@@ -1,0 +1,7 @@
+Release version vs. subvervion revision
+
+https://www.astro.uni-bonn.de/svn/ocordes/arctic
+
+
+- v1.1.1  svn rev. 922
+
