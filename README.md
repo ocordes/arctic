@@ -1,2 +1,2 @@
 # arctic
-artic - Algorith foR Charge Transfer Inefficency Correction (Astronomy)
+artic - Algorithm foR Charge Transfer Inefficency Correction (Astronomy)
