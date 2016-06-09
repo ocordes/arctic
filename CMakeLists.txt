@@ -20,8 +20,8 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 # define the target and parameter
 
 # these instructions search the directory tree when cmake is
-# invoked and put all files that match the pattern in the variables 
-# `sources` 
+# invoked and put all files that match the pattern in the variables
+# `sources`
 
 file(GLOB_RECURSE sources src/*.cc src/*.h)
 
@@ -44,25 +44,33 @@ include_directories(${CCFITS_INCLUDE_DIR})
 target_link_libraries( arctic ${CCFITS_LIBRARIES})
 
 
+# os configuration file
+INCLUDE (CheckIncludeFiles)
+CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
+CHECK_INCLUDE_FILES (utime.h HAVE_UTIME_H)
+configure_file ("${PROJECT_SOURCE_DIR}/src/config_cmake.h.in"
+                "${PROJECT_BINARY_DIR}/config.h" )
+# Now make sure that you the the build directory on your "Include" path when compiling
+include_directories(${PROJECT_BINARY_DIR})
+
+
 # install part
 install(TARGETS arctic DESTINATION bin)
 
 # CPack part
-set(VERSION 5.7.1)
+set(VERSION 1.3.0-git)
 
 # CPack version numbers for release tarball name.
-set(CPACK_PACKAGE_VERSION_MAJOR 5)
-set(CPACK_PACKAGE_VERSION_MINOR 7)
-set(CPACK_PACKAGE_VERSION_PATCH 1)
+set(CPACK_PACKAGE_VERSION_MAJOR 1)
+set(CPACK_PACKAGE_VERSION_MINOR 3)
+set(CPACK_PACKAGE_VERSION_PATCH 0)
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The Scientific Plotting Library
-PLplot")
-set(CPACK_PACKAGE_VENDOR "PLplot development team")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Algorithm foR Charge Transfer Inefficency Correcton - arctic")
+set(CPACK_PACKAGE_VENDOR "Oliver Cordes/Ole Marggraf")
 set(CPACK_PACKAGE_DESCRIPTION_FILE ${CMAKE_CURRENT_SOURCE_DIR}/README)
 set(CPACK_GENERATOR TGZ)
 set(
-CPACK_SOURCE_PACKAGE_FILE_NAME
-"plplot-${VERSION}"
+CPACK_SOURCE_PACKAGE_FILE_NAME "arctic-${VERSION}"
 CACHE INTERNAL "tarball basename"
 )
 set(CPACK_SOURCE_GENERATOR TGZ)
@@ -74,10 +82,10 @@ set(CPACK_SOURCE_IGNORE_FILES
 "\\\\.cvsignore$"
 "^${PROJECT_SOURCE_DIR}.*/CVS/"
 "^${PROJECT_SOURCE_DIR}/debian/"
-"^${PROJECT_SOURCE_DIR}/old/"
+"^${PROJECT_SOURCE_DIR}/build/"
+"^${PROJECT_SOURCE_DIR}/demo/"
+"^${PROJECT_SOURCE_DIR}/test_suite/data/*.fitsq"
+"^${PROJECT_SOURCE_DIR}/tests/"
 )
 #message("CPACK_SOURCE_IGNORE_FILES = ${CPACK_SOURCE_IGNORE_FILES}")
 include(CPack)
-
-
-
