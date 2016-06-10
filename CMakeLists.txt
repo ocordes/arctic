@@ -1,6 +1,26 @@
 cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
+set(VERSION 1.3.0-git)
+
+# et current date
+MACRO (TODAY RESULT)
+    IF (WIN32)
+        EXECUTE_PROCESS(COMMAND "cmd" " /C date /T" OUTPUT_VARIABLE ${RESULT})
+        string(REGEX REPLACE "(..)/(..)/..(..).*" "\\1/\\2/\\3" ${RESULT} ${${RESULT}})
+    ELSEIF(UNIX)
+        EXECUTE_PROCESS(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE ${RESULT})
+        string(REGEX REPLACE "(..)/(..)/..(..).*" "\\1/\\2/\\3" ${RESULT} ${${RESULT}})
+    ELSE (WIN32)
+        MESSAGE(SEND_ERROR "date not implemented")
+        SET(${RESULT} 000000)
+    ENDIF (WIN32)
+ENDMACRO (TODAY)
+
+TODAY(RESULT)
+message(STATUS "Compilation date = ${RESULT}")
+set(BUILD ${RESULT})
+
 # Compile with C++11 support.  Disable __STRICT_ANSI__ to support
 # some nice OpenCL shortcuts (i.e. cl_float2's .s0, .s1 syntax).
 include(CheckCXXCompilerFlag)
@@ -58,7 +78,6 @@ include_directories(${PROJECT_BINARY_DIR})
 install(TARGETS arctic DESTINATION bin)
 
 # CPack part
-set(VERSION 1.3.0-git)
 
 # CPack version numbers for release tarball name.
 set(CPACK_PACKAGE_VERSION_MAJOR 1)

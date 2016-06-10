@@ -7,8 +7,6 @@ src/.deps/.dirstamp
 
 Makefile
 
-*.in
-
 configure
 
 config.log
