@@ -3,98 +3,14 @@
 
 #cmakedefine HAVE_MALLOC_H 1
 
-#define BUILD "@BUILD@"
-#define VERSION "@VERSION@"
+#cmakedefine HAVE_UTIME_H 1
+
+#cmakedefine HAVE_SYS_TIME_H 1
+
+#cmakedefine HAVE_SYS_RESOURCE_H 1
 
 /* build date of package */
-#undef BUILD
-
-/* Define to 1 if you have the <CCfits/CCfits> header file. */
-#undef HAVE_CCFITS_CCFITS
-
-/* define if the compiler supports basic C++11 syntax */
-#undef HAVE_CXX11
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#undef HAVE_DLFCN_H
-
-/* Define to 1 if you have the <fitsio.h> header file. */
-#undef HAVE_FITSIO_H
-
-/* Define to 1 if you have the <inttypes.h> header file. */
-#undef HAVE_INTTYPES_H
-
-/* Define to 1 if you have the `CCfits' library (-lCCfits). */
-#undef HAVE_LIBCCFITS
-
-/* Define to 1 if you have the `cfitsio' library (-lcfitsio). */
-#undef HAVE_LIBCFITSIO
-
-/* Define to 1 if you have the `m' library (-lm). */
-#undef HAVE_LIBM
-
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#undef HAVE_STDINT_H
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#undef HAVE_STDLIB_H
-
-/* Define to 1 if you have the <strings.h> header file. */
-#undef HAVE_STRINGS_H
-
-/* Define to 1 if you have the <string.h> header file. */
-#undef HAVE_STRING_H
-
-/* Define to 1 if you have the <sys/resource.h> header file. */
-#undef HAVE_SYS_RESOURCE_H
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#undef HAVE_SYS_STAT_H
-
-/* Define to 1 if you have the <sys/time.h> header file. */
-#undef HAVE_SYS_TIME_H
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#undef HAVE_SYS_TYPES_H
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#undef HAVE_UNISTD_H
-
-/* Define to 1 if you have the <utime.h> header file. */
-#undef HAVE_UTIME_H
-
-/* Define to 1 if `utime(file, NULL)' sets file's timestamp to the present. */
-#undef HAVE_UTIME_NULL
-
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
-#undef LT_OBJDIR
-
-/* Name of package */
-#undef PACKAGE
-
-/* Define to the address where bug reports for this package should be sent. */
-#undef PACKAGE_BUGREPORT
-
-/* Define to the full name of this package. */
-#undef PACKAGE_NAME
-
-/* Define to the full name and version of this package. */
-#undef PACKAGE_STRING
-
-/* Define to the one symbol short name of this package. */
-#undef PACKAGE_TARNAME
-
-/* Define to the home page for this package. */
-#undef PACKAGE_URL
-
-/* Define to the version of this package. */
-#undef PACKAGE_VERSION
-
-/* Define to 1 if you have the ANSI C header files. */
-#undef STDC_HEADERS
+#define BUILD "@BUILD@"
 
 /* Version number of package */
-#undef VERSION
+#define VERSION "@VERSION@"

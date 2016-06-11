@@ -3,23 +3,11 @@ project( arctic )
 
 set(VERSION 1.3.0-git)
 
-# et current date
-MACRO (TODAY RESULT)
-    IF (WIN32)
-        EXECUTE_PROCESS(COMMAND "cmd" " /C date /T" OUTPUT_VARIABLE ${RESULT})
-        string(REGEX REPLACE "(..)/(..)/..(..).*" "\\1/\\2/\\3" ${RESULT} ${${RESULT}})
-    ELSEIF(UNIX)
-        EXECUTE_PROCESS(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE ${RESULT})
-        string(REGEX REPLACE "(..)/(..)/..(..).*" "\\1/\\2/\\3" ${RESULT} ${${RESULT}})
-    ELSE (WIN32)
-        MESSAGE(SEND_ERROR "date not implemented")
-        SET(${RESULT} 000000)
-    ENDIF (WIN32)
-ENDMACRO (TODAY)
+# get current date
+execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
+string( REPLACE "\n" "" BUILD ${BUILD})
+message(STATUS "Compilation date = ${BUILD}")
 
-TODAY(RESULT)
-message(STATUS "Compilation date = ${RESULT}")
-set(BUILD ${RESULT})
 
 # Compile with C++11 support.  Disable __STRICT_ANSI__ to support
 # some nice OpenCL shortcuts (i.e. cl_float2's .s0, .s1 syntax).
@@ -67,7 +55,9 @@ target_link_libraries( arctic ${CCFITS_LIBRARIES})
 # os configuration file
 INCLUDE (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
-CHECK_INCLUDE_FILES (utime.h HAVE_UTIME_H)
+#CHECK_INCLUDE_FILES (utime.h HAVE_UTIME_H)
+CHECK_INCLUDE_FILES (sys/time.h HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILES (sys/resource.h HAVE_SYS_RESOURCE_H)
 configure_file ("${PROJECT_SOURCE_DIR}/src/config_cmake.h.in"
                 "${PROJECT_BINARY_DIR}/config.h" )
 # Now make sure that you the the build directory on your "Include" path when compiling
