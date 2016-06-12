@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* cte_image_euclid.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-03-08
+   changed by: Oliver Cordes 2016-06-12
 
    $Id: cte_image_euclid.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -41,7 +41,6 @@
 
 
 #include <sys/time.h>
-#include <sys/resource.h>
 
 //#define __debug
 #define debug_pixel 800
@@ -54,7 +53,7 @@
 cte_image_euclid::cte_image_euclid( std::shared_ptr<params> p )
 {
   parameters = p;
-  
+
   // initialize variables
   empty_trap_limit = parameters->empty_trap_limit;
 
@@ -141,10 +140,10 @@ void cte_image_euclid::print_traps( std::valarray<double> & t, int n_species, in
 	    }
 	  s += std::to_string( t[(j*n_species)+i] ) + " ";
 	  d +=  t[(j*n_species)+i];
-	  
+
 	}
       s += "= " + std::to_string( d );
-      if ( c < 3 ) 
+      if ( c < 3 )
 	output( 10, "%05i: %s\n", j, s.c_str() );
     }
 }
@@ -351,8 +350,8 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
         }
      }
   output( 10, "Done.\n" );
-					      
-					      
+
+
   // array structures in general ...
   // in the IDL description we have n_species x something array
   // for traps, release, capture ..
@@ -361,7 +360,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
   // over something and then loop over n_species
 
   output( 10, "Create exponential factor ...\n" );
-  
+
   //exponential_factor = (double*) malloc( n_species * n_levels * sizeof( double ) );
   std::valarray<double> exponential_factor( 0.0, n_species*n_levels );
 
@@ -372,13 +371,13 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
 
   output( 10, "Done.\n" );
 
-  
+
 
   well_range = well_depth - well_notch_depth;
 
 
   output( 10, "Setup traps ...\n" );
-  
+
   //traps = (double*) malloc( n_species * n_levels * sizeof( double ) );
   std::valarray<double> traps(0.0, n_species * n_levels );
 
@@ -389,7 +388,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
-  
+
 
   for (i_column=start_x;i_column<end_x;i_column++)
     {
@@ -408,7 +407,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
           n_levels_traps = 0;
 
           stat_count = 0;
-	  
+
 
           for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
             {
@@ -429,7 +428,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
                   if ( im < 0.0 )
                     im = 0.0;
                   freec = im;
-		  
+
 
                   // Release any trapped electrons, using the appropriate decay half-life
 
@@ -498,7 +497,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
 
 
                       // calculate the number of electrons which can be captured
-		      
+
                       // opti
                       double trap_sum = 0.0;
 		      for (i=0;i<n_species*(cheight-1);i++)
@@ -509,7 +508,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
 		      double sum2 = n_electrons_per_trap_total_express * dheight - trap_sum;
 		      double sum3 = trap_sum;
 		      #endif
-		      
+
 		      sum = (n_electrons_per_trap_total_express*(cheight-1))
                         //- get_sum_double_array( traps, cheight-1, n_species );
 			- trap_sum;
@@ -522,7 +521,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
 			  #ifdef __debug
 			  sum2 -= traps[pos];
 			  sum3 += traps[pos];
-			  #endif 
+			  #endif
                           if ( c > 0.0 )
                             sum += c;
                         }
@@ -548,11 +547,11 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
 		      output( 10, "max_capture : %f\n", total_capture );
 		      output( 10, "pot_capture : %f %f %f = %f\n", pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
 		      #endif
-		      
+
                       if ( total_capture < 1e-14 )
                         total_capture = 1e-14;
 
-		      
+
                       d = freec / total_capture;
                       double ov = dheight - (cheight-1);
                       if ( d < 1.0 )
@@ -614,7 +613,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
 			       n_electrons_per_trap_express[1],
 			       n_electrons_per_trap_express[2], n_electrons_per_trap_total_express );
 
-		      
+
 		      std::valarray<double> pot_capture2( 0.0, n_species );
 		      for (i=cheight;i<n_levels_traps;i++)
 			for (j=0;j<n_species;j++)
@@ -658,7 +657,7 @@ void cte_image_euclid::clock_charge_image( std::valarray<double> & image,
           diff_time = get_difftime( start_time, temp_time );
           cpu_diff_time = get_difftime( cpu_start_time.ru_utime, cpu_temp_time.ru_utime );
           eta_time = ( diff_time / ( (i_column+1) - start_x ) ) * ( end_x - start_x );
-	  
+
           output( 1, "Clocking column #%i/%i in %fs, or %fs/column. ETA %.1fs.\n",
                   i_column+1, ( end_x - start_x ),
                   cpu_diff_time,
@@ -790,13 +789,13 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 
 
   // setup variables
-  
+
   traps_total = parameters->trap_density.sum();
   std::valarray<double> n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) n_levels );
   std::valarray<double> n_electrons_per_trap_express = std::valarray<double> ( n_electrons_per_trap );
   well_range = well_depth - well_notch_depth;
-  
-  // new code with variable express 
+
+  // new code with variable express
   express_multiplier = (int*) malloc( express * (image_height+1 ) * sizeof( int ) );
 
   // setup of the express array
@@ -821,7 +820,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
         }
      }
 
-  
+
   std::valarray<double> exponential_factor( 0.0, n_species*n_levels );
 
   for (i=0;i<n_levels;i++)
@@ -846,13 +845,13 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
   std::valarray<double> n_electrons_per_trap_express_ov = n_electrons_per_trap_express;
 
   int     h, h2, skip;
-  double ov;   
+  double ov;
   double  c;
 
-  double dheight2; 
+  double dheight2;
   int cheight2;
 
-  
+
   // info about the image and algorithm
   sparse_pixels = get_sparse_pixels( image, traps_total );
 
@@ -866,7 +865,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 
 
   output( 1, "Using n_levels=%i\n", n_levels );
-  
+
 
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
@@ -888,7 +887,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 	  // how much levels are really used, these levels have then also valid entries ...
 	  //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
 	  //trapl_fill = std::valarray<int> ( 0, n_levels );
-	  
+
 
 
           for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
@@ -913,7 +912,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
                   freec = im;
 
                   // Release any trapped electrons, using the appropriate decay half-life
-		  
+
                   // release a number of electrons in the traps
                   // trapped electrons relased exponentially
 
@@ -936,9 +935,9 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 		  //     trapl[j] -= vrelease;
 		  //     sum += vrelease.sum() * trapl_fill[j];
 		  //   }
-		  
 
-		  
+
+
                   freec += sum;
 
 
@@ -952,7 +951,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
                       else
                         if ( d < 0.0 )
                           d = 0.0;
-		      
+
 		      dheight = n_levels * d;
 
 
@@ -978,7 +977,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 			{
 			  h2 = h + trapl_fill[j];
 
-			  
+
 			  // don't need to check for max. because n_electrons_per_trap_express is
 			  // always higher or equal then the last step -> structure of the express
 			  // array, and the trap cannot hold more electrons then n_electrons_per_trap_express
@@ -1016,9 +1015,9 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 		      for (i=0;i<nr_trapl;i++)
 			traps_total += trapl[i].sum() * trapl_fill[i];
 		      output( 10, "ntrap_total : %f\n", traps_total );
-		      
+
 		      print_trapl( trapl, trapl_fill, n_species, nr_trapl );
-		      
+
 
 		      output( 10, "free,dheight: %f %f\n", freec, dheight );
                       output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight );
@@ -1033,17 +1032,17 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 
                       d = freec / total_capture;
 
-		     
+
 
 		      // the result is all levels which are absorbed
 		      // by the new dheight are gone
 		      // the first level may be modified
-		      
+
 		      // skip has the height until the new bunches
 
 		      // some helpers
 		      n_electrons_per_trap_express_ov = n_electrons_per_trap_express * ov;
-		      
+
                       if ( d < 1.0 )
                         {
 			  #ifdef __debug
@@ -1057,7 +1056,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 			  dheight2 = dheight;
 			  cheight2 = cheight;
 
-			  
+
 			  // walk through all entries
 			  h = 0;
 			  for(j=nr_trapl-1;j>=0;j--)
@@ -1147,9 +1146,9 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 					      new_nr_trapl++;
 					    }
 					}
-					      
+
 				    }
-				      
+
 				}
 			      h += trapl_fill[j];
 			      dheight2 -= trapl_fill[j];
@@ -1194,7 +1193,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 			  //
 			  // trapl_fill gives the number of filled levels
 
-			  
+
 			  // prepare the stack for refilling
 
 			  skip = 0;
@@ -1213,7 +1212,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 			  #ifdef __debug
 			  output( 10, "h,nr_trapl,d: %i %i %f\n", h, nr_trapl, dheight );
                           #endif
-			  
+
 			  if ( skip == dheight )
 			    {
 			      // best solution ...
@@ -1222,7 +1221,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 			      #ifdef __debug
 			      output( 10, "Balla balla\n" );
 			      output( 10, "skip=%i dheight=%f\n", skip, dheight );
-			      #endif 
+			      #endif
 			      trapl_fill[nr_trapl+1] = cheight;
 			      trapl_fill[nr_trapl] = 1;
 			      trapl[nr_trapl+1] = n_electrons_per_trap_express;
@@ -1232,7 +1231,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 			  else
 			    {
 			      // normal case
-			      
+
 			      if ( nr_trapl == 0 )
 				{
 				  trapl_fill[1] = cheight;
@@ -1248,7 +1247,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 				  // ov is a single level with ov * n_electrons_per_trap fill
 
 				  // skip levels are already skipped
-				  
+
 				  // modify the first levels
 				  // using cheight because this is the number of remaining levels
 				  // from the prior filled trap levels
@@ -1256,7 +1255,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 				  #ifdef __debug
 				  output( 10, "tr_f[0],ch,skip: %i %i %i\n", trapl_fill[0], cheight, skip );
 				  #endif
-				  
+
 				  trapl_fill[nr_trapl-1] -= cheight - skip;
 
 				  if ( trapl_fill[nr_trapl-1] == 1 )
@@ -1293,7 +1292,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 				  // fill the leading trap level
 				  trapl_fill[nr_trapl] = cheight;
 				  trapl[nr_trapl] = n_electrons_per_trap_express;
-				  
+
 				  nr_trapl ++;
 				}
 			    }
@@ -1302,7 +1301,7 @@ void cte_image_euclid::clock_charge_image_neo( std::valarray<double> & image,
 		      #ifdef __debug
 		      print_trapl( trapl, trapl_fill, n_species, nr_trapl );
 		      #endif
-		      
+
                       // delete the captured exlectrons from
                       //   the pixel value
                       freec -= total_capture;
@@ -1409,7 +1408,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 				    std::valarray<long> & xrange,
 				    std::valarray<long> & yrange )
 {
-  // local variables copied from parameter set 
+  // local variables copied from parameter set
   // makes the code faster, since the access of the class pointer is
   // only once ...
   int     n_species;
@@ -1492,7 +1491,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
   well_fill_power  = parameters->well_fill_power;
   express          = parameters->express;
   readout_offset   = parameters->readout_offset;
-  
+
   //traps_total = 0;
   //for (i=0;i<n_species;i++)
   //  traps_total += trap_density[i];
@@ -1503,11 +1502,11 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
   // n_levels = round( 2.0 / traps_total );
   // if ( n_levels < 1  )
   //   n_levels = 1;
-  
+
 
   // change the n_levels to a dynamic variable
   // n_levels = 10000;
-  // (*pn_levels) = n_levels; 
+  // (*pn_levels) = n_levels;
 
   // removed in favor of a class variable
   //n_levels = (*pn_levels);
@@ -1578,7 +1577,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
   double ntrap_fill = 0.0;
 
 
-  // initialize the time measurement 
+  // initialize the time measurement
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
 
@@ -1598,8 +1597,8 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 	  // all traps are empty
 	  ntrap = std::valarray<double> ( 0.0, n_species );
 	  ntrap_fill = 0.0;
-	  
-          
+
+
 
 
           for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
@@ -1630,8 +1629,8 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 
 		  // Release any trapped electrons, using the appropriate decay half-life
 
-                  // release a number of electrons in the traps 
-                  // trapped electrons relased exponentially 
+                  // release a number of electrons in the traps
+                  // trapped electrons relased exponentially
 
 		  sum = 0.0;
 
@@ -1672,16 +1671,16 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 
                       // calculate the number of electrons which can be captured
 
-		      
+
 
 		      // new code
 
-		      
+
 		      // the number of trap electrons which are not affected
 
 		      std::valarray<double> trap_electron_rest( 0.0, n_species );
 
-		      if ( dheight > ntrap_fill )			
+		      if ( dheight > ntrap_fill )
 			{
 			}
 		      else
@@ -1708,7 +1707,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 			      if ( c > 0.0 )
 				max_capture[i] += c;
 			    }
-			  
+
 			  // old code
 			  //max_capture = ( n_electrons_per_trap_express - ntrap ) * dheight;
 			}
@@ -1725,9 +1724,9 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 			  // possible electrons in all trap levels - all filled electrons - all possibly captured electrons
 			  trap_pot_capture = n_electrons_per_trap_express * ( ceil( ntrap_fill ) - ceil( dheight) ) - ( ntrap * ( ntrap_fill - ceil( dheight) ) );
 			}
-		      
+
 		      double trap_pot_capture_total = trap_pot_capture.sum();
-			
+
 		      // this is the maximum of electrons which can be filled into the trap levels
 		      total_capture = max_capture_total;
 
@@ -1741,9 +1740,9 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 		      output( 10, "max_capture : %f %f %f = %f\n", max_capture[0], max_capture[1], max_capture[2], max_capture_total );
 		      output( 10, "pot_capture : %f %f %f = %f\n", trap_pot_capture[0], trap_pot_capture[1], trap_pot_capture[2], trap_pot_capture_total );
 
-		      
+
                       #endif
-		      
+
                       if ( total_capture < 1e-14 )
                         total_capture = 1e-14;
 
@@ -1761,7 +1760,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 			}
 		      else
 			{
-			  // more electrons than required for capturing process 
+			  // more electrons than required for capturing process
 			  // -> fill all traps to the max
 
 			  //for (i=0;i<n_species;i++)
@@ -1803,7 +1802,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 			  #ifdef __debug
 			  output( 10, "fill_species: %f %f %f\n", ntrap_fill_species[0], ntrap_fill_species[1], ntrap_fill_species[2] );
 			  #endif
-			  
+
 			  // use the maximum of all values
 			  double ntrap_fill3 = ntrap_fill_species.max();
 
@@ -1812,10 +1811,10 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 			  for (i=0;i<n_species;i++)
 			    ntrap[i] *= 1.0 - ( trap_pot_capture[i] / ntrap_fill3 ) / ntrap[i];
 
-			  
-			  
+
+
 			  ntrap_fill = ntrap_fill3;
-			  
+
 			  ////double s = ntrap.sum() * dheight + trap_electron_rest_total;
 
 			  // BIG question if we need here ntrap.sum() instead n_electrons_per_trap_total_express
@@ -1831,7 +1830,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
                           #ifdef __debug
 			  double t = ntrap.sum();
 			  #endif
-			      
+
 			  //for (i=0;i<n_species;i++)
 			  //  ntrap[i] *= f;
 			  #ifdef __debug
@@ -1858,7 +1857,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
 		      pot_cap_check = ( n_electrons_per_trap_express - ntrap ) * ntrap_fill;
 		      output( 10, "pot_cap_chk : %f %f %f = %f\n", pot_cap_check[0], pot_cap_check[1], pot_cap_check[2], pot_cap_check.sum() );
 		      #endif
-		      
+
                       #ifdef __debug
 		      if ( i_pixel == debug_pixel )
                         {
@@ -1868,7 +1867,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
                       #endif
 
 
-			   
+
                       // delete the captured exlectrons from
                       //   the pixel value
                       freec -= total_capture;
@@ -1893,7 +1892,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
       //#ifdef __debug
       //output( 1, "\n" );
       //#endif
-      
+
       /* time measurement */
       if ( ( i_column % 200 ) == 0 )
         {
@@ -1910,7 +1909,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
                   ( eta_time - diff_time ) );
 
         }
-      
+
       //output( 1, "stat_count=%i\n", stat_count );
 
     } /* end of i_column loop */
@@ -1926,7 +1925,7 @@ void cte_image_euclid::clock_charge_image_neo2( std::valarray<double> & image,
   output( 1, "                          %fs CPU TIME, or %fs/column\n",
           cpu_diff_time, ( cpu_diff_time  / ( end_x - start_x ) ) );
 
-  // free local variables 
+  // free local variables
   free( express_multiplier );
 }
 
@@ -1938,7 +1937,7 @@ void cte_image_euclid::clock_charge( std::shared_ptr<std::valarray<double>> im,
 			      bool unclock )
 {
   output( 11, "cte_image_euclid::clock_charge\n" );
-  
+
   image_width  = w;
   image_height = h;
 
@@ -2005,7 +2004,7 @@ void cte_image_euclid::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
 	}
     }
-  
+
   // copy the data back into the original image
   (*im) = image;
   //(*im) = (*trail);
