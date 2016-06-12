@@ -62,7 +62,8 @@ public:
     mesg = s;
   }
   
-  virtual ~slice_exception() _NOEXCEPT {}
+  //virtual ~slice_exception() _NOEXCEPT {}
+  virtual ~slice_exception() {}
 
   virtual const char* what() const throw()
   {
