@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-03-09
+   changed by: Oliver Cordes 2016-06-19
 
    $Id: params.hh 975 2016-03-09 13:08:56Z ocordes $
 
@@ -38,6 +38,7 @@
 #include <string>
 #include <valarray>
 
+#include "image_slice.hh"
 #include "strstr.hh"
 
 
@@ -45,14 +46,14 @@
 #define WORKING_MODE_ACS    2
 #define WORKING_MODE_EUCLID 3
 
-// Defines a real type for images 
+// Defines a real type for images
 
 
 class params {
 protected:
   void load_config( std::string filename );
 public:
-  // variables
+  // CTI variables
   bool                  neo_algorithm;
   bool                  neo_algorithm2;
   double                well_depth;
@@ -71,17 +72,24 @@ public:
   int                   n_species;
   std::valarray<double> trap_density;
   std::valarray<double> trap_lifetime;
-
-  std::string           config_filename;
-
   bool                  cut_upper_limit;
   double                upper_limit;
-  
+
+  // image variables
+  bool                  rotate;
+  bool                  direction;
+  bool                  force;
+
+  // standard variables
+  std::string           config_filename;
+
+
   params();
   virtual ~params();
 
   virtual void parse_args( std::string key, std::string val );
-  
+  virtual void check_params ( void );
+
   void set_args(  int *argc, char **argv[] );
 
   std::valarray<double> str2array( std::CString );

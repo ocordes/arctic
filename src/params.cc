@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-03-09
+   changed by: Oliver Cordes 2016-06-13
 
    $Id: params.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -41,6 +41,7 @@
 #include <fstream>
 #include <exception>
 
+#include "image_slice.hh"
 #include "output.hh"
 #include "params.hh"
 #include "strstr.hh"
@@ -51,7 +52,7 @@ params::params()
 {
   neo_algorithm     = false;
   neo_algorithm2    = false;
-  well_depth        = 84700;     
+  well_depth        = 84700;
   well_notch_depth  = 1e-9;
   well_fill_power   = 0.478;
   check_empty_traps = true;
@@ -72,6 +73,13 @@ params::params()
 
   // only for reading parameters, not used in the CTE code
   n_species         = 0;
+
+
+  // imaage variables
+  rotate = image_readout_y;
+  direction = image_forward;
+
+  force = false;
 
   config_filename   = "";
   output( 11, "params::params()\n" );
@@ -106,7 +114,7 @@ void params::load_config( std::string filename )
 
 	  // clean spaces
 	  s = s.clean_white();
-	  
+
 	  //std::cout << s << std::endl;
 
 	  std::CString key = s.strtok( true, "=#" );
@@ -122,8 +130,8 @@ void params::load_config( std::string filename )
     }
   else
     std::cout << "Can't open config file '" << filename << "'! Config file will be ignored!" << std::endl;
-  
-  
+
+
   output( 1, "Done.\n" );
 }
 
@@ -134,6 +142,14 @@ void params::load_config( std::string filename )
 void params::parse_args( std::string key, std::string val )
 {
   throw "Not implemented!";
+}
+
+
+//
+
+void params::check_params( void )
+{
+  //throw "Not implemented!";
 }
 
 
@@ -178,28 +194,31 @@ void params::set_args( int *argc, char **argv[]  )
 	    }
 
 	  // default
-	  
+
 	  // split parameter  for further checks
 
 	  std::CString s( (*argv)[i] );
 	  s = s.clean_start( '-' );
 	  std::CString key = s.strtok( true, "=#\0\n" );
 	  std::CString val = s.strtok( false, "=#\0\n" );
-  
+
 	  // convert key into upper cases
 	  key = key.toupper();
-  
+
 	  parse_args( key, val );
-	} // end of if (*argv)[0]  == '-' 
+	} // end of if (*argv)[0]  == '-'
       else
 	{
 	  (*argv)[outp] = (*argv)[i];
 	  (*argv)[i] = NULL;
 	  outp++;
 	}
-      
+
       i++;
     }
+
+  // finally check parameter for consistency
+  check_params();
 }
 
 
@@ -260,7 +279,7 @@ int get_working_mode( int argc, char *argv[] )
 		return WORKING_MODE_EUCLID;
 	    }
 	}
-	
+
     }
   return WORKING_MODE_FITS;
 }
