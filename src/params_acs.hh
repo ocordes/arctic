@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* param_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2015-07-07
+   changed by: Oliver Cordes 2016-06-13
 
    $Id: params_acs.hh 822 2015-07-07 12:41:27Z ocordes $
 
@@ -49,8 +49,9 @@ public:
   // functions
   params_acs();
   virtual void parse_args( std::string key, std::string val );
-  
+
   void calc_trap_config( double date );
+  virtual void check_params ( void );
 };
 
 

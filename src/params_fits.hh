@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* param_fits.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2015-06-28
+   changed by: Oliver Cordes 2016-06-13
 
    $Id: params_fits.hh 809 2015-06-26 12:23:14Z ocordes $
 
@@ -49,6 +49,7 @@ public:
   // functions
   params_fits();
   virtual void parse_args( std::string key, std::string val );
+  virtual void check_params ( void );
 };
 
 

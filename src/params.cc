@@ -149,7 +149,7 @@ void params::parse_args( std::string key, std::string val )
 
 void params::check_params( void )
 {
-  //throw "Not implemented!";
+  throw "Not implemented!";
 }
 
 

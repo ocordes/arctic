@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-03-08
+   changed by: Oliver Cordes 2016-06-13
 
    $Id: params_fits.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -98,7 +98,7 @@ void params_fits::parse_args( std::string key, std::string val )
   if ( key == "CHECK_EMPTY_TRAPS" )
     {
       bool b = true;
-      
+
       if ( val != "" )
 	b = tobool( val );
       check_empty_traps = b;
@@ -107,7 +107,7 @@ void params_fits::parse_args( std::string key, std::string val )
       return;
     }
 
-  
+
   if ( key == "N_ITERATIONS" )
     {
       n_iterations = atoi( val.c_str() );
@@ -132,7 +132,7 @@ void params_fits::parse_args( std::string key, std::string val )
 
       if ( val != "" )
 	b = tobool( val );
-      
+
       unclock = b;
       output( 10, "params: unclock=%i\n", unclock );
       return;
@@ -143,7 +143,7 @@ void params_fits::parse_args( std::string key, std::string val )
 
       if ( val != "" )
 	b = tobool( val );
-      
+
       dark_mode = b;
       output( 10, "params: dark_mode=%i\n", dark_mode );
       return;
@@ -170,7 +170,7 @@ void params_fits::parse_args( std::string key, std::string val )
     }
   if ( key == "TRAP_LIFETIME" )
     {
-      static_trap_definitions = 1;           // overwrite FITS informations      
+      static_trap_definitions = 1;           // overwrite FITS informations
       trap_lifetime = str2array( val );
       output( 10, "params: trap_lifetime=\n" );
       for (unsigned int n=0;n<trap_lifetime.size();n++) output( 10, "   %f\n", trap_lifetime[n] );
@@ -193,7 +193,7 @@ void params_fits::parse_args( std::string key, std::string val )
 	  neo_algorithm = true;
 	  neo_algorithm2 = false;
 	}
-      
+
       output( 10, "params: classic_algorithm=%i\n", b );
       output( 10, "params: neo_algorithm=%i\n", neo_algorithm );
       return;
@@ -204,12 +204,12 @@ void params_fits::parse_args( std::string key, std::string val )
 
       if ( val != "" )
 	b = tobool( val );
-      
+
       neo_algorithm = b;
 
       if ( b )
 	  neo_algorithm2 = false;
-      
+
       output( 10, "params: neo_algorithm=%i\n", neo_algorithm );
       return;
     }
@@ -219,12 +219,12 @@ void params_fits::parse_args( std::string key, std::string val )
 
       if ( val != "" )
 	b = tobool( val );
-      
+
       neo_algorithm2 = b;
 
        if ( b )
 	  neo_algorithm = false;
-      
+
       output( 10, "params: neo_algorithm2=%i\n", neo_algorithm2 );
       return;
     }
@@ -234,7 +234,7 @@ void params_fits::parse_args( std::string key, std::string val )
 
       if ( val != "" )
 	b = tobool( val );
-      
+
       cut_upper_limit = b;
       output( 10, "params: cut_upper_limit=%i\n", cut_upper_limit );
       return;
@@ -246,5 +246,9 @@ void params_fits::parse_args( std::string key, std::string val )
       output( 10, "params: upper_limit=%f\n", upper_limit );
       return;
     }
-  
+
+}
+
+void params_fits::check_params ( void )
+{
 }

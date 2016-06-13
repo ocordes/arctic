@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2015-06-19
+   changed by: Oliver Cordes 2016-06-13
 
    $Id: params_euclid.cc 803 2015-06-23 12:56:45Z ocordes $
 
@@ -40,4 +40,9 @@ void params_euclid::parse_args( std::string key, std::string val )
 {
   output( 11, "params_euclid::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
   params_fits::parse_args( key, val );
+}
+
+
+void params_euclid::check_params ( void )
+{
 }

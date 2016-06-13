@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* params_acs.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-02-29
+   changed by: Oliver Cordes 2016-06-13
 
    $Id: params_acs.cc 970 2016-02-29 16:27:14Z ocordes $
 
@@ -55,7 +55,7 @@ void params_acs::parse_args( std::string key, std::string val )
       output( 10, "params: single_fits=%i\n", single_fits );
       return;
     }
-  
+
   params_fits::parse_args( key, val );
 }
 
@@ -64,14 +64,14 @@ void params_acs::parse_args( std::string key, std::string val )
 void params_acs::calc_trap_config( double date )
 {
   double launch_date = 2452334.5;       /* Date of SM3B when ACS was installed */
-  
+
   double temperature_date = 2453920.0;  /* Date of temperature decrement */
   double repair_date = 2454968.0;       /* Date of SM4 when ACS was repaired */
 
   double trap_initial_density_presm4 = 0.017845;
   double trap_growth_rate_presm4 = 3.5488e-4;
 
-  
+
   //double trap_initial_density_postsm4 = 0.404611;
   //double trap_growth_rate_postsm4 = 2.93286e-4;
 
@@ -80,14 +80,14 @@ void params_acs::calc_trap_config( double date )
   //double trap_growth_rate_postsm4     =  0.000491395 *1.07;
 
 
-  // updated for Massey et al. (2013b) 
+  // updated for Massey et al. (2013b)
   double trap_growth_rate_postsm4     = 0.00056512878;
   double trap_initial_density_postsm4 = -0.249304;
 
   double sm4_trap_release_time[3]   = { 0.74, 7.7, 37 };    /* pixels */
 
   #define n_sm4_trap_parameter 3
-  
+
   //double sm4_trap_ratio[3]          = { 0.18, 0.61, 0.51 }; /* relative densities */
   double sm4_trap_ratio[3]          = { 0.169333,0.450667,0.380000 }; /* updated for Massey et al. (2013b) */
   double sm4_trap_ratio_sum;
@@ -139,11 +139,16 @@ void params_acs::calc_trap_config( double date )
   for (i=0;i<n_species;i++)
     trap_density[i] *= (sm4_trap_ratio[i] / sm4_trap_ratio_sum );
 
-  
+
   output( 1, "Model has %f traps per pixel, %f days after launch.\n", trap_density.sum(), (date-launch_date) );
 
   //output( 1, "Model has %i trap species:\n", trap_density.size() );
   //output( 1, " Nr  density  lifetime\n" );
   //for (unsigned int j=0;j<trap_density.size();j++)
   //  output( 1, " %2i: %f %f\n", j+1, trap_density[j], trap_lifetime[j] );
+}
+
+
+void params_acs::check_params ( void )
+{
 }
