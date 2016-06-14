@@ -22,7 +22,7 @@
 /* cte_image_euclid.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-12
+   changed by: Oliver Cordes 2016-06-14
 
    $Id: cte_image_euclid.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -41,6 +41,7 @@
 
 
 #include <sys/time.h>
+#include <sys/resource.h>
 
 //#define __debug
 #define debug_pixel 800
