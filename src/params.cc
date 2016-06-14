@@ -145,7 +145,11 @@ void params::parse_args( std::string key, std::string val )
 }
 
 
-//
+// use this function to verify/check all given parameters
+// it will be called after all parameters are set, so one
+// can do consistency checks or reset parameters
+// e.g. the force = false parameter an be used to overwrite
+// unwanted parameters
 
 void params::check_params( void )
 {

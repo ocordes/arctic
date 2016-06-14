@@ -57,7 +57,7 @@ INCLUDE (CheckIncludeFiles)
 CHECK_INCLUDE_FILES (malloc.h HAVE_MALLOC_H)
 #CHECK_INCLUDE_FILES (utime.h HAVE_UTIME_H)
 CHECK_INCLUDE_FILES (sys/time.h HAVE_SYS_TIME_H)
-#CHECK_INCLUDE_FILES (sys/resource.h HAVE_SYS_RESOURCE_H)
+CHECK_INCLUDE_FILES (sys/resource.h HAVE_SYS_RESOURCE_H)
 configure_file ("${PROJECT_SOURCE_DIR}/src/config_cmake.h.in"
                 "${PROJECT_BINARY_DIR}/config.h" )
 # Now make sure that you the the build directory on your "Include" path when compiling
