@@ -22,7 +22,7 @@
 /* param_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-13
+   changed by: Oliver Cordes 2016-06-15
 
    $Id: params_acs.hh 822 2015-07-07 12:41:27Z ocordes $
 
@@ -48,7 +48,7 @@ public:
   int single_fits;
   // functions
   params_acs();
-  virtual void parse_args( std::string key, std::string val );
+  virtual void parse_args( std::string key, std::string val, int & error );
 
   void calc_trap_config( double date );
   virtual void check_params ( void );

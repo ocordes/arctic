@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-13
+   changed by: Oliver Cordes 2016-06-15
 
    $Id: params_euclid.cc 803 2015-06-23 12:56:45Z ocordes $
 
@@ -36,10 +36,10 @@
 
 
 
-void params_euclid::parse_args( std::string key, std::string val )
+void params_euclid::parse_args( std::string key, std::string val, int & error )
 {
   output( 11, "params_euclid::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
-  params_fits::parse_args( key, val );
+  params_fits::parse_args( key, val, error );
 }
 
 

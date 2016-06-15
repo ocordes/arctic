@@ -22,7 +22,7 @@
 /* param_euclid.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-13
+   changed by: Oliver Cordes 2016-06-15
 
    $Id: params_euclid.hh 807 2015-06-24 13:37:37Z ocordes $
 
@@ -45,7 +45,7 @@
 class params_euclid : public params_fits {
 public:
   params_euclid() : params_fits() {};
-  virtual void parse_args( std::string key, std::string val );
+  virtual void parse_args( std::string key, std::string val, int & error );
   virtual void check_params ( void );
 };
 

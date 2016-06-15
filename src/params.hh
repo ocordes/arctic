@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-19
+   changed by: Oliver Cordes 2016-06-15
 
    $Id: params.hh 975 2016-03-09 13:08:56Z ocordes $
 
@@ -41,10 +41,19 @@
 #include "image_slice.hh"
 #include "strstr.hh"
 
+// define the implemented working modes
 
 #define WORKING_MODE_FITS   1
 #define WORKING_MODE_ACS    2
 #define WORKING_MODE_EUCLID 3
+
+
+// define the parse-results
+
+#define PARSE_OK            0
+#define PARSE_UNKNOWN       1
+#define PARSE_ERROR         2
+
 
 // Defines a real type for images
 
@@ -87,7 +96,7 @@ public:
   params();
   virtual ~params();
 
-  virtual void parse_args( std::string key, std::string val );
+  virtual void parse_args( std::string key, std::string val, int & error );
   virtual void check_params ( void );
 
   void set_args(  int *argc, char **argv[] );

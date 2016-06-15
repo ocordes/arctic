@@ -1,9 +1,11 @@
 #!/bin/sh
 
-# changedi by Oliver Cordes: 2015-11-23
+# changedi by Oliver Cordes: 2016-06-15
 
 INFILE=$HOME/git/arctic/demo/jbke01rkq_drkA.fits
 OUTFILE=$HOME/git/arctic/demo/testA.fits
+
+export PATH=$HOME/git/arctic/build:$HOME/git/arctic:$PATH
 
 args=""
 
@@ -16,4 +18,4 @@ while [ -n "$1" ]; do
   esac
 done
 
-./arctic -d 10 --out_float -c test_opt.cte ${INFILE} ${OUTFILE} -m ACS $args
+arctic -d 10 --out_float -c test_opt.cte ${INFILE} ${OUTFILE} -m ACS $args

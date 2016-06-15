@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-13
+   changed by: Oliver Cordes 2016-06-16
 
    $Id: params.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -50,7 +50,7 @@
 
 params::params()
 {
-  neo_algorithm     = false;
+  neo_algorithm     = true;
   neo_algorithm2    = false;
   well_depth        = 84700;
   well_notch_depth  = 1e-9;
@@ -94,6 +94,8 @@ params::~params()
 
 void params::load_config( std::string filename )
 {
+  int error;
+
   output( 1, "Loading config file '%s' ...\n", filename.c_str() );
 
   std::ifstream f;
@@ -124,7 +126,9 @@ void params::load_config( std::string filename )
 	  key = key.toupper();
 
 	  //std::cout << "key=" << key << " val=" << val << std::endl;
-	  parse_args( key, val );
+
+    error = PARSE_OK;
+	  parse_args( key, val, error );
 	}
       f.close();
     }
@@ -139,7 +143,7 @@ void params::load_config( std::string filename )
 // use this virtual function only for declaration
 // it schould never be called!!!
 
-void params::parse_args( std::string key, std::string val )
+void params::parse_args( std::string key, std::string val, int & error )
 {
   throw "Not implemented!";
 }
@@ -162,6 +166,8 @@ void params::set_args( int *argc, char **argv[]  )
 {
   int nargc = (*argc);
   int outp  = 1;
+
+  int error;
 
   int i = 1; // the first argument is always the program name ;-)
 
@@ -209,7 +215,8 @@ void params::set_args( int *argc, char **argv[]  )
 	  // convert key into upper cases
 	  key = key.toupper();
 
-	  parse_args( key, val );
+    error = PARSE_OK;
+	  parse_args( key, val, error );
 	} // end of if (*argv)[0]  == '-'
       else
 	{
