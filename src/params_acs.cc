@@ -22,7 +22,7 @@
 /* params_acs.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-15
+   changed by: Oliver Cordes 2016-06-16
 
    $Id: params_acs.cc 970 2016-02-29 16:27:14Z ocordes $
 
@@ -53,6 +53,7 @@ void params_acs::parse_args( std::string key, std::string val, int & error )
     {
       single_fits = atoi( val.c_str() );
       output( 10, "params: single_fits=%i\n", single_fits );
+      error = PARSE_OK;
       return;
     }
 

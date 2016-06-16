@@ -107,30 +107,39 @@ void params::load_config( std::string filename )
   if ( f.is_open() )
     {
       while ( getline(f, s) )
-	{
-	  // ignore empty lines and comments
-	  if ( ( s == "" ) || ( s[0] == '#' ) )
-	    {
-	      continue;
-	    }
+	     {
+	        // ignore empty lines and comments
+	        if ( ( s == "" ) || ( s[0] == '#' ) ) {
+	           continue;
+	        }
 
-	  // clean spaces
-	  s = s.clean_white();
+	        // clean spaces
+	        s = s.clean_white();
 
-	  //std::cout << s << std::endl;
+	        //std::cout << s << std::endl;
 
-	  std::CString key = s.strtok( true, "=#" );
-	  std::CString val = s.strtok( false, "=#" );
+	        std::CString key = s.strtok( true, "=#" );
+	        std::CString val = s.strtok( false, "=#" );
 
-	  // convert key into upper cases
-	  key = key.toupper();
+	        // convert key into upper cases
+	        key = key.toupper();
 
-	  //std::cout << "key=" << key << " val=" << val << std::endl;
+	        //std::cout << "key=" << key << " val=" << val << std::endl;
 
-    error = PARSE_OK;
-	  parse_args( key, val, error );
-	}
-      f.close();
+          error = PARSE_ERROR;
+	        parse_args( key, val, error );
+          switch (error) {
+            case PARSE_OK:
+              break;
+            case PARSE_UNKNOWN:
+              std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
+              break;
+            case PARSE_ERROR:
+              std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
+              break;
+          }
+        }
+	  f.close();
     }
   else
     std::cout << "Can't open config file '" << filename << "'! Config file will be ignored!" << std::endl;
@@ -215,8 +224,18 @@ void params::set_args( int *argc, char **argv[]  )
 	  // convert key into upper cases
 	  key = key.toupper();
 
-    error = PARSE_OK;
-	  parse_args( key, val, error );
+    error = PARSE_ERROR;
+    parse_args( key, val, error );
+    switch (error) {
+      case PARSE_OK:
+        break;
+      case PARSE_UNKNOWN:
+        std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
+        break;
+      case PARSE_ERROR:
+        std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
+        break;
+    }
 	} // end of if (*argv)[0]  == '-'
       else
 	{

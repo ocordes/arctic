@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-15
+   changed by: Oliver Cordes 2016-06-16
 
    $Id: params.hh 975 2016-03-09 13:08:56Z ocordes $
 
@@ -52,7 +52,7 @@
 
 #define PARSE_OK            0
 #define PARSE_UNKNOWN       1
-#define PARSE_ERROR         2
+#define PARSE_ERROR         100
 
 
 // Defines a real type for images

@@ -56,6 +56,8 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 
       if ( xrange[0] < 0 )
         xrange[0] = 0;
+
+      error = PARSE_OK;
       return;
     }
   if ( key == "YRANGE" )
@@ -69,30 +71,36 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 
       if ( yrange[0] < 0 )
         yrange[0] = 0;
+
+      error = PARSE_OK;
       return;
     }
   if ( key == "WELL_DEPTH" )
     {
       well_depth = atof( val.c_str() );
       output( 10, "params: well_depth=%f\n", well_depth );
+      error = PARSE_OK;
       return;
     }
   if ( key == "WELL_NOTCH_DEPTH" )
     {
       well_notch_depth = atof( val.c_str() );
       output( 10, "params: well_notch_depth=%e\n", well_notch_depth );
+      error = PARSE_OK;
       return;
     }
   if ( key == "WELL_FILL_POWER" )
     {
       well_fill_power = atof( val.c_str() );
       output( 10, "params: well_fill_power=%f\n", well_fill_power );
+      error = PARSE_OK;
       return;
     }
   if ( key == "EMPTY_TRAP_LIMIT" )
     {
       empty_trap_limit = atof( val.c_str() );
       output( 10, "params: empty_trap_limit=%f\n", empty_trap_limit );
+      error = PARSE_OK;
       return;
     }
   if ( key == "CHECK_EMPTY_TRAPS" )
@@ -100,10 +108,11 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
+	       b = tobool( val );
       check_empty_traps = b;
 
       output( 10, "params: check_empty_traps=%i\n", check_empty_traps );
+      error = PARSE_OK;
       return;
     }
 
@@ -112,18 +121,21 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
     {
       n_iterations = atoi( val.c_str() );
       output( 10, "params: n_iterations=%i\n", n_iterations );
+      error = PARSE_OK;
       return;
     }
   if ( key == "EXPRESS" )
     {
       express = atoi( val.c_str() );
       output( 10, "params: express=%i\n", express );
+      error = PARSE_OK;
       return;
     }
   if ( key == "N_LEVELS" )
     {
       n_levels = atoi( val.c_str() );
       output( 10, "params: n_levels=%i\n", n_levels );
+      error = PARSE_OK;
       return;
     }
   if ( key == "UNCLOCK" )
@@ -131,10 +143,11 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
+	     b = tobool( val );
 
       unclock = b;
       output( 10, "params: unclock=%i\n", unclock );
+      error = PARSE_OK;
       return;
     }
   if ( key == "DARK_MODE" )
@@ -142,22 +155,25 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
+	       b = tobool( val );
 
       dark_mode = b;
       output( 10, "params: dark_mode=%i\n", dark_mode );
+      error = PARSE_OK;
       return;
     }
   if ( key == "READOUT_OFFSET" )
     {
       readout_offset = atoi( val.c_str() );
       output( 10, "params: readout_offset=%i\n", readout_offset );
+      error = PARSE_OK;
       return;
     }
   if ( key == "N_SPECIES" )
     {
       n_species = atoi( val.c_str() );
       output( 10, "params: n_species=%i\n", n_species );
+      error = PARSE_OK;
       return;
     }
   if ( key == "TRAP_DENSITY" )
@@ -166,6 +182,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       trap_density = str2array( val );
       output( 10, "params: trap_density=\n" );
       for (unsigned int n=0;n<trap_density.size();n++) output( 10, "   %f\n", trap_density[n] );
+      error = PARSE_OK;
       return;
     }
   if ( key == "TRAP_LIFETIME" )
@@ -174,6 +191,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       trap_lifetime = str2array( val );
       output( 10, "params: trap_lifetime=\n" );
       for (unsigned int n=0;n<trap_lifetime.size();n++) output( 10, "   %f\n", trap_lifetime[n] );
+      error = PARSE_OK;
       return;
     }
   if ( key == "CLASSIC" )
@@ -181,21 +199,22 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
+	       b = tobool( val );
 
       if ( b )
-	{
-	  neo_algorithm = false;
-	  neo_algorithm2 = false;
-	}
+	    {
+	        neo_algorithm = false;
+	        neo_algorithm2 = false;
+	    }
       else
-	{
-	  neo_algorithm = true;
-	  neo_algorithm2 = false;
-	}
+     	{
+	       neo_algorithm = true;
+	        neo_algorithm2 = false;
+	    }
 
       output( 10, "params: classic_algorithm=%i\n", b );
       output( 10, "params: neo_algorithm=%i\n", neo_algorithm );
+      error = PARSE_OK;
       return;
     }
   if ( key == "NEO" )
@@ -211,6 +230,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 	  neo_algorithm2 = false;
 
       output( 10, "params: neo_algorithm=%i\n", neo_algorithm );
+      error = PARSE_OK;
       return;
     }
   if ( key == "NEO2" )
@@ -226,6 +246,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 	  neo_algorithm = false;
 
       output( 10, "params: neo_algorithm2=%i\n", neo_algorithm2 );
+      error = PARSE_OK;
       return;
     }
   if ( key == "CUT_UPPER_LIMIT" )
@@ -237,6 +258,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 
       cut_upper_limit = b;
       output( 10, "params: cut_upper_limit=%i\n", cut_upper_limit );
+      error = PARSE_OK;
       return;
     }
 
@@ -244,8 +266,39 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
     {
       upper_limit = atof( val.c_str() );
       output( 10, "params: upper_limit=%f\n", upper_limit );
+      error = PARSE_OK;
       return;
     }
+  if ( key == "ROTATE" )
+  {
+    rotate = image_readout_y;
+    error = PARSE_OK;
+    return;
+  }
+  if ( key == "READOUT_X" )
+  {
+    rotate = image_readout_x;
+    error = PARSE_OK;
+    return;
+  }
+  if ( key == "READOUT_Y" )
+  {
+    rotate = image_readout_y;
+    error = PARSE_OK;
+    return;
+  }
+  if ( key == "FORWARD" )
+  {
+    direction = image_forward;
+    error = PARSE_OK;
+    return;
+  }
+  if ( key == "REVERSE" )
+  {
+    direction = image_reverse;
+    error = PARSE_OK;
+    return;
+  }
 
 }
 
