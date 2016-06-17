@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-15
+   changed by: Oliver Cordes 2016-06-17
 
    $Id: params_fits.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -138,6 +138,13 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       error = PARSE_OK;
       return;
     }
+  if ( key == "CLOCK" )
+  {
+    unclock = false;
+    output( 10, "params: clock=true -> unclock=%i\n", unclock );
+    error = PARSE_OK;
+    return;
+  }
   if ( key == "UNCLOCK" )
     {
       bool b = true;

@@ -22,7 +22,7 @@
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-14
+   changed by: Oliver Cordes 2016-06-17
 
 
    $Id: cte_image.cc 999 2016-05-10 13:14:31Z ocordes $
@@ -35,6 +35,7 @@
 #include <iomanip>
 
 #include "cte_image.hh"
+#include "image_slice.hh"
 #include "output.hh"
 #include "params.hh"
 
@@ -908,6 +909,13 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   int cheight2;
 
 
+  // image slicer definitions
+  std::image_slice is( image_width,
+                        image_height,
+                        readout_offset,
+                        image_readout_y,
+                        image_forward );
+
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
@@ -928,7 +936,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 	  //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
 	  //trapl_fill = std::valarray<int> ( 0, n_levels );
 
-
+          is.reset( i_column ); // initialize the image slicer
 
           for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
             {
@@ -943,7 +951,11 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 	      if ( express_factor_pixel != 0 )
                 {
                   // extract pixel
-                  im = image[((i_pixel+start_y)*image_width)+i_column];
+                  //im = image[((i_pixel+start_y)*image_width)+i_column];
+                  im = image[ (*is) ];
+                  //double im2 = image[(*is)];
+                  //output( 10, "im=%f im2=%f\n", im, im2 );
+                  //output( 10, "is=%i\n", (*is) );
                   if ( im > well_depth )
                     im = well_depth;
                   if ( im < 0.0 )
@@ -1426,7 +1438,10 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 		  output( 10, "strail: %.10f\n", trail );
 		  #endif
 		  trail *= express_factor_pixel;
-		  image[((i_pixel+start_y)*image_width)+i_column] += trail;
+		  //image[((i_pixel+start_y)*image_width)+i_column] += trail;
+      image[(*is)] += trail;
+      // next image element
+      is++;
 
 		  #ifdef __debug
 		  output( 10, "ptrail: %.10f\n", trail );
@@ -2031,16 +2046,16 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
   if (  xrange.size() >= 2 )
     {
       if ( xrange[0] < 0 )
-	xrange[0] = 0;
+	       xrange[0] = 0;
       if ( xrange[1] > image_width )
-	xrange[1] = image_width;
+	       xrange[1] = image_width;
     }
   if (  yrange.size() >= 2 )
     {
       if ( yrange[0] < 0 )
-	yrange[0] = 0;
+	       yrange[0] = 0;
       if ( yrange[1] > image_height )
-	yrange[1] = image_height;
+	       yrange[1] = image_height;
     }
 
 
@@ -2048,47 +2063,47 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
     {
       // unclocking mode
       for (unsigned int iteration=0;iteration<parameters->n_iterations;iteration++)
-	{
-	  output( 1, "Iteration %i/%i\n", iteration+1, parameters->n_iterations );
+	       {
+	          output( 1, "Iteration %i/%i\n", iteration+1, parameters->n_iterations );
 
-	  //if ( have_negative_values( model, naxes[0], naxes[1] ) == 1 )
-          //  output( 1, "Image contains negative pixels!\n" );
+	          //if ( have_negative_values( model, naxes[0], naxes[1] ) == 1 )
+            //  output( 1, "Image contains negative pixels!\n" );
 
-          //model_readout = copy_image( (char*)model, naxes[0], naxes[1], DOUBLE_IMG );
+            //model_readout = copy_image( (char*)model, naxes[0], naxes[1], DOUBLE_IMG );
 
-	  // image holds now the original image + trail
+	          // image holds now the original image + trail
 
-	  trail = image;
-	  if (parameters->neo_algorithm2 == true )
-	    clock_charge_image_neo2( trail, xrange, yrange );
-	  else
-	    {
-	      if (parameters->neo_algorithm == true )
-		clock_charge_image_neo( trail, xrange, yrange );
-	      else
-		clock_charge_image( trail, xrange, yrange );
-	    }
+	          trail = image;
+	          if (parameters->neo_algorithm2 == true )
+	             clock_charge_image_neo2( trail, xrange, yrange );
+	          else
+	          {
+	             if (parameters->neo_algorithm == true )
+		              clock_charge_image_neo( trail, xrange, yrange );
+	             else
+		              clock_charge_image( trail, xrange, yrange );
+	          }
 
 
-	  // do some statistics after work
-          output( 1, "Minmax(old image): %f %f\n", image.min(), image.max() );
+	          // do some statistics after work
+            output( 1, "Minmax(old image): %f %f\n", image.min(), image.max() );
 
-          // sub the trail
-	  image -= trail;
-	  image += (*im);
+            // sub the trail
+	          image -= trail;
+	          image += (*im);
 
-	  //for (unsigned int i=0;i<image.size();i++)
-	  //  trail[i] = 0.0;
+	          //for (unsigned int i=0;i<image.size();i++)
+	          //  trail[i] = 0.0;
 
-	  // limit_to_max
-          //limit_to_max( image, (65536.-3) );
+	          // limit_to_max
+            //limit_to_max( image, (65536.-3) );
 
-	  if ( parameters->cut_upper_limit == true )
-	    limit_to_max( image, parameters->upper_limit );
+	          if ( parameters->cut_upper_limit == true )
+	             limit_to_max( image, parameters->upper_limit );
 
-          output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
+            output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
 
-	}
+	         }
     }
   else
     {
