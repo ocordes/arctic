@@ -22,7 +22,7 @@
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-17
+   changed by: Oliver Cordes 2016-06-27
 
 
    $Id: cte_image.cc 999 2016-05-10 13:14:31Z ocordes $
@@ -64,6 +64,10 @@ cte_image::cte_image( std::shared_ptr<params> p )
   // initialize variables
   check_empty_traps = parameters->check_empty_traps;
   empty_trap_limit = parameters->empty_trap_limit;
+
+  rotate = parameters->rotate;
+  direction = parameters->direction;
+
 
 
   // print model information
@@ -275,7 +279,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   if ( xrange.size() <  2 )
     {
       start_x = 0;
-      end_x = image_width;
+      end_x = width;
     }
   else
     {
@@ -286,7 +290,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   if ( yrange.size() < 2 )
     {
       start_y = 0;
-      end_y = image_height;
+      end_y = height;
     }
   else
     {
@@ -331,11 +335,11 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   /* new code with variable express */
 
   output( 10, "Create express_multiplier...\n" );
-  std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (image_height+1 ) );
+  std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
   int p_express_multiplier = 0;
   int express_factor_pixel = 0;
 
-  for (i_pixel=0;i_pixel<image_height+1;i_pixel++)
+  for (i_pixel=0;i_pixel<height+1;i_pixel++)
     {
       int d;
       int d2;
@@ -344,14 +348,14 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
         {
           int pos;
           d = ( i_pixel + 1 + readout_offset);
-          d2= ((image_height+1+readout_offset)*(i_express+1))/express;
+          d2= ((height+1+readout_offset)*(i_express+1))/express;
           if ( d > d2 )
             d = d2;
 
           d -= i_sum;
           i_sum += d;
 
-          pos = (i_express*(image_height+1))+i_pixel;
+          pos = (i_express*(height+1))+i_pixel;
           express_multiplier[pos] = d;
         }
      }
@@ -389,6 +393,13 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   output( 10, "Done.\n" );
 
 
+  // image slicer definitions
+  std::image_slice is( image_width,
+                          image_height,
+                          0,
+                          rotate,
+                          direction );
+
   output( 10, "Start CTE calculations ...\n" );
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
@@ -412,6 +423,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
           stat_count = 0;
 
+          is.reset( i_column ); // initialize the image slicer
 
           for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
             {
@@ -425,7 +437,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
               if ( express_factor_pixel != 0 )
                 {
                   // extract pixel
-                  im = image[((i_pixel+start_y)*image_width)+i_column];
+                  //im = image[((i_pixel+start_y)*image_width)+i_column];
+                  im = image[ (*is) ];
                   if ( im > well_depth )
                     im = well_depth;
                   if ( im < 0.0 )
@@ -681,7 +694,10 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 		  output( 10, "strail: %.10f\n", trail );
 		  #endif
 		  trail *= express_factor_pixel;
-		  image[((i_pixel+start_y)*image_width)+i_column] += trail;
+		  //image[((i_pixel+start_y)*image_width)+i_column] += trail;
+      image[(*is)] += trail;
+      // next image element
+      is++;
 
 		  #ifdef __debug
 		  output( 10, "ptrail: %.10f\n", trail );
@@ -689,7 +705,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
                 } /* end of p_express_multiplier[i_pixel] != 0 */
             } /* i_pixel loop for the trail */
-          p_express_multiplier += image_height +1;
+          p_express_multiplier += height +1;
         }  /* end of express loop */
 
       /* time measurement */
@@ -783,7 +799,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   if ( xrange.size() <  2 )
     {
       start_x = 0;
-      end_x = image_width;
+      end_x = width;
     }
   else
     {
@@ -794,7 +810,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   if ( yrange.size() < 2 )
     {
       start_y = 0;
-      end_y = image_height;
+      end_y = height;
     }
   else
     {
@@ -842,13 +858,13 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   well_range = well_depth - well_notch_depth;
 
   // new code with variable express
-  std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (image_height+1 ) );
+  std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
   int p_express_multiplier = 0;
   int express_factor_pixel = 0;
 
   output( 10, "Create express_multiplier...\n" );
   // setup of the express array
-  for (i_pixel=0;i_pixel<image_height+1;i_pixel++)
+  for (i_pixel=0;i_pixel<height+1;i_pixel++)
     {
       int d;
       int d2;
@@ -857,14 +873,14 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
         {
           int pos;
           d = ( i_pixel + 1 + readout_offset);
-	  d2= ((image_height+1+readout_offset)*(i_express+1))/express;
+	        d2 = ((height+1+readout_offset)*(i_express+1))/express;
           if ( d > d2 )
             d = d2;
 
           d -= i_sum;
           i_sum += d;
 
-          pos = (i_express*(image_height+1))+i_pixel;
+          pos = (i_express*(height+1))+i_pixel;
           express_multiplier[pos] = d;
         }
      }
@@ -912,9 +928,9 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   // image slicer definitions
   std::image_slice is( image_width,
                         image_height,
-                        readout_offset,
-                        image_readout_y,
-                        image_forward );
+                        0,
+                        rotate,
+                        direction );
 
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
@@ -1449,7 +1465,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 
                 } /* end of p_express_multiplier[i_pixel] != 0 */
             } /* i_pixel loop for the trail */
-          p_express_multiplier += image_height +1;
+          p_express_multiplier += height +1;
         }  /* end of express loop */
 
       //#ifdef __debug
@@ -2032,8 +2048,23 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 {
   output( 11, "cte_image::clock_charge\n" );
 
-  image_width  = w;
+
+  // sets the image parameters according to the rotation paramater
+
+  image_width = w;
   image_height = h;
+
+  if ( rotate == image_readout_y )
+  {
+    width  = w;
+    height = h;
+  }
+  else
+  {
+    // the image is rotated
+    width = h;
+    height = w;
+  }
 
 
   // make a local copy of the image data
@@ -2047,15 +2078,15 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
     {
       if ( xrange[0] < 0 )
 	       xrange[0] = 0;
-      if ( xrange[1] > image_width )
-	       xrange[1] = image_width;
+      if ( xrange[1] > width )
+	       xrange[1] = width;
     }
   if (  yrange.size() >= 2 )
     {
       if ( yrange[0] < 0 )
 	       yrange[0] = 0;
-      if ( yrange[1] > image_height )
-	       yrange[1] = image_height;
+      if ( yrange[1] > height )
+	       yrange[1] = height;
     }
 
 

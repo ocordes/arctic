@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-03-08
+   changed by: Oliver Cordes 2016-06-27
 
    $Id: cte_image.hh 975 2016-03-09 13:08:56Z ocordes $
 
@@ -75,8 +75,12 @@ protected:
 
   long                                 image_width;
   long                                 image_height;
+  long                                 width;
+  long                                 height;
 
-  
+  bool                                 rotate;
+  bool                                 direction;
+
   // extern declarated variables
   bool                                 check_empty_traps;
   double                               empty_trap_limit;

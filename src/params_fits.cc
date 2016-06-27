@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-17
+   changed by: Oliver Cordes 2016-06-27
 
    $Id: params_fits.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -278,31 +278,39 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
     }
   if ( key == "ROTATE" )
   {
-    rotate = image_readout_y;
+    rotate = ~rotate;
+    if ( rotate == image_readout_y )
+      output( 10, "params: readout_y selected\n" );
+    else
+      output( 10, "params: readout_x selected\n" );
     error = PARSE_OK;
     return;
   }
   if ( key == "READOUT_X" )
   {
     rotate = image_readout_x;
+    output( 10, "params: readout_x selected\n" );
     error = PARSE_OK;
     return;
   }
   if ( key == "READOUT_Y" )
   {
     rotate = image_readout_y;
+    output( 10, "params: readout_y selected\n" );
     error = PARSE_OK;
     return;
   }
   if ( key == "FORWARD" )
   {
     direction = image_forward;
+    output( 10, "params: readout_forward selected\n" );
     error = PARSE_OK;
     return;
   }
   if ( key == "REVERSE" )
   {
     direction = image_reverse;
+    output( 10, "params: readout_reverse selected\n" );
     error = PARSE_OK;
     return;
   }
