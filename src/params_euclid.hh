@@ -46,6 +46,8 @@ class params_euclid : public params_fits {
 private:
   bool        has_local_n_species;
   bool        has_local_trap_density;
+  
+  int         ccd;
 public:
   params_euclid() : params_fits() {};
 

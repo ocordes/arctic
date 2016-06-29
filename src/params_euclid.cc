@@ -28,6 +28,7 @@
 
 */
 
+#include <cstdlib>
 
 #include "output.hh"
 #include "params_fits.hh"
@@ -70,11 +71,26 @@ void params_euclid::parse_args( std::string key, std::string val, int & error )
   output( 11, "params_euclid::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
   params_fits::parse_args( key, val, error );
 
+  if ( key == "CCD" )
+    {
+      ccd = atoi( val.c_str() );
+      output( 10, "params: ccd=%i\n", ccd );
+      error = PARSE_OK;
+      return;
+    }
+
+
   if ( key == "N_SPECIES" )
+  {
     has_local_n_species = true;
+    return;
+  }
 
   if ( key == "TRAP_DENSITY" )
+  {
     has_local_trap_density = true;
+    return;
+  }
 }
 
 

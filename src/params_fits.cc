@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-27
+   changed by: Oliver Cordes 2016-06-29
 
    $Id: params_fits.cc 975 2016-03-09 13:08:56Z ocordes $
 
@@ -286,14 +286,14 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
     error = PARSE_OK;
     return;
   }
-  if ( key == "READOUT_X" )
+  if ( ( key == "READOUT_X" ) || ( key == "SERIAL") )
   {
     rotate = image_readout_x;
     output( 10, "params: readout_x selected\n" );
     error = PARSE_OK;
     return;
   }
-  if ( key == "READOUT_Y" )
+  if ( ( key == "READOUT_Y" ) || ( key == "PARALLEL") )
   {
     rotate = image_readout_y;
     output( 10, "params: readout_y selected\n" );
