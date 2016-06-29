@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,7 +15,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -48,7 +48,7 @@
 int main( int argc, char *argv[])
 {
   std::cout << argv[0] << " Version " << VERSION << " build " << BUILD << std::endl;
-  
+
   // parse for debug parameter and inititialize the debug/output module
   debug_init( argc, argv );
 
@@ -59,7 +59,7 @@ int main( int argc, char *argv[])
   // params parameters( &argc, &argv );
 
   image *im = NULL;
-  
+
   try {
     std::cout << "Working in ";
     switch( working_mode )
@@ -93,7 +93,7 @@ int main( int argc, char *argv[])
       std::cerr << "Program aborted!" <<  std::endl;
       exit( 1 );
     }
-
+  
   if ( im->clock_charge() == 0 )
     {
       // save file only of the CTE correction was run sccessfully
@@ -104,5 +104,5 @@ int main( int argc, char *argv[])
   // free image
   delete im;
 
-  return 0; 
+  return 0;
 }

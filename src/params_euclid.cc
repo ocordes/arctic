@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-15
+   changed by: Oliver Cordes 2016-06-29
 
    $Id: params_euclid.cc 803 2015-06-23 12:56:45Z ocordes $
 
@@ -35,11 +35,46 @@
 #include "strstr.hh"
 
 
+void params_euclid::set_args( int *argc, char **argv[]  )
+{
+  output( 1, "params:euclid::set_args called\n" );
+
+  params_fits::set_args( argc, argv );
+
+  // put in here the code for reading the euclid mission database
+
+  // load_global_mission_database();
+  // load_local_mission_database();
+
+  // copy pnly data from thw database is necessary
+  if ( has_local_n_species == true)
+  {
+    output( 10, "Using local n_species ...\n" );
+  }
+  else
+  {
+    // copy data from mission database
+  }
+  if ( has_local_trap_density == true)
+  {
+    output( 10, "Using local trap_density ...\n" );
+  }
+  else
+  {
+    // copy data from mission database
+  }
+}
 
 void params_euclid::parse_args( std::string key, std::string val, int & error )
 {
   output( 11, "params_euclid::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
   params_fits::parse_args( key, val, error );
+
+  if ( key == "N_SPECIES" )
+    has_local_n_species = true;
+
+  if ( key == "TRAP_DENSITY" )
+    has_local_trap_density = true;
 }
 
 
