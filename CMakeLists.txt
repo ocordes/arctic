@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
-set(VERSION 1.3.0-git)
+set(VERSION 1.3.0)
 
 # get current date
 execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
