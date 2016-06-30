@@ -22,7 +22,7 @@
 /* param_euclid.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-29
+   changed by: Oliver Cordes 2016-06-30
 
    $Id: params_euclid.hh 807 2015-06-24 13:37:37Z ocordes $
 
@@ -46,10 +46,10 @@ class params_euclid : public params_fits {
 private:
   bool        has_local_n_species;
   bool        has_local_trap_density;
-  
+
   int         ccd;
 public:
-  params_euclid() : params_fits() {};
+  params_euclid();
 
   void set_args( int *argc, char **argv[]  );
   virtual void parse_args( std::string key, std::string val, int & error );

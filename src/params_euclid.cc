@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-29
+   changed by: Oliver Cordes 2016-06-30
 
    $Id: params_euclid.cc 803 2015-06-23 12:56:45Z ocordes $
 
@@ -34,6 +34,13 @@
 #include "params_fits.hh"
 #include "params_euclid.hh"
 #include "strstr.hh"
+
+
+params_euclid::params_euclid() : params_fits()
+{
+  has_local_n_species    = false;
+  has_local_trap_density = false;
+}
 
 
 void params_euclid::set_args( int *argc, char **argv[]  )
