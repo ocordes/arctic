@@ -1,4 +1,4 @@
-/* (C) Copyright 2013 by Oliver Cordes         
+/* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>. 
+    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* image_fits.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2015-12-02
+   changed by: Oliver Cordes 2016-07-04
 
    $Id: image_fits.hh 917 2015-12-02 10:00:30Z ocordes $
 
@@ -42,27 +42,14 @@
 
 using namespace CCfits;
 
-// Defines the simple FITS image class 
+// Defines the simple FITS image class
 
 
 class fits_image : public image{
 public:
   fits_image( int argc, char *argv[] );
   virtual ~fits_image();
-  virtual int  read_file( void );
-  virtual void write_file( void );
   virtual int  clock_charge( void );
-private:
-  std::shared_ptr<params_fits>           parameters;
-  std::string                            infilename;
-  std::string                            outfilename;
-
-  std::unique_ptr<FITS>                  FITS_image;
-
-  std::shared_ptr<std::valarray<double>> image_data;
-  
-    long                                 image_width;
-  long                                   image_height;
 };
 
 
