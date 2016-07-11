@@ -390,6 +390,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
   std::valarray<double> traps(0.0, n_species * n_levels );
 
+  std::valarray<double> pot_capture( 0.0, n_species );
+
   output( 10, "Done.\n" );
 
 
@@ -539,176 +541,167 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
 
 
-                      // calculate the number of electrons which can be captured
+                  // calculate the number of electrons which can be captured
 
-                      // opti
-                      double trap_sum = 0.0;
-		      for (i=0;i<n_species*(cheight-1);i++)
-                        trap_sum += traps[i];
+                  // opti
+                  double trap_sum = 0.0;
+		              for (i=0;i<n_species*(cheight-1);i++)
+                    trap_sum += traps[i];
 
-		      #ifdef __debug
-		      output( 10, "debug:  %i\n", i_pixel );
-		      double sum2 = n_electrons_per_trap_total * dheight - trap_sum;
-		      double sum3 = trap_sum;
-		      #endif
+		              #ifdef __debug
+		              output( 10, "debug:  %i\n", i_pixel );
+		              double sum2 = n_electrons_per_trap_total * dheight - trap_sum;
+		              double sum3 = trap_sum;
+		              #endif
 
-		      sum = (n_electrons_per_trap_total*(cheight-1))
-                        //- get_sum_double_array( traps, cheight-1, n_species );
-			- trap_sum;
-                      d = dheight - (cheight-1);
+		              sum = (n_electrons_per_trap_total*(cheight-1))
+                  //- get_sum_double_array( traps, cheight-1, n_species );
+			               - trap_sum;
+                  d = dheight - (cheight-1);
+                  for (j=0;j<n_species;j++)
+                    {
+                      double c = 0.0;
+                      int pos = (cheight-1)*n_species+j;
+			                c = n_electrons_per_trap[j] * d - traps[pos];
+			                #ifdef __debug
+			                sum2 -= traps[pos];
+			                sum3 += traps[pos];
+			                #endif
+                      if ( c > 0.0 )
+                        sum += c;
+                    }
+                  total_capture = sum;
+
+		              // look which method is best and fastest
+		              //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n", sum, sum2, trap_sum, n_electrons_per_trap_total_express * dheight, sum3 );
+
+
+		              for (i=cheight;i<n_levels_traps;i++)
+			               for (j=0;j<n_species;j++)
+			                  {
+			                    int pos = (i*n_species)+j;
+			                    pot_capture[j] += n_electrons_per_trap[j] - traps[pos];
+			                  }
+
+		              #ifdef __debug
+		              output( 10, "ntrap_total : %.15f\n", traps.sum() );
+
+		              print_traps( traps, n_species, n_levels_traps );
+		              output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
+		              output( 10, "cheight,ch-1: %i %i\n", cheight, cheight-1 );
+		              output( 10, "max_capture : %.15f\n", total_capture );
+		              output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n", pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
+		              #endif
+
+                  if ( total_capture < 1e-14 )
+                    total_capture = 1e-14;
+
+
+                  d = freec / total_capture;
+                  double ov = dheight - (cheight-1);
+                  if ( d < 1.0 )
+                    {
+			                #ifdef __debug
+			                output( 10, "d < 1.0\n" );
+                      #endif
+
+                      // less electrons than required for capturing process
+                      for (i=0;i<cheight-1;i++)
+                        for (j=0;j<n_species;j++)
+                          {
+                            int pos = (i*n_species)+j;
+
+                            double c = ( n_electrons_per_trap[j] - traps[pos] ) * d;
+                            traps[pos] += c;
+                          }
+
                       for (j=0;j<n_species;j++)
-                        {
-                          double c = 0.0;
+			                  {
                           int pos = (cheight-1)*n_species+j;
-			  c = n_electrons_per_trap[j] * d - traps[pos];
-			  #ifdef __debug
-			  sum2 -= traps[pos];
-			  sum3 += traps[pos];
-			  #endif
-                          if ( c > 0.0 )
-                            sum += c;
-                        }
-                      total_capture = sum;
 
-		      // look which method is best and fastest
-		      //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n", sum, sum2, trap_sum, n_electrons_per_trap_total_express * dheight, sum3 );
-
-
-		      std::valarray<double> pot_capture( 0.0, n_species );
-		      for (i=cheight;i<n_levels_traps;i++)
-			for (j=0;j<n_species;j++)
-			  {
-			    int pos = (i*n_species)+j;
-			    pot_capture[j] += n_electrons_per_trap[j] - traps[pos];
-			  }
-
-		      #ifdef __debug
-		      output( 10, "ntrap_total : %.15f\n", traps.sum() );
-
-		      print_traps( traps, n_species, n_levels_traps );
-		      output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
-		      output( 10, "cheight,ch-1: %i %i\n", cheight, cheight-1 );
-		      output( 10, "max_capture : %.15f\n", total_capture );
-		      output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n", pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
-		      #endif
-
-                      if ( total_capture < 1e-14 )
-                        total_capture = 1e-14;
-
-
-                      d = freec / total_capture;
-                      double ov = dheight - (cheight-1);
-                      if ( d < 1.0 )
-                        {
-			  #ifdef __debug
-			  output( 10, "d < 1.0\n" );
-			  #endif
-                          // less electrons than required for capturing process
-                          for (i=0;i<cheight-1;i++)
-                            for (j=0;j<n_species;j++)
-                              {
-                                int pos = (i*n_species)+j;
-
-                                double c = ( n_electrons_per_trap[j] - traps[pos] ) * d;
-                                traps[pos] += c;
-                              }
-
-                          for (j=0;j<n_species;j++)
-			    {
-                              int pos = (cheight-1)*n_species+j;
-
-                              if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
-                                {
-                                  double c = ( ( n_electrons_per_trap[j] * ov ) - traps[pos] ) * d;
-                                  traps[pos] += c;
-                                }
-                            }
-                          total_capture *= d;
-                        }
-                      else
-                        {
-                          // more electrons than required for capturing process
-                          // -> fill all traps to the max
-                          for (i=0;i<cheight-1;i++)
-                            for (j=0;j<n_species;j++)
-                              {
-                                int pos = (i*n_species)+j;
-                                traps[pos] = n_electrons_per_trap[j];
-			      }
-
-                          for (j=0;j<n_species;j++)
+                          if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
                             {
-                              int pos = (cheight-1)*n_species+j;
-                              if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
-                                  traps[pos] = ( n_electrons_per_trap[j] * ov );
+                              double c = ( ( n_electrons_per_trap[j] * ov ) - traps[pos] ) * d;
+                              traps[pos] += c;
                             }
                         }
+                      total_capture *= d;
+                    }
+                  else
+                    {
+                      int pos;
+                      // more electrons than required for capturing process
+                      // -> fill all traps to the max
+
+                      for (i=0;i<cheight-1;i++)
+                        for (j=0;j<n_species;j++)
+                          {
+                            pos = (i*n_species)+j;
+                            traps[pos] = n_electrons_per_trap[j];
+			                    }
+
+                       for (j=0;j<n_species;++j)
+                          {
+                            pos = (cheight-1)*n_species+j;
+                            if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
+                              traps[pos] = ( n_electrons_per_trap[j] * ov );
+                          }
+                    }
 
 
-                      if ( cheight > n_levels_traps )
-                        n_levels_traps = cheight;
+                  if ( cheight > n_levels_traps )
+                    n_levels_traps = cheight;
 
-		      #ifdef __debug
-		      output( 10, "ntrap_fill  : %i\n", n_levels_traps );
-		      output( 10, "ntrap_total : %f\n", traps.sum() );
+		              #ifdef __debug
+		              output( 10, "ntrap_fill  : %i\n", n_levels_traps );
+		              output( 10, "ntrap_total : %f\n", traps.sum() );
 
-		      output( 10, "n_e_p_t     : %f %f %f = %f\n",
-			       n_electrons_per_trap[0],
-			       n_electrons_per_trap[1],
-			       n_electrons_per_trap[2], n_electrons_per_trap_total );
+		              output( 10, "n_e_p_t     : %f %f %f = %f\n",
+			               n_electrons_per_trap[0],
+			               n_electrons_per_trap[1],
+			               n_electrons_per_trap[2], n_electrons_per_trap_total );
 
 
-		      std::valarray<double> pot_capture2( 0.0, n_species );
-		      for (i=cheight;i<n_levels_traps;i++)
-			for (j=0;j<n_species;j++)
-			  {
-			    int pos = (i*n_species)+j;
-			    pot_capture2[j] += n_electrons_per_trap[j] - traps[pos];
-			  }
-		      output( 10, "pot_capture2: %f %f %f = %f\n", pot_capture2[0], pot_capture2[1], pot_capture2[2], pot_capture2.sum() );
+		              std::valarray<double> pot_capture2( 0.0, n_species );
+		              for (i=cheight;i<n_levels_traps;i++)
+			              for (j=0;j<n_species;j++)
+			                {
+			                  int pos = (i*n_species)+j;
+			                  pot_capture2[j] += n_electrons_per_trap[j] - traps[pos];
+			                }
+		              output( 10, "pot_capture2: %f %f %f = %f\n", pot_capture2[0], pot_capture2[1], pot_capture2[2], pot_capture2.sum() );
 
-		      print_traps( traps, n_species, n_levels_traps+1 );
-		      #endif
+		              print_traps( traps, n_species, n_levels_traps+1 );
+		              #endif
 
-                      // delete the captured exlectrons from
-                      //   the pixel value
-                      freec -= total_capture;
+                  // delete the captured exlectrons from
+                  //   the pixel value
+                  freec -= total_capture;
 
-                    } /* end of if ( freec > well_notch_depth ) */
+              } /* end of if ( freec > well_notch_depth ) */
 
-                  //#ifdef __debug
-                  //if ( i_pixel == debug_pixel )
-                  //  output( 1, "%i ", p_express_multiplier[i_pixel] );
-                  //#endif
 
-                  /* add the trail for i_pixel */
+		          double trail =  ( freec - im );
+		          #ifdef __debug
+		          output( 10, "strail: %.10f\n", trail );
+		          #endif
+		          trail *= express_factor_pixel;
+		          //image[((i_pixel+start_y)*image_width)+i_column] += trail;
 
-                  //(*image_data)[((i_pixel+start_y)*image_width)+i_column] += ( freec - im );
+              image[(*is)] += trail;
+              // next image element
 
-                  // save only the trail ...
-		  //image[((i_pixel+start_y)*image_width)+i_column] += ( freec - im ) * express_factor_pixel;
-		  //image[((i_pixel+start_y)*image_width)+i_column] += ( freec - im );
+              //output( 10, "i_pixel=%4i is=%7i pos=%7i\n", i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
 
-		  double trail =  ( freec - im );
-		  #ifdef __debug
-		  output( 10, "strail: %.10f\n", trail );
-		  #endif
-		  trail *= express_factor_pixel;
-		  //image[((i_pixel+start_y)*image_width)+i_column] += trail;
-      image[(*is)] += trail;
-      // next image element
+		          #ifdef __debug
+		          output( 10, "ptrail: %.10f\n", trail );
+		          #endif
 
-      //output( 10, "i_pixel=%4i is=%7i pos=%7i\n", i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
-
-		  #ifdef __debug
-		  output( 10, "ptrail: %.10f\n", trail );
-		  #endif
-
-                } /* end of p_express_multiplier[i_pixel] != 0 */
+             } /* end of p_express_multiplier[i_pixel] != 0 */
             // nevertheless that we are doing nothing, change the slicer
             // next image element
             ++is;
-            } /* i_pixel loop for the trail */
+           } /* i_pixel loop for the trail */
           p_express_multiplier += height +1;
         }  /* end of express loop */
 
