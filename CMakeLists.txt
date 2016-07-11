@@ -10,7 +10,6 @@ message(STATUS "Compilation date = ${BUILD}")
 
 
 # Compile with C++11 support.  Disable __STRICT_ANSI__ to support
-# some nice OpenCL shortcuts (i.e. cl_float2's .s0, .s1 syntax).
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)

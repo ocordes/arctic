@@ -22,7 +22,7 @@
 /* image_slice.cc
 
    written by: Oliver Cordes 2016-05-09
-   changed by: Oliver Cordes 2016-05-11
+   changed by: Oliver Cordes 2016-07-11
 
 */
 
@@ -83,7 +83,7 @@ void std::image_slice::reset( size_t col )
 
       if ( offs >= width )
 	throw std::slice_exception( std::string( "Offset larger than image width!" ) );
-      
+
       if ( direction )
 	{
 	  // image reverse
@@ -107,7 +107,7 @@ void std::image_slice::reset( size_t col )
 
       if ( offs >= height )
 	throw std::slice_exception( std::string( "Offset larger than image height!" ) );
-      
+
       if ( direction )
 	{
 	  // image reverse
@@ -123,22 +123,24 @@ void std::image_slice::reset( size_t col )
 	  stride    = width;
 	}
     }
-  
-  pos = begin_pos;
-  //throw std::slice_exception( std::string("Reset failed!") );
 
-  // std::cout << begin_pos << " " << end_pos << " " << stride << std::endl;
+  pos = begin_pos;
+
+  //std::cout << begin_pos << " " << end_pos << " " << stride << std::endl;
 }
 
 
 long & std::image_slice::operator++( void )
 {
   pos += stride;
-  
+
   if ( stride > 0 )
     {
       if ( pos > end_pos )
+      {
+        //std::cout << "pos=" << pos << " end_pos=" << end_pos << " " << std::endl;
 	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
+}
     }
   else
     {
@@ -159,7 +161,10 @@ long std::image_slice::operator++(  int )
   if ( stride > 0 )
     {
       if ( pos > end_pos )
+      {
+        //std::cout << "pos=" << pos << " end_pos=" << end_pos << " " << std::endl;
 	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
+}
     }
   else
     {
@@ -167,7 +172,7 @@ long std::image_slice::operator++(  int )
       if ( pos < end_pos )
 	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
     }
-  
+
   return t;
 }
 

@@ -430,7 +430,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
               // inner pixel loop
 
-	      // access the express array only once and use this value twice ;-)
+	            // access the express array only once and use this value twice ;-)
               express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
 
               // check if we need to calculate a new trail for that pixel
@@ -462,80 +462,80 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
                   freec += sum;
 
 
-		  if ( check_empty_traps == true )
-		    {
-		      // clear n_levels_traps
+		            if ( check_empty_traps == true )
+		            {
+		                // clear n_levels_traps
 
-		      // this algorithm looks for empty traps and reduces
-		      // the values of n_levels_traps to speedup the code,
-		      // the trap array is analyzed from the prosition
-		      // n_levels_traps which hold always the max position
-		      // of a trap which was used before ! */
+		                // this algorithm looks for empty traps and reduces
+		                // the values of n_levels_traps to speedup the code,
+		                // the trap array is analyzed from the prosition
+		                // n_levels_traps which hold always the max position
+		                // of a trap which was used before ! */
 
-		      // for (i=n_levels_traps-1;i>=0;i--)
-		      //   {
-		      //     int to_break = 0;
+		                // for (i=n_levels_traps-1;i>=0;i--)
+		                //   {
+		                //     int to_break = 0;
 
-		      //     for (j=0;j<n_species;j++)
-		      //       {
-		      //         int pos = (i*n_species)+j;
+		                //     for (j=0;j<n_species;j++)
+		                //       {
+		                //         int pos = (i*n_species)+j;
 
-		      //         if ( traps[pos] > empty_trap_limit )
-		      // 	    {
-		      //             to_break = 1;
-		      //             break;
-		      //           }
-		      //         else
-		      //           traps[pos] = 0.0;
-		      //       }
-		      //     if ( to_break == 1 )
-		      //       break;
-		      //     n_levels_traps = i;
-		      //     stat_count++;
-		      //   }
+		                //         if ( traps[pos] > empty_trap_limit )
+		                // 	    {
+		                //             to_break = 1;
+		                //             break;
+		                //           }
+		                //         else
+		                //           traps[pos] = 0.0;
+		                //       }
+		                //     if ( to_break == 1 )
+		                //       break;
+		                //     n_levels_traps = i;
+		                //     stat_count++;
+		                //   }
 
-		      for (i=n_levels_traps-1;i>=0;i--)
-			{
-			  double sum = 0.0;
-
-			  for (j=0;j<n_species;j++)
-			    {
-			      int pos = (i*n_species)+j;
-			      sum += traps[pos];
-			    }
-
-			  if ( sum > empty_trap_limit )
-			    break;
-
-			  // clean the complete level!
-			  for (j=0;j<n_species;j++)
-			    {
-			      int pos = (i*n_species)+j;
-			      traps[pos] = 0.0;
-			    }
-
-			  n_levels_traps = i;
-			  stat_count++;
-			}
-		    }
-
-
-                  // Capture any free electrons in the vicinity of empty traps
-
-                  if ( freec > well_notch_depth )
+		                for (i=n_levels_traps-1;i>=0;i--)
                     {
-                      d = pow(((freec - well_notch_depth ) / well_range ),well_fill_power);
-                      if ( d > 1.0 )
-                        d =  1.0;
-                      else
-                        if ( d < 0.0 )
-                          d = 0.0;
+			                   double sum = 0.0;
 
-                      dheight = n_levels * d;
+			                   for (j=0;j<n_species;j++)
+			                   {
+			                        int pos = (i*n_species)+j;
+			                        sum += traps[pos];
+			                   }
+
+			                   if ( sum > empty_trap_limit )
+			                      break;
+
+			                   // clean the complete level!
+			                   for (j=0;j<n_species;j++)
+			                   {
+			                        int pos = (i*n_species)+j;
+			                        traps[pos] = 0.0;
+			                   }
+
+			                   n_levels_traps = i;
+			                   stat_count++;
+	                   }
+              }
+
+
+              // Capture any free electrons in the vicinity of empty traps
+
+              if ( freec > well_notch_depth )
+                {
+                  d = pow(((freec - well_notch_depth ) / well_range ),well_fill_power);
+                  if ( d > 1.0 )
+                    d =  1.0;
+                  else
+                    if ( d < 0.0 )
+                      d = 0.0;
+
+                  dheight = n_levels * d;
 
 
 
-                      cheight = ceil( dheight );
+                  cheight = ceil( dheight );
 
 
 
@@ -697,13 +697,17 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 		  //image[((i_pixel+start_y)*image_width)+i_column] += trail;
       image[(*is)] += trail;
       // next image element
-      is++;
+
+      //output( 10, "i_pixel=%4i is=%7i pos=%7i\n", i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
 
 		  #ifdef __debug
 		  output( 10, "ptrail: %.10f\n", trail );
 		  #endif
 
                 } /* end of p_express_multiplier[i_pixel] != 0 */
+            // nevertheless that we are doing nothing, change the slicer
+            // next image element
+            ++is;
             } /* i_pixel loop for the trail */
           p_express_multiplier += height +1;
         }  /* end of express loop */
@@ -1456,14 +1460,15 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 		  trail *= express_factor_pixel;
 		  //image[((i_pixel+start_y)*image_width)+i_column] += trail;
       image[(*is)] += trail;
-      // next image element
-      is++;
 
 		  #ifdef __debug
 		  output( 10, "ptrail: %.10f\n", trail );
 		  #endif
 
                 } /* end of p_express_multiplier[i_pixel] != 0 */
+                // nevertheless that we are doing nothing, change the slicer
+                // next image element
+                ++is;
             } /* i_pixel loop for the trail */
           p_express_multiplier += height +1;
         }  /* end of express loop */
