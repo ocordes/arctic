@@ -2,20 +2,20 @@
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
-    This file is part of acs-cte-project.
+    This file is part of arctic-project.
 
-    acs-cte is free software: you can redistribute it and/or modify
+    arctic is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    acs-cte is distributed in the hope that it will be useful,
+    arctic is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -24,7 +24,7 @@
    written by: Oliver Cordes 2015-06-18
    changed by: Oliver Cordes 2016-06-30
 
-   $Id: params_euclid.cc 803 2015-06-23 12:56:45Z ocordes $
+   $Id$
 
 */
 

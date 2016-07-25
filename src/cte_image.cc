@@ -4,18 +4,18 @@
 w
     This file is part of arctic project.
 
-    acs-cte is free software: you can redistribute it and/or modify
+    arctic is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    acs-cte is distributed in the hope that it will be useful,
+    arctic is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -1637,22 +1637,22 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 
   for (i_pixel=0;i_pixel<image_height+1;i_pixel++)
     {
-      int d;
-      int d2;
+      int _d;
+      int _d2;
       int i_sum = 0;
       for (i_express=0;i_express<express;i_express++)
         {
           int pos;
-          d = ( i_pixel + 1 + readout_offset);
-          d2= ((image_height+1+readout_offset)*(i_express+1))/express;
-          if ( d > d2 )
-            d = d2;
+          _d = ( i_pixel + 1 + readout_offset);
+          _d2= ((image_height+1+readout_offset)*(i_express+1))/express;
+          if ( _d > _d2 )
+            _d = _d2;
 
-          d -= i_sum;
-          i_sum += d;
+          _d -= i_sum;
+          i_sum += _d;
 
           pos = (i_express*(image_height+1))+i_pixel;
-          express_multiplier[pos] = d;
+          express_multiplier[pos] = _d;
         }
      }
 
@@ -2033,8 +2033,7 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 			      long w, long h,
 			      std::valarray<long> & xrange,
-			      std::valarray<long> & yrange,
-			      bool unclock )
+			      std::valarray<long> & yrange )
 {
   output( 11, "cte_image::clock_charge\n" );
 

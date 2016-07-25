@@ -4,18 +4,18 @@
 
     This file is part of artic-project.
 
-    acs-cte is free software: you can redistribute it and/or modify
+    arctic is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    acs-cte is distributed in the hope that it will be useful,
+    arctic is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -61,7 +61,7 @@ public:
   {
     mesg = s;
   }
-  
+
   //virtual ~slice_exception() _NOEXCEPT {}
   virtual ~slice_exception() {}
 
@@ -69,7 +69,7 @@ public:
   {
     return mesg.c_str();
   }
-  
+
 private:
   std::string mesg;
 
@@ -92,9 +92,9 @@ private:
 public:
   image_slice();
   image_slice( size_t w, size_t h, size_t o, bool rot, bool dir );
-  
+
   void reset( size_t col );
-  
+
   long operator*() { return (size_t) pos; }
 
   long & operator++();
@@ -103,7 +103,7 @@ public:
 
   image_slice begin();
   image_slice end();
-    
+
 };
 
 #endif

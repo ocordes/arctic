@@ -4,18 +4,18 @@
 
     This file is part of arctic-project.
 
-    acs-cte is free software: you can redistribute it and/or modify
+    arctic is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    acs-cte is distributed in the hope that it will be useful,
+    arctic is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with acs-cte.  If not, see <http://www.gnu.org/licenses/>.
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -24,7 +24,7 @@
    written by: Oliver Cordes 2013-02-05
    changed by: Oliver Cordes 2015-11-30
 
-   $Id: arctic.cc 917 2015-12-02 10:00:30Z ocordes $
+   $Id$
 
 */
 
@@ -93,7 +93,7 @@ int main( int argc, char *argv[])
       std::cerr << "Program aborted!" <<  std::endl;
       exit( 1 );
     }
-  
+
   if ( im->clock_charge() == 0 )
     {
       // save file only of the CTE correction was run sccessfully

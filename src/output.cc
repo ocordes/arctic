@@ -2,20 +2,20 @@
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
-    This file is part of animation.
+    This file is part of arctic.
 
-    animation is free software: you can redistribute it and/or modify
+    arctic is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    animation is distributed in the hope that it will be useful,
+    arctic is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with animation.  If not, see <http://www.gnu.org/licenses/>.
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -24,7 +24,7 @@
    written by: Oliver Cordes 2010-07-20
    changed by: Oliver Cordes 2015-11-30
 
-   $Id: output.cc 915 2015-11-30 16:07:09Z ocordes $
+   $Id$
 
 */
 
@@ -58,11 +58,11 @@ void debug_generate_timestamp( void )
 {
     struct tm   *timep;
     time_t       times;
-    
+
     times = time( NULL );
     timep = localtime( &times );
-  
-    snprintf( timestamp, 20, "%02i:%02i.%02i", 
+
+    snprintf( timestamp, 20, "%02i:%02i.%02i",
 	      timep->tm_hour, timep->tm_min, timep->tm_sec );
 }
 
@@ -74,7 +74,7 @@ void debug_init( int argc, char *argv[] )
 {
   for (int i=1;i<argc;i++)
     {
-      if ( std::strcmp( argv[i], "-d" ) == 0 ) 
+      if ( std::strcmp( argv[i], "-d" ) == 0 )
 	{
 	  i++;
 	  if ( i == argc )
@@ -88,7 +88,7 @@ void debug_init( int argc, char *argv[] )
 	      //std::cout << "new debug level=" << debug_level << std::endl;
 	    }
 	}
-	
+
     }
 }
 
@@ -100,16 +100,16 @@ void output( int dlevel, const char *format, ... )
     va_list ap;
 
     /* be completly quiet */
-    if ( debug_level == 0 ) 
+    if ( debug_level == 0 )
       return;
 
     if ( dlevel <= debug_level )
-      {	
+      {
 	/* generate output */
 	va_start( ap, format );
 	vsnprintf( dummy, 1000, format, ap );
 	va_end( ap );
-	
+
 	if ( debug_level == 1 )
 	  printf( "%s", dummy );
 	else
@@ -117,7 +117,7 @@ void output( int dlevel, const char *format, ... )
 	    debug_generate_timestamp();
 	    printf( "%s: %s", timestamp, dummy );
 	  }
-	
+
 	fflush( stdout );
     }
 }

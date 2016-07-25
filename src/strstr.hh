@@ -4,7 +4,7 @@
 // changed by: Oliver Cordes 2015-07-20
 
 /*
-   Copyright (C) 2005 Oliver-Mark Cordes
+C   opyright (C) 2005 Oliver-Mark Cordes
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 */
 
 // $Log$
-// $Id: strstr.hh 844 2015-07-20 14:29:34Z ocordes $
+// $Id$
 //
 
 #ifndef __strstr_h
@@ -39,10 +39,10 @@ namespace std
 
 class std::CString : public std::string
 {
-  size_type  lastpos; 
+  size_type  lastpos;
  public:
   CString() : string() { lastpos = 0; };
-  CString( const char *s ) : string( s ) { lastpos = 0; }; 
+  CString( const char *s ) : string( s ) { lastpos = 0; };
   CString( const string & s, size_type pos = 0, size_type n = npos )
     : string( s, pos , n ) { lastpos = 0; };
   string strtok( bool  start, const string & delim );

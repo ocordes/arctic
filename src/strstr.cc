@@ -4,30 +4,28 @@
 // changed by: Oliver Cordes 2015-06-22
 
 /*
-   Copyright (C) 2005 Oliver-Mark Cordes
+    This file is part of arctic project.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+    arctic is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+    arctic is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
+    You should have received a copy of the GNU General Public License
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // $Log$
-// $Id: strstr.cc 844 2015-07-20 14:29:34Z ocordes $
+// $Id$
 
 
 #include <string>
-#include <locale>  
+#include <locale>
 
 //using namespace std;
 
@@ -105,7 +103,7 @@ std::string std::CString::toupper( void )
   string retstr = (*this);
 
   std::locale loc;
-  
+
   for (std::string::size_type i=0; i<retstr.length(); ++i)
     retstr[i] = std::toupper(retstr[i],loc);
 

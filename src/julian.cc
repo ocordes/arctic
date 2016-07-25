@@ -2,20 +2,20 @@
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
-    This file is part of acs-cte-project
+    This file is part of arctic-project
 
-    animation is free software: you can redistribute it and/or modify
+    arctic is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    animation is distributed in the hope that it will be useful,
+    arctic is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with animation.  If not, see <http://www.gnu.org/licenses/>. 
+    along with arctic.  If not, see <http://www.gnu.org/licenses/>. 
 
 */
 
@@ -25,7 +25,7 @@
    changed by: Oliver Cordes 2015-01-05
    changed by: Ole Marggraf 2015-06-23
 
-   $Id: julian.cc 804 2015-06-23 16:20:43Z marggraf $
+   $Id$
 
 */
 
@@ -64,7 +64,7 @@ SUBROUTINE JDATE(TAG,MONAT,JAHR,HR,MIN,SEC,JD)
 
   double D, N, JD;
 
-  // take the 1.1.1980 as a reference 
+  // take the 1.1.1980 as a reference
   year -= 1980;
   D = (hour / 24.0 ) + ( minute / 1440.0 ) + ( second / 86400. );
   N = year*365+(month-1)*31+day;
@@ -76,7 +76,7 @@ SUBROUTINE JDATE(TAG,MONAT,JAHR,HR,MIN,SEC,JD)
   */
 
   /*
-   * new algorithm, taken from Fernie (1983), IAPPP 13, p16, 
+   * new algorithm, taken from Fernie (1983), IAPPP 13, p16,
    * http://adsabs.harvard.edu/full/1983IAPPP..13...16F
    */
 
