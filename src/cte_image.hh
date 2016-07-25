@@ -22,9 +22,9 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-27
+   changed by: Oliver Cordes 2016-07-25
 
-   $Id: cte_image.hh 975 2016-03-09 13:08:56Z ocordes $
+   $Id$
 
 */
 
@@ -58,9 +58,12 @@ private:
 		      std::valarray<int> & trapl_fill,
 		      int n_species,
 		      int nr_trapl );
-
   bool   val_array_smaller( std::valarray<double> & v1,
 			    std::valarray<double> & v2 );
+  void   create_express_multiplier( std::valarray<int> & express_multiplier,
+                                    int express,
+                                    int h,
+                                    int readout_offset );
   void   clock_charge_image( std::valarray<double> &,
 			     std::valarray<long> &,
 			     std::valarray<long> & );

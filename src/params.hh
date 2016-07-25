@@ -2,7 +2,7 @@
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
-    This file is part of acs-cte-project.
+    This file is part of arctic project.
 
     acs-cte is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-16
+   changed by: Oliver Cordes 2016-07-25
 
-   $Id: params.hh 975 2016-03-09 13:08:56Z ocordes $
+   $Id$
 
 */
 
@@ -96,7 +96,7 @@ public:
   params();
   virtual ~params();
 
-  virtual void parse_args( std::string key, std::string val, int & error );
+  virtual void parse_args( std::string, std::string, int & );
   virtual void check_params ( void );
 
   void set_args(  int *argc, char **argv[] );

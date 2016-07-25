@@ -1,7 +1,7 @@
 /* (C) Copyright 2013,2014,205,2016 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
-
+w
     This file is part of arctic project.
 
     acs-cte is free software: you can redistribute it and/or modify
@@ -120,14 +120,14 @@ void cte_image::limit_to_max( std::valarray<double> & v, double limit )
 
 
 
-double cte_image::get_sum_double_array( double *array, int width, int height )
+double cte_image::get_sum_double_array( double *array, int w, int h )
 {
   double sum = 0.0;
 
   int    totel;
   int    i;
 
-  totel = width * height;
+  totel = w * h;
 
   for (i=0;i<totel;i++)
     sum += array[i];
@@ -217,6 +217,34 @@ bool cte_image::val_array_smaller( std::valarray<double> & v1,
     if ( v1[i] < v2[i] )
       return true;
   return false;
+}
+
+
+void cte_image::create_express_multiplier( std::valarray<int> & express_multiplier,
+                                           int express,
+                                           int h,
+                                           int readout_offset )
+{
+  for (int i_pixel=0;i_pixel<height+1;i_pixel++)
+      {
+        int d;
+        int d2;
+        int i_sum = 0;
+        for (int i_express=0;i_express<express;i_express++)
+          {
+            int pos;
+            d = ( i_pixel + 1 + readout_offset);
+            d2= ((h+1+readout_offset)*(i_express+1))/express;
+            if ( d > d2 )
+              d = d2;
+
+            d -= i_sum;
+            i_sum += d;
+
+            pos = (i_express*(height+1))+i_pixel;
+            express_multiplier[pos] = d;
+          }
+       }
 }
 
 
@@ -339,26 +367,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   int p_express_multiplier = 0;
   int express_factor_pixel = 0;
 
-  for (i_pixel=0;i_pixel<height+1;i_pixel++)
-    {
-      int d;
-      int d2;
-      int i_sum = 0;
-      for (i_express=0;i_express<express;i_express++)
-        {
-          int pos;
-          d = ( i_pixel + 1 + readout_offset);
-          d2= ((height+1+readout_offset)*(i_express+1))/express;
-          if ( d > d2 )
-            d = d2;
+  create_express_multiplier( express_multiplier, express, height, readout_offset );
 
-          d -= i_sum;
-          i_sum += d;
-
-          pos = (i_express*(height+1))+i_pixel;
-          express_multiplier[pos] = d;
-        }
-     }
   output( 10, "Done.\n" );
 
 
@@ -498,7 +508,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
 		                for (i=n_levels_traps-1;i>=0;i--)
                     {
-			                   double sum = 0.0;
+			                   sum = 0.0;
 
                          int    pos = i*n_species;
 
@@ -856,32 +866,13 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   well_range = well_depth - well_notch_depth;
 
   // new code with variable express
+  output( 10, "Create express_multiplier...\n" );
   std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
   int p_express_multiplier = 0;
   int express_factor_pixel = 0;
 
-  output( 10, "Create express_multiplier...\n" );
-  // setup of the express array
-  for (i_pixel=0;i_pixel<height+1;i_pixel++)
-    {
-      int d;
-      int d2;
-      int i_sum = 0;
-      for (i_express=0;i_express<express;i_express++)
-        {
-          int pos;
-          d = ( i_pixel + 1 + readout_offset);
-	        d2 = ((height+1+readout_offset)*(i_express+1))/express;
-          if ( d > d2 )
-            d = d2;
+  create_express_multiplier( express_multiplier, express, height, readout_offset );
 
-          d -= i_sum;
-          i_sum += d;
-
-          pos = (i_express*(height+1))+i_pixel;
-          express_multiplier[pos] = d;
-        }
-     }
 
   output( 10, "Done.\n" );
 
@@ -1410,10 +1401,10 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 		      	      #endif
 		      	      if ( std::abs( trapl[i].sum() - trapl[j].sum() ) < empty_trap_limit  )
 				{
-				  int c = trapl_fill[j] + trapl_fill[i];
+				  int cc = trapl_fill[j] + trapl_fill[i];
 				  trapl[j] *= trapl_fill[j];
 				  trapl[j] += trapl[i] * (double) trapl_fill[i];
-				  trapl[j] /= c;
+				  trapl[j] /= cc;
 				  trapl_fill[j] += trapl_fill[i];
 				}
 		      	      else
@@ -1491,7 +1482,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
       //output( 1, "stat_count=%i\n", stat_count );
 
       {
-	double traps_total = 0.0;
+	traps_total = 0.0;
 	for (i=0;i<nr_trapl;i++)
 	  traps_total += trapl[i].sum() * trapl_fill[i];
 	output( 11, "%5i trap fill end: %f (%i)\n", i_column, traps_total, nr_trapl );
@@ -1554,8 +1545,8 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 
   /* helpers */
   int     i;
-  double  d;
   double  sum;
+  double  d;
 
 
   /* time measurement */
