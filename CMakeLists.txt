@@ -40,7 +40,7 @@ add_executable( arctic ${sources} )
 
 # just for example add some compiler flags
 #target_compile_options( arctic  PUBLIC  -g -O2 -std=gnu++11 -Wall )
-target_compile_options( arctic  PUBLIC  -g -O2 -Wall )
+target_compile_options( arctic  PUBLIC  -g -O3 -Wall )
 
 
 

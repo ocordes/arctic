@@ -1,8 +1,8 @@
-/* (C) Copyright 2013 by Oliver Cordes
+/* (C) Copyright 2013,2014,205,2016 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
 
-    This file is part of acs-cte-project.
+    This file is part of arctic project.
 
     acs-cte is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-27
+   changed by: Oliver Cordes 2016-07-25
 
 
-   $Id: cte_image.cc 999 2016-05-10 13:14:31Z ocordes $
+   $Id$
 
 */
 
@@ -474,47 +474,44 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 		                // n_levels_traps which hold always the max position
 		                // of a trap which was used before ! */
 
-		                // for (i=n_levels_traps-1;i>=0;i--)
-		                //   {
-		                //     int to_break = 0;
-
-		                //     for (j=0;j<n_species;j++)
-		                //       {
-		                //         int pos = (i*n_species)+j;
-
-		                //         if ( traps[pos] > empty_trap_limit )
-		                // 	    {
-		                //             to_break = 1;
-		                //             break;
+		                //  for (i=n_levels_traps-1;i>=0;i--)
+		                //    {
+		                //      int to_break = 0;
+                     //
+		                //      for (j=0;j<n_species;j++)
+		                //        {
+		                //          int pos = (i*n_species)+j;
+                     //
+		                //          if ( traps[pos] > empty_trap_limit )
+		                //  	    {
+		                //              to_break = 1;
+		                //              break;
 		                //           }
-		                //         else
-		                //           traps[pos] = 0.0;
-		                //       }
-		                //     if ( to_break == 1 )
-		                //       break;
-		                //     n_levels_traps = i;
-		                //     stat_count++;
-		                //   }
+		                //          else
+		                //            traps[pos] = 0.0;
+		                //        }
+		                //      if ( to_break == 1 )
+		                //        break;
+		                //      n_levels_traps = i;
+		                //      stat_count++;
+		                //    }
 
 		                for (i=n_levels_traps-1;i>=0;i--)
                     {
 			                   double sum = 0.0;
 
+                         int    pos = i*n_species;
+
 			                   for (j=0;j<n_species;j++)
-			                   {
-			                        int pos = (i*n_species)+j;
-			                        sum += traps[pos];
-			                   }
+			    			  			      sum += traps[pos+j];
+
 
 			                   if ( sum > empty_trap_limit )
 			                      break;
 
 			                   // clean the complete level!
 			                   for (j=0;j<n_species;j++)
-			                   {
-			                        int pos = (i*n_species)+j;
-			                        traps[pos] = 0.0;
-			                   }
+			                        traps[pos+j] = 0.0;
 
 			                   n_levels_traps = i;
 			                   stat_count++;
@@ -576,14 +573,14 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 		              //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n", sum, sum2, trap_sum, n_electrons_per_trap_total_express * dheight, sum3 );
 
 
+                  #ifdef __debug
 		              for (i=cheight;i<n_levels_traps;i++)
+                  {
+                     int pos = (i*n_species);
 			               for (j=0;j<n_species;j++)
-			                  {
-			                    int pos = (i*n_species)+j;
-			                    pot_capture[j] += n_electrons_per_trap[j] - traps[pos];
-			                  }
+			                    pot_capture[j] += n_electrons_per_trap[j] - traps[pos+j];
+			            }
 
-		              #ifdef __debug
 		              output( 10, "ntrap_total : %.15f\n", traps.sum() );
 
 		              print_traps( traps, n_species, n_levels_traps );
@@ -629,22 +626,24 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
                     }
                   else
                     {
-                      int pos;
+                      int pos = 0; // pos is walking trough the whole array
                       // more electrons than required for capturing process
                       // -> fill all traps to the max
 
                       for (i=0;i<cheight-1;i++)
                         for (j=0;j<n_species;j++)
                           {
-                            pos = (i*n_species)+j;
+                            //pos = (i*n_species)+j;
                             traps[pos] = n_electrons_per_trap[j];
+                            ++pos;
 			                    }
 
                        for (j=0;j<n_species;++j)
                           {
-                            pos = (cheight-1)*n_species+j;
+                            //pos = (cheight-1)*n_species+j;
                             if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
                               traps[pos] = ( n_electrons_per_trap[j] * ov );
+                            ++pos;
                           }
                     }
 
@@ -723,7 +722,9 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
         }
 
       //output( 1, "stat_count=%i\n", stat_count );
+      #ifdef __debug
       output( 11, "%5i trap fill end: %f\n", i_column, traps.sum() );
+      #endif
 
     } /* end of i_column loop */
 
