@@ -1284,7 +1284,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 			  output( 10, "h,nr_trapl,d: %i %i %.15f\n", h, nr_trapl, dheight );
                           #endif
 
-			  if ( skip == dheight )
+			  if ( skip - dheight < 1e-14 )
 			    {
 			      // best solution ... but only reached, if dheight is n_levels,
 			      // which means a bright star or strong cosmic passed ...
