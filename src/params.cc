@@ -295,7 +295,11 @@ int get_working_mode( int argc, char *argv[] )
 	  if ( i == argc )
 	    {
 	      std::cout << "Warning: no mode parameter given! Returning default values!" << std::endl;
-	      return WORKING_MODE_FITS;
+#ifdef IS_EUCLID_ENVIRONMENT
+	        return WORKING_MODE_EUCLID;
+#else
+	        return WORKING_MODE_FITS;
+#endif
 	    }
 	  else
 	    {
@@ -311,7 +315,11 @@ int get_working_mode( int argc, char *argv[] )
 	}
 
     }
-  return WORKING_MODE_FITS;
+#ifdef IS_EUCLID_ENVIRONMENT
+    return WORKING_MODE_EUCLID;
+#else
+    return WORKING_MODE_FITS;
+#endif
 }
 
 

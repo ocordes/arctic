@@ -47,7 +47,11 @@
 
 int main( int argc, char *argv[])
 {
-  std::cout << argv[0] << " Version " << VERSION << " build " << BUILD << std::endl;
+  std::cout << argv[0] << " Version " << VERSION << " build " << BUILD;
+#ifdef IS_EUCLID_ENVIRONMENT
+    std::cout << "(Euclid)";
+#endif
+  std::cout << std::endl;
 
   // parse for debug parameter and inititialize the debug/output module
   debug_init( argc, argv );
@@ -77,7 +81,7 @@ int main( int argc, char *argv[])
 	im = new euclid_image( argc, argv );
 	break;
       default:
-	std::cout << "Stamdard FITS mode!" << std::endl;
+	std::cout << "Standard FITS mode!" << std::endl;
 	im = new fits_image( argc, argv );
 	break;
       }
