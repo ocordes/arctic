@@ -41,6 +41,8 @@
 #include <fstream>
 #include <exception>
 
+#include "config.h"
+
 #include "image_slice.hh"
 #include "output.hh"
 #include "params.hh"
