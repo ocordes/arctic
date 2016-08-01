@@ -353,7 +353,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
   sparse_pixels = get_sparse_pixels( image, traps_total );
 
-  output( 1, "There are %i pixels containing more traps than charge.\nThe order in which these traps should be filled is ambiguous.\n", sparse_pixels );
+  output( 1, "There are %i pixels containing more traps than charge.\n\
+The order in which these traps should be filled is ambiguous.\n", sparse_pixels );
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
@@ -580,7 +581,9 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
                   total_capture = sum;
 
 		              // look which method is best and fastest
-		              //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n", sum, sum2, trap_sum, n_electrons_per_trap_total_express * dheight, sum3 );
+		              //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n", 
+                              //            sum, sum2, trap_sum, 
+                              //            n_electrons_per_trap_total_express * dheight, sum3 );
 
 
                   #ifdef __debug
@@ -597,7 +600,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 		              output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
 		              output( 10, "cheight,ch-1: %i %i\n", cheight, cheight-1 );
 		              output( 10, "max_capture : %.15f\n", total_capture );
-		              output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n", pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
+		              output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n", 
+                                          pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
 		              #endif
 
                   if ( total_capture < 1e-14 )
@@ -678,7 +682,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 			                  int pos = (i*n_species)+j;
 			                  pot_capture2[j] += n_electrons_per_trap[j] - traps[pos];
 			                }
-		              output( 10, "pot_capture2: %f %f %f = %f\n", pot_capture2[0], pot_capture2[1], pot_capture2[2], pot_capture2.sum() );
+		              output( 10, "pot_capture2: %f %f %f = %f\n", 
+                                      pot_capture2[0], pot_capture2[1], pot_capture2[2], pot_capture2.sum() );
 
 		              print_traps( traps, n_species, n_levels_traps+1 );
 		              #endif
@@ -700,7 +705,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
               image[(*is)] += trail;
               // next image element
 
-              //output( 10, "i_pixel=%4i is=%7i pos=%7i\n", i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
+              //output( 10, "i_pixel=%4i is=%7i pos=%7i\n", 
+	      //        i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
 
 		          #ifdef __debug
 		          output( 10, "ptrail: %.10f\n", trail );
@@ -846,7 +852,8 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   // info about the image and algorithm
   sparse_pixels = get_sparse_pixels( image, traps_total );
 
-  output( 1, "There are %i pixels containing more traps than charge.\nThe order in which these traps should be filled is ambiguous.\n", sparse_pixels );
+  output( 1, "There are %i pixels containing more traps than charge.\n\
+              The order in which these traps should be filled is ambiguous.\n", sparse_pixels );
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
@@ -1623,10 +1630,12 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 
   sparse_pixels = get_sparse_pixels( image, traps_total );
 
-  output( 1, "There are %i pixels containing more traps than charge.\nThe order in which these traps should be filled is ambiguous.\n", sparse_pixels );
+  output( 1, "There are %i pixels containing more traps than charge.\n\
+The order in which these traps should be filled is ambiguous.\n", sparse_pixels );
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
-  output( 1, "Using Olli's second idea to make the code faster and simpler! Warning, results may differ!\n" );
+  output( 1, "Using Olli's second idea to make the code faster and simpler! \
+Warning, results may differ!\n" );
 
 
   output( 1, "Using n_levels=%i\n", n_levels );
@@ -1821,8 +1830,11 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 			}
 		      else
 			{
-			  // possible electrons in all trap levels - all filled electrons - all possibly captured electrons
-			  trap_pot_capture = n_electrons_per_trap_express * ( ceil( ntrap_fill ) - ceil( dheight) ) - ( ntrap * ( ntrap_fill - ceil( dheight) ) );
+			  // possible electrons in all trap levels 
+                          // - all filled electrons 
+                          // - all possibly captured electrons
+			  trap_pot_capture = n_electrons_per_trap_express * ( ceil( ntrap_fill ) 
+                                             - ceil( dheight) ) - ( ntrap * ( ntrap_fill - ceil( dheight) ) );
 			}
 
 		      double trap_pot_capture_total = trap_pot_capture.sum();
@@ -1832,13 +1844,19 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 
                       #ifdef __debg
 		      output( 10, "debug:  %i\n", i_pixel );
-		      output( 10, "ts,tc       : %f %f\n", ntrap.sum() * ( ceil( dheight ) - 1 ), ntrap.sum() * dheight );
-		      output( 10, "ntrap       : %f %f %f * %f\n", ntrap[0], ntrap[1], ntrap[2], ntrap_fill );
+		      output( 10, "ts,tc       : %f %f\n", ntrap.sum() * ( ceil( dheight ) - 1 ), 
+                              ntrap.sum() * dheight );
+		      output( 10, "ntrap       : %f %f %f * %f\n", 
+                              ntrap[0], ntrap[1], ntrap[2], ntrap_fill );
 		      output( 10, "ntrap_total : %f\n", ntrap.sum() * ntrap_fill );
 		      output( 10, "free,dheight: %f %f\n", freec, dheight );
-		      output( 10, "elect_rest  : %f %f %f = %f\n", trap_electron_rest[0], trap_electron_rest[1], trap_electron_rest[2], trap_electron_rest_total );
-		      output( 10, "max_capture : %f %f %f = %f\n", max_capture[0], max_capture[1], max_capture[2], max_capture_total );
-		      output( 10, "pot_capture : %f %f %f = %f\n", trap_pot_capture[0], trap_pot_capture[1], trap_pot_capture[2], trap_pot_capture_total );
+		      output( 10, "elect_rest  : %f %f %f = %f\n", 
+                              trap_electron_rest[0], trap_electron_rest[1], trap_electron_rest[2], 
+                              trap_electron_rest_total );
+		      output( 10, "max_capture : %f %f %f = %f\n", 
+                              max_capture[0], max_capture[1], max_capture[2], max_capture_total );
+		      output( 10, "pot_capture : %f %f %f = %f\n", 
+                              trap_pot_capture[0], trap_pot_capture[1], trap_pot_capture[2], trap_pot_capture_total );
 
 
                       #endif
@@ -1880,7 +1898,9 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
                       #ifdef __debug
 		      if ( i_pixel == debug_pixel )
 			{
-			  //output( 1, "dheight=%f n_e_p_t_t_e=%f restadd=%f pc=%f\n", dheight, n_electrons_per_trap_total_express, trap_electron_rest / n_electrons_per_trap_total_express, trap_pot_capture_total );
+			  //output( 1, "dheight=%f n_e_p_t_t_e=%f restadd=%f pc=%f\n",
+                          //        dheight, n_electrons_per_trap_total_express, 
+                          //        trap_electron_rest / n_electrons_per_trap_total_express, trap_pot_capture_total );
 			}
                       #endif
 		      if ( trap_electron_rest_total  > 0.0 )
@@ -1900,7 +1920,8 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 			  ntrap_fill_species = ( tot_electrons + trap_pot_capture ) / ntrap;
 
 			  #ifdef __debug
-			  output( 10, "fill_species: %f %f %f\n", ntrap_fill_species[0], ntrap_fill_species[1], ntrap_fill_species[2] );
+			  output( 10, "fill_species: %f %f %f\n", 
+                                  ntrap_fill_species[0], ntrap_fill_species[1], ntrap_fill_species[2] );
 			  #endif
 
 			  // use the maximum of all values
@@ -1937,7 +1958,8 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 			  if ( i_pixel == debug_pixel )
 			    {
 			      output(1, "s=%f, ntrap_fill=%f ntrap_fill2=%f f=%f\n", s, ntrap_fill, ntrap_fill2, f );
-			      //output(1, "ntrap_sum=%f tot1=%f tot2=%f\n", ntrap.sum()*f, ntrap.sum()*f*ntrap_fill2, t*dheight+trap_electron_rest );
+			      //output(1, "ntrap_sum=%f tot1=%f tot2=%f\n", 
+                              //       ntrap.sum()*f, ntrap.sum()*f*ntrap_fill2, t*dheight+trap_electron_rest );
 			    }
 			  #endif
 
@@ -1955,7 +1977,8 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 
 		      std::valarray<double> pot_cap_check( 0.0, n_species );
 		      pot_cap_check = ( n_electrons_per_trap_express - ntrap ) * ntrap_fill;
-		      output( 10, "pot_cap_chk : %f %f %f = %f\n", pot_cap_check[0], pot_cap_check[1], pot_cap_check[2], pot_cap_check.sum() );
+		      output( 10, "pot_cap_chk : %f %f %f = %f\n", 
+                              pot_cap_check[0], pot_cap_check[1], pot_cap_check[2], pot_cap_check.sum() );
 		      #endif
 
                       #ifdef __debug
