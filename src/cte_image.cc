@@ -581,8 +581,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   total_capture = sum;
 
 		              // look which method is best and fastest
-		              //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n", 
-                              //            sum, sum2, trap_sum, 
+		              //output( 10, "sum,sum2,ts,tf,tc: %f %f %f %f %f\n",
+                              //            sum, sum2, trap_sum,
                               //            n_electrons_per_trap_total_express * dheight, sum3 );
 
 
@@ -600,7 +600,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 		              output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
 		              output( 10, "cheight,ch-1: %i %i\n", cheight, cheight-1 );
 		              output( 10, "max_capture : %.15f\n", total_capture );
-		              output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n", 
+		              output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n",
                                           pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
 		              #endif
 
@@ -682,7 +682,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                  int pos = (i*n_species)+j;
 			                  pot_capture2[j] += n_electrons_per_trap[j] - traps[pos];
 			                }
-		              output( 10, "pot_capture2: %f %f %f = %f\n", 
+		              output( 10, "pot_capture2: %f %f %f = %f\n",
                                       pot_capture2[0], pot_capture2[1], pot_capture2[2], pot_capture2.sum() );
 
 		              print_traps( traps, n_species, n_levels_traps+1 );
@@ -705,7 +705,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               image[(*is)] += trail;
               // next image element
 
-              //output( 10, "i_pixel=%4i is=%7i pos=%7i\n", 
+              //output( 10, "i_pixel=%4i is=%7i pos=%7i\n",
 	      //        i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
 
 		          #ifdef __debug
@@ -941,13 +941,12 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
       for (i_express=0;i_express<express;i_express++)
         {
           // traps are empty
-	  nr_trapl   = 0;
+	        nr_trapl   = 0;
 
-	  // good question if this is really necessary, because the array is used via nr_trapl as an indication
-	  // how much levels are really used, these levels have then also valid entries ...
-	  //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
-	  //trapl_fill = std::valarray<int> ( 0, n_levels );
-
+	        // good question if this is really necessary, because the array is used via nr_trapl as an indication
+	        // how much levels are really used, these levels have then also valid entries ...
+	        //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
+	        //trapl_fill = std::valarray<int> ( 0, n_levels );
           is.reset( i_column ); // initialize the image slicer
 
           for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
@@ -957,8 +956,8 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 
               // check if we need to calculate a new trail for that pixel
 
-	      // access the express array only once and use this value twice ;-)
-	      express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
+	            // access the express array only once and use this value twice ;-)
+	            express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
 
 	      if ( express_factor_pixel != 0 )
                 {
@@ -1830,10 +1829,10 @@ Warning, results may differ!\n" );
 			}
 		      else
 			{
-			  // possible electrons in all trap levels 
-                          // - all filled electrons 
+			  // possible electrons in all trap levels
+                          // - all filled electrons
                           // - all possibly captured electrons
-			  trap_pot_capture = n_electrons_per_trap_express * ( ceil( ntrap_fill ) 
+			  trap_pot_capture = n_electrons_per_trap_express * ( ceil( ntrap_fill )
                                              - ceil( dheight) ) - ( ntrap * ( ntrap_fill - ceil( dheight) ) );
 			}
 
@@ -1844,18 +1843,18 @@ Warning, results may differ!\n" );
 
                       #ifdef __debg
 		      output( 10, "debug:  %i\n", i_pixel );
-		      output( 10, "ts,tc       : %f %f\n", ntrap.sum() * ( ceil( dheight ) - 1 ), 
+		      output( 10, "ts,tc       : %f %f\n", ntrap.sum() * ( ceil( dheight ) - 1 ),
                               ntrap.sum() * dheight );
-		      output( 10, "ntrap       : %f %f %f * %f\n", 
+		      output( 10, "ntrap       : %f %f %f * %f\n",
                               ntrap[0], ntrap[1], ntrap[2], ntrap_fill );
 		      output( 10, "ntrap_total : %f\n", ntrap.sum() * ntrap_fill );
 		      output( 10, "free,dheight: %f %f\n", freec, dheight );
-		      output( 10, "elect_rest  : %f %f %f = %f\n", 
-                              trap_electron_rest[0], trap_electron_rest[1], trap_electron_rest[2], 
+		      output( 10, "elect_rest  : %f %f %f = %f\n",
+                              trap_electron_rest[0], trap_electron_rest[1], trap_electron_rest[2],
                               trap_electron_rest_total );
-		      output( 10, "max_capture : %f %f %f = %f\n", 
+		      output( 10, "max_capture : %f %f %f = %f\n",
                               max_capture[0], max_capture[1], max_capture[2], max_capture_total );
-		      output( 10, "pot_capture : %f %f %f = %f\n", 
+		      output( 10, "pot_capture : %f %f %f = %f\n",
                               trap_pot_capture[0], trap_pot_capture[1], trap_pot_capture[2], trap_pot_capture_total );
 
 
@@ -1899,7 +1898,7 @@ Warning, results may differ!\n" );
 		      if ( i_pixel == debug_pixel )
 			{
 			  //output( 1, "dheight=%f n_e_p_t_t_e=%f restadd=%f pc=%f\n",
-                          //        dheight, n_electrons_per_trap_total_express, 
+                          //        dheight, n_electrons_per_trap_total_express,
                           //        trap_electron_rest / n_electrons_per_trap_total_express, trap_pot_capture_total );
 			}
                       #endif
@@ -1920,7 +1919,7 @@ Warning, results may differ!\n" );
 			  ntrap_fill_species = ( tot_electrons + trap_pot_capture ) / ntrap;
 
 			  #ifdef __debug
-			  output( 10, "fill_species: %f %f %f\n", 
+			  output( 10, "fill_species: %f %f %f\n",
                                   ntrap_fill_species[0], ntrap_fill_species[1], ntrap_fill_species[2] );
 			  #endif
 
@@ -1958,7 +1957,7 @@ Warning, results may differ!\n" );
 			  if ( i_pixel == debug_pixel )
 			    {
 			      output(1, "s=%f, ntrap_fill=%f ntrap_fill2=%f f=%f\n", s, ntrap_fill, ntrap_fill2, f );
-			      //output(1, "ntrap_sum=%f tot1=%f tot2=%f\n", 
+			      //output(1, "ntrap_sum=%f tot1=%f tot2=%f\n",
                               //       ntrap.sum()*f, ntrap.sum()*f*ntrap_fill2, t*dheight+trap_electron_rest );
 			    }
 			  #endif
@@ -1977,7 +1976,7 @@ Warning, results may differ!\n" );
 
 		      std::valarray<double> pot_cap_check( 0.0, n_species );
 		      pot_cap_check = ( n_electrons_per_trap_express - ntrap ) * ntrap_fill;
-		      output( 10, "pot_cap_chk : %f %f %f = %f\n", 
+		      output( 10, "pot_cap_chk : %f %f %f = %f\n",
                               pot_cap_check[0], pot_cap_check[1], pot_cap_check[2], pot_cap_check.sum() );
 		      #endif
 
@@ -2156,18 +2155,17 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
       // do something
       if (parameters->neo_algorithm2 == true )
-	clock_charge_image_neo2( image, xrange, yrange );
+	      clock_charge_image_neo2( image, xrange, yrange );
       else
-	{
-	  if (parameters->neo_algorithm == true )
-	    clock_charge_image_neo( image, xrange, yrange );
-	  else
-	    clock_charge_image( image, xrange, yrange );
-	}
+	      {
+	        if (parameters->neo_algorithm == true )
+	          clock_charge_image_neo( image, xrange, yrange );
+	        else
+	          clock_charge_image( image, xrange, yrange );
+	      }
 
-      // add the trail
-      // image += trail;
-      //image = trail;
+      output( 1, "Minmax(old image): %f %f\n", (*im).min(), (*im).max() );
+      output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
     }
 
   // copy the data back into the original image
