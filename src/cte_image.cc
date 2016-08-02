@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-25
+   changed by: Oliver Cordes 2016-08-01
 
 
    $Id$
@@ -103,7 +103,7 @@ long cte_image::get_sparse_pixels( std::valarray<double> & v, double limit )
 {
   long nr = 0;
 
-  for (unsigned long i=0;i<v.size();i++)
+  for (unsigned long i=0;i<v.size();++i)
     if ( ( v[i] > 0.0 ) && ( v[i] < limit ) )
       nr++;
 
@@ -225,7 +225,7 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
                                            int h,
                                            int readout_offset )
 {
-  for (int i_pixel=0;i_pixel<height+1;i_pixel++)
+  for (int i_pixel=0;i_pixel<height+1;++i_pixel)
       {
         int d;
         int d2;
@@ -853,7 +853,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   sparse_pixels = get_sparse_pixels( image, traps_total );
 
   output( 1, "There are %i pixels containing more traps than charge.\n\
-              The order in which these traps should be filled is ambiguous.\n", sparse_pixels );
+The order in which these traps should be filled is ambiguous.\n", sparse_pixels );
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
@@ -887,8 +887,8 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 
   std::valarray<double> exponential_factor( 0.0, n_species*n_levels );
 
-  for (i=0;i<n_levels;i++)
-    for (j=0;j<n_species;j++)
+  for (i=0;i<n_levels;++i)
+    for (j=0;j<n_species;++j)
       exponential_factor[(i*n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
 
   output( 10, "Done.\n" );
@@ -933,12 +933,12 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   getrusage( RUSAGE_SELF, &cpu_start_time );
 
 
-  for (i_column=start_x;i_column<end_x;i_column++)
+  for (i_column=start_x;i_column<end_x;++i_column)
     {
       // p_express_multiplier is a column pointer of the express array
       p_express_multiplier = 0;
 
-      for (i_express=0;i_express<express;i_express++)
+      for (i_express=0;i_express<express;++i_express)
         {
           // traps are empty
 	        nr_trapl   = 0;
@@ -949,7 +949,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 	        //trapl_fill = std::valarray<int> ( 0, n_levels );
           is.reset( i_column ); // initialize the image slicer
 
-          for (i_pixel=0;i_pixel<(end_y-start_y);i_pixel++)
+          for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
             {
 
               // inner pixel loop
@@ -959,7 +959,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 	            // access the express array only once and use this value twice ;-)
 	            express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
 
-	      if ( express_factor_pixel != 0 )
+	            if ( express_factor_pixel != 0 )
                 {
                   // extract pixel
                   //im = image[((i_pixel+start_y)*image_width)+i_column];
@@ -978,25 +978,25 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
                   // release a number of electrons in the traps
                   // trapped electrons relased exponentially
 
-		  sum = 0.0;
-		  for (j=0;j<nr_trapl;j++)
-		    {
-		      for (i=0;i<n_species;i++)
-		  	{
-		  	  release = trapl[j][i] * exponential_factor[i];
-		  	  trapl[j][i] -= release;
-		  	  sum += release * (double) trapl_fill[j];
-		  	}
-		    }
+		              sum = 0.0;
+		              for (j=0;j<nr_trapl;++j)
+		                {
+		                  for (i=0;i<n_species;++i)
+		  	                {
+		  	                 release = trapl[j][i] * exponential_factor[i];
+		  	                 trapl[j][i] -= release;
+		  	                 sum += release * (double) trapl_fill[j];
+		  	                }
+		                }
 
-		  // valarray code is slower!
-		  // sum = 0.0;
-		  // for (j=0;j<nr_trapl;j++)
-		  //   {
-		  //     vrelease = trapl[j] * exponential_factor;
-		  //     trapl[j] -= vrelease;
-		  //     sum += vrelease.sum() * trapl_fill[j];
-		  //   }
+		              // valarray code is slower!
+		              // sum = 0.0;
+		              // for (j=0;j<nr_trapl;j++)
+		              //   {
+		              //     vrelease = trapl[j] * exponential_factor;
+		              //     trapl[j] -= vrelease;
+		              //     sum += vrelease.sum() * trapl_fill[j];
+		              //   }
 
 
 
@@ -1014,133 +1014,134 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
                         if ( d < 0.0 )
                           d = 0.0;
 
-		      dheight = n_levels * d;
+		                  dheight = n_levels * d;
 
 
 
-		      // cheight is the last full filled trap level
+		                  // cheight is the last full filled trap level
                       cheight = ceil( dheight ) - 1;
 
-		      // ov is the fraction of the last filled trap level
-		      ov = dheight - cheight;
+		                  // ov is the fraction of the last filled trap level
+		                  ov = dheight - cheight;
 
 
 
                       // calculate the number of electrons which can be captured
 
 
-		      // new code
+		                  // new code
 
-		      total_capture = 0.0;
+		                  total_capture = 0.0;
 
-		      // scan all levels
-		      h = 0;
-		      for (j=nr_trapl-1;j>=0;j--)
-			{
-			  h2 = h + trapl_fill[j];
-
-
-			  // don't need to check for max. because n_electrons_per_trap_express is
-			  // always higher or equal then the last step -> structure of the express
-			  // array, and the trap cannot hold more electrons then n_electrons_per_trap_express
-			  // of the last step!
-			  if ( h2 < dheight )
-			    {
-			      // this levels are going directly into the calculations
-			      total_capture += ( n_electrons_per_trap_total - trapl[j].sum() ) * trapl_fill[j];
-			    }
-			  else
-			    {
-			      total_capture += ( n_electrons_per_trap_total - trapl[j].sum() ) * ( cheight - h );
-
-			      for (i=0;i<n_species;i++)
-				{
-				  c = n_electrons_per_trap[i] * ov - trapl[j][i];
-				  if ( c > 0.0 )
-				    total_capture += c;
-				}
-			    }
-			  h = h2;
-			  if ( h > dheight )
-			    break;
-			}
-
-		      // h has the height of all used levels
-		      if ( h < dheight )
-			{
-			  total_capture +=  n_electrons_per_trap_total * ( dheight - h );
-			}
-
-		      #ifdef __debug
-		      output( 10, "debug:  %i\n", i_pixel );
-		      double traps_total = 0.0;
-		      for (i=0;i<nr_trapl;i++)
-			traps_total += trapl[i].sum() * trapl_fill[i];
-		      output( 10, "ntrap_total : %.15f\n", traps_total );
-
-		      print_trapl( trapl, trapl_fill, n_species, nr_trapl );
+		                  // scan all levels
+		                  h = 0;
+		                  for (j=nr_trapl-1;j>=0;--j)
+			                  {
+			                    h2 = h + trapl_fill[j];
 
 
-		      output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
-                      output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight );
-                      output( 10, "max_capture : %.15f\n", total_capture );
+			                    // don't need to check for max. because n_electrons_per_trap_express is
+			                    // always higher or equal then the last step -> structure of the express
+			                    // array, and the trap cannot hold more electrons then n_electrons_per_trap_express
+			                    // of the last step!
+			                    if ( h2 < dheight )
+			                      {
+			                         // this levels are going directly into the calculations
+			                        total_capture += ( n_electrons_per_trap_total - trapl[j].sum() ) * trapl_fill[j];
+			                      }
+			                    else
+			                      {
+			                        total_capture += ( n_electrons_per_trap_total - trapl[j].sum() ) * ( cheight - h );
 
-                      #endif
+			                        for (i=0;i<n_species;++i)
+				                        {
+				                          c = n_electrons_per_trap[i] * ov - trapl[j][i];
+				                          if ( c > 0.0 )
+				                            total_capture += c;
+				                        }
+			                      }
+			                    h = h2;
+			                    if ( h > dheight )
+			                      break;
+			                  }
 
-                      if ( total_capture < 1e-14 )
+		                 // h has the height of all used levels
+		                 if ( h < dheight )
+			                 {
+			                   total_capture +=  n_electrons_per_trap_total * ( dheight - h );
+			                 }
+
+		                 #ifdef __debug
+		                 output( 10, "debug:  %i\n", i_pixel );
+		                 double traps_total = 0.0;
+	  	               for (i=0;i<nr_trapl;++i)
+	 		                  traps_total += trapl[i].sum() * trapl_fill[i];
+  		               output( 10, "ntrap_total : %.15f\n", traps_total );
+
+		                 print_trapl( trapl, trapl_fill, n_species, nr_trapl );
+
+
+		                 output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
+                     output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight );
+                     output( 10, "max_capture : %.15f\n", total_capture );
+
+                     #endif
+
+                     if ( total_capture < 1e-14 )
                         total_capture = 1e-14;
 
-		      // use cheight -1 from this point
+		                 // use cheight -1 from this point
 
-                      d = freec / total_capture;
-
-
-
-		      // the result is all levels which are absorbed
-		      // by the new dheight are gone
-		      // the first level may be modified
-
-		      // skip has the height until the new bunches
-
-		      // some helpers
-		      n_electrons_per_trap_ov = n_electrons_per_trap * ov;
+                     d = freec / total_capture;
 
 
 
-                      // #ifdef __debug
-                      // for (i=0;i<n_species;i++)
-                      //    output( 10, "level %i : %.15f\n", i, n_electrons_per_trap_ov[i] );
-                      // for (i=0;i<n_species;i++)
-                      //    output( 10, "level %i : %.15f\n", i, n_electrons_per_trap[i] * ov );
-                      // #endif
+		                 // the result is all levels which are absorbed
+		                 // by the new dheight are gone
+		                 // the first level may be modified
 
-                      if ( d < 1.0 )
-                        {
-			  #ifdef __debug
-			  output( 10, "d < 1.0\n" );
-			  #endif
-			  // not easy needs a help array
+		                 // skip has the height until the new bunches
 
-			  new_nr_trapl = 0;
-
-			  // use some helper pointer
-			  dheight2 = dheight;
-			  cheight2 = cheight;
+		                 // some helpers
+		                 n_electrons_per_trap_ov = n_electrons_per_trap * ov;
 
 
-			  // walk through all entries
-			  h = 0;
-			  for(j=nr_trapl-1;j>=0;j--)
-			    {
-			      if ( dheight2 < 0.0 )
-				{
-				  // nothing is needed anymore
-				  // just copy that level
-				  new_trapl[new_nr_trapl] = trapl[j];
-				  new_trapl_fill[new_nr_trapl] = trapl_fill[j];
-				  new_nr_trapl++;
-				}
-			      else
+
+                     // #ifdef __debug
+                     // for (i=0;i<n_species;i++)
+                     //    output( 10, "level %i : %.15f\n", i, n_electrons_per_trap_ov[i] );
+                     // for (i=0;i<n_species;i++)
+                     //    output( 10, "level %i : %.15f\n", i, n_electrons_per_trap[i] * ov );
+                     // #endif
+
+                     if ( d < 1.0 )
+                       {
+			                   #ifdef __debug
+			                   output( 10, "d < 1.0\n" );
+			                   #endif
+
+			                   // not easy needs a help array
+
+			                   new_nr_trapl = 0;
+
+			                   // use some helper pointer
+			                   dheight2 = dheight;
+			                   cheight2 = cheight;
+
+
+			                   // walk through all entries
+			                   h = 0;
+			                   for (j=nr_trapl-1;j>=0;--j)
+			                     {
+			                       if ( dheight2 < 0.0 )
+				                       {
+				                         // nothing is needed anymore
+				                         // just copy that level
+				                         new_trapl[new_nr_trapl] = trapl[j];
+				                         new_trapl_fill[new_nr_trapl] = trapl_fill[j];
+				                         new_nr_trapl++;
+				                       }
+			                       else
 				{
 				  // we need to modify existing levels
 				  // scan each bunch of levels
