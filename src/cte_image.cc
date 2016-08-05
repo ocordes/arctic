@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-08-01
+   changed by: Oliver Cordes 2016-08-05
 
 
    $Id$
@@ -54,6 +54,15 @@ w
 
 // use to activate the comparison code
 //#define compariaon
+
+
+
+// define some macros for the neo code
+
+#define newtrap( new_h, new_val) ( trapl_fill[nr_trapl] = new_h; trapl[nr_trapl] = new_val; ++nr_trapl; )
+
+// endof macros
+
 
 
 
@@ -336,6 +345,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   well_depth       = parameters->well_depth;
   well_notch_depth = parameters->well_notch_depth;
   well_fill_power  = parameters->well_fill_power;
+  well_range       = well_depth - well_notch_depth;
   express          = parameters->express;
   readout_offset   = parameters->readout_offset;
 
@@ -394,14 +404,13 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
 
-  well_range = well_depth - well_notch_depth;
-
-
   output( 10, "Setup traps ...\n" );
 
   std::valarray<double> traps(0.0, n_species * n_levels );
 
+  #ifdef __debug
   std::valarray<double> pot_capture( 0.0, n_species );
+  #endif
 
   output( 10, "Done.\n" );
 
@@ -842,6 +851,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   well_depth       = parameters->well_depth;
   well_notch_depth = parameters->well_notch_depth;
   well_fill_power  = parameters->well_fill_power;
+  well_range       = well_depth - well_notch_depth;
   express          = parameters->express;
   readout_offset   = parameters->readout_offset;
   dark_mode        = parameters->dark_mode;
@@ -870,7 +880,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   std::valarray<double> n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) n_levels );
   n_electrons_per_trap_total = traps_total / n_levels;
-  well_range = well_depth - well_notch_depth;
 
   // new code with variable express
   output( 10, "Create express_multiplier...\n" );
@@ -892,8 +901,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
       exponential_factor[(i*n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
 
   output( 10, "Done.\n" );
-
-  well_range = well_depth - well_notch_depth;
 
 
   // trap level information implementations
@@ -1073,10 +1080,10 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 		                 #ifdef __debug
 		                 output( 10, "debug:  %i\n", i_pixel );
-		                 double traps_total = 0.0;
-	  	               for (i=0;i<nr_trapl;++i)
-	 		                  traps_total += trapl[i].sum() * trapl_fill[i];
-  		               output( 10, "ntrap_total : %.15f\n", traps_total );
+                     double traps_total2 = 0.0;
+                     for (i=0;i<nr_trapl;++i)
+                        traps_total2 += trapl[i].sum() * trapl_fill[i];
+                     output( 10, "ntrap_total : %.15f\n", traps_total2 );
 
 		                 print_trapl( trapl, trapl_fill, n_species, nr_trapl );
 
@@ -1323,6 +1330,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                        // we have removed all levels from the stack which will be
 			                        // absorbed completely during the new filling
 
+                              // skip is the number of levels which are already absorbed!
 
 			                        // we are lucky, the levels are empty because we are at the
 			                        // start or the new dheight is larger than all previous levels
@@ -1344,53 +1352,48 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 				                           // cheight full trap levels
 				                           // ov is a single level with ov * n_electrons_per_trap fill
 
-				                           // skip levels are already skipped
+				                           // skip levels are already absorbed
 
 				                           // modify the first levels
 				                           // using cheight because this is the number of remaining levels
-				                          // from the prior filled trap levels
+				                           // from the prior filled trap levels
+
+                                   // cheight - skip are the (sub)-levels  which needs to be absorbed
+                                   // by the next big entry
+				                           trapl_fill[nr_trapl-1] -= cheight - skip;   // absorbes levels
+
+                                   // check what to do anyway, if there is a chance to modify the
+                                   // big level!
+
+                                   if ( val_array_smaller( trapl[nr_trapl-1], n_electrons_per_trap_ov ) )
+                                   {
+                                     if ( trapl_fill[nr_trapl-1] > 1 )
+                                     {
+                                       // split levels
+                                       --trapl_fill[nr_trapl-1];
+                                       trapl_fill[nr_trapl] = 1;
+                                       trapl[nr_trapl] = trapl[nr_trapl-1];
+                                       ++nr_trapl;
+                                     }
+
+                                     // fill only the species which needs to be filled
+                                     for (j=0;j<n_species;++j)
+                                       // modify if there are free
+                                       if ( trapl[nr_trapl-1][j] < n_electrons_per_trap_ov[j] )
+                                         trapl[nr_trapl-1][j] =  n_electrons_per_trap_ov[j];
+
+                                   }
 
 
-				                          trapl_fill[nr_trapl-1] -= cheight - skip;
+				                           // fill the leading trap level if necessary
+				                           if ( cheight > 0 )
+				                             {
+				                                trapl_fill[nr_trapl] = cheight;
+				                                trapl[nr_trapl] = n_electrons_per_trap;
 
-				                          if ( trapl_fill[nr_trapl-1] == 1 )
-				                            {
-				                               // we have a existing trap level for modifications
-				                               for (j=0;j<n_species;++j)
-					                               // modify if there are free
-					                               if ( trapl[nr_trapl-1][j] < n_electrons_per_trap_ov[j] )
-					                                 trapl[nr_trapl-1][j] =  n_electrons_per_trap_ov[j];
-				                            }
-				                          else
-				                            {
-				                               // we have a level which is used more than once, so
-				                               // check if we can use this level
-				                               if ( val_array_smaller( trapl[nr_trapl-1], n_electrons_per_trap_ov ) )
-					                               {
-					                                  // yes, we can use this level,
-					                                  // so break up the level into a single one and the rest
-					                                  --trapl_fill[nr_trapl-1];
-					                                  trapl_fill[nr_trapl] = 1;
-					                                  trapl[nr_trapl] = trapl[nr_trapl-1];
-					                                  // fill this new level up
-					                                  for (j=0;j<n_species;++j)
-					                                     if ( trapl[nr_trapl][j] < n_electrons_per_trap_ov[j]  )
-					                                       {
-						                                       trapl[nr_trapl][j] =  n_electrons_per_trap_ov[j];
-					                                       }
-					                                  ++nr_trapl;
-					                               }
-				                            }
-
-				                          // fill the leading trap level if necessary
-				                          if ( cheight > 0 )
-				                            {
-				                               trapl_fill[nr_trapl] = cheight;
-				                               trapl[nr_trapl] = n_electrons_per_trap;
-
-				                               ++nr_trapl;
-				                            }
-	                            }
+				                                ++nr_trapl;
+				                             }
+	                           }
 			                     }
                         }
 
@@ -1488,7 +1491,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
           gettimeofday( &temp_time, NULL );
           getrusage( RUSAGE_SELF, &cpu_temp_time);
           diff_time = get_difftime( start_time, temp_time );
-	  cpu_diff_time = get_difftime( cpu_start_time.ru_utime, cpu_temp_time.ru_utime );
+	        cpu_diff_time = get_difftime( cpu_start_time.ru_utime, cpu_temp_time.ru_utime );
           eta_time = ( diff_time / ( (i_column+1) - start_x ) ) * ( end_x - start_x );
 
           output( 1, "Clocking column #%i/%i in %fs, or %fs/column. ETA %.1fs.\n",
