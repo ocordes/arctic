@@ -235,7 +235,7 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
                                            int readout_offset )
 {
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
-      {
+     {
         int d;
         int d2;
         int i_sum = 0;
@@ -704,24 +704,17 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               } /* end of if ( freec > well_notch_depth ) */
 
 
-		          double trail =  ( freec - im );
-		          #ifdef __debug
-		          output( 10, "strail: %.10f\n", trail );
-		          #endif
-		          trail *= express_factor_pixel;
-		          //image[((i_pixel+start_y)*image_width)+i_column] += trail;
+              #ifdef __debug
+              double trail = ( freec - im );
+              output( 10, "strail: %.10f\n", trail );
+              trail *= express_factor_pixel;
+              output( 10, "ptrail: %.10f\n", trail );
+              #endif
 
-              image[(*is)] += trail;
-              // next image element
-
-              //output( 10, "i_pixel=%4i is=%7i pos=%7i\n",
-	      //        i_pixel, (*is), (((i_pixel+start_y)*image_width)+i_column) );
-
-		          #ifdef __debug
-		          output( 10, "ptrail: %.10f\n", trail );
-		          #endif
+              image[(*is)] += ( freec - im ) * express_factor_pixel;
 
              } /* end of p_express_multiplier[i_pixel] != 0 */
+
             // nevertheless that we are doing nothing, change the slicer
             // next image element
             ++is;
@@ -806,7 +799,7 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
   /* helpers */
   int     i, j;
   double  d;
-  double  sum;
+  double  sum, sum2;
 
   /* time measurement */
   struct timeval start_time;
@@ -964,20 +957,20 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               // check if we need to calculate a new trail for that pixel
 
 	            // access the express array only once and use this value twice ;-)
-	            express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
+	            //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
+              express_factor_pixel = express_multiplier[p_express_multiplier];
 
 	            if ( express_factor_pixel != 0 )
                 {
                   // extract pixel
-                  //im = image[((i_pixel+start_y)*image_width)+i_column];
                   im = image[ (*is) ];
-                  //double im2 = image[(*is)];
-                  //output( 10, "im=%f im2=%f\n", im, im2 );
-                  //output( 10, "is=%i\n", (*is) );
+
+                  // shape pixel value
                   if ( im > well_depth )
                     im = well_depth;
-                  if ( im < 0.0 )
-                    im = 0.0;
+                  else
+                    if ( im < 0.0 )
+                      im = 0.0;
                   freec = im;
 
                   // Release any trapped electrons, using the appropriate decay half-life
@@ -988,25 +981,18 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 		              sum = 0.0;
 		              for (j=0;j<nr_trapl;++j)
 		                {
+                      sum2 = 0.0;
 		                  for (i=0;i<n_species;++i)
 		  	                {
 		  	                 release = trapl[j][i] * exponential_factor[i];
 		  	                 trapl[j][i] -= release;
-		  	                 sum += release * (double) trapl_fill[j];
+		  	                 sum2 += release;
 		  	                }
+                      // do the multiplication at the end ;-)
+                      sum += sum2 * (double) trapl_fill[j];
 		                }
 
-		              // valarray code is slower!
-		              // sum = 0.0;
-		              // for (j=0;j<nr_trapl;j++)
-		              //   {
-		              //     vrelease = trapl[j] * exponential_factor;
-		              //     trapl[j] -= vrelease;
-		              //     sum += vrelease.sum() * trapl_fill[j];
-		              //   }
-
-
-
+		              // add the released electrons to the pixel value
                   freec += sum;
 
 
@@ -1033,10 +1019,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
 
-                      // calculate the number of electrons which can be captured
-
-
-		                  // new code
+                      // calculate the number of electrons which can be
+                      // captured  in the traps
 
 		                  total_capture = 0.0;
 
@@ -1047,10 +1031,12 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                    h2 = h + trapl_fill[j];
 
 
-			                    // don't need to check for max. because n_electrons_per_trap_express is
-			                    // always higher or equal then the last step -> structure of the express
-			                    // array, and the trap cannot hold more electrons then n_electrons_per_trap_express
-			                    // of the last step!
+			                    // don't need to check for max. because
+                          // n_electrons_per_trap_express is always higher or
+                          // equal then the last step -> structure of the
+                          // express array, and the trap cannot hold more
+                          // electrons then n_electrons_per_trap_express of the
+			                    // last step!
 			                    if ( h2 < dheight )
 			                      {
 			                         // this levels are going directly into the calculations
@@ -1113,13 +1099,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 		                 n_electrons_per_trap_ov = n_electrons_per_trap * ov;
 
 
-
-                     // #ifdef __debug
-                     // for (i=0;i<n_species;i++)
-                     //    output( 10, "level %i : %.15f\n", i, n_electrons_per_trap_ov[i] );
-                     // for (i=0;i<n_species;i++)
-                     //    output( 10, "level %i : %.15f\n", i, n_electrons_per_trap[i] * ov );
-                     // #endif
 
                      if ( d < 1.0 )
                        {
@@ -1257,13 +1236,13 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                   #ifdef __debug
 			                   output( 10, "Copying back the temporary data ..\n" );
 			                   #endif
-			                   i = 0;
-			                   for (j=new_nr_trapl-1;j>=0;--j)
+
+			                   // copy the temporary array back
+			                   for (j=new_nr_trapl-1,i=0;j>=0;--j,++i)
 			                     {
 			                       trapl[i]      = new_trapl[j];
 			                       trapl_fill[i] = new_trapl_fill[j];
-			                       ++i;
-			                     }
+			                  			                     }
 			                   nr_trapl = new_nr_trapl;
 			                   total_capture *= d;
                        }
@@ -1316,12 +1295,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                               trapl_fill[nr_trapl] = cheight;
                               trapl[nr_trapl] = n_electrons_per_trap;
                               ++nr_trapl;
-
-			                        //trapl_fill[nr_trapl+1] = cheight;
-			                        //trapl_fill[nr_trapl] = 1;
-			                        //trapl[nr_trapl+1] = n_electrons_per_trap;
-			                        //trapl[nr_trapl] = n_electrons_per_trap_ov;
-			                        //nr_trapl += 2;
 			                     }
 			                   else
 			                     {
@@ -1447,38 +1420,32 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
                     } /* end of if ( freec > well_notch_depth ) */
 
-                  //#ifdef __debug
-                  //if ( i_pixel == debug_pixel )
-                  //  output( 1, "%i ", p_express_multiplier[i_pixel] );
-                  //#endif
 
-		              /* add the trail for i_pixel */
 
-                  //(*image_data)[((i_pixel+start_y)*image_width)+i_column] += ( freec - im );
 
-                  // save only the trail ...
-		              //image[((i_pixel+start_y)*image_width)+i_column] += ( freec - im ) * express_factor_pixel;
-		              //image[((i_pixel+start_y)*image_width)+i_column] += ( freec - im );
-
-		              double trail =  ( freec - im );
 		              #ifdef __debug
+                  double trail = ( freec - im );
 		              output( 10, "strail: %.10f\n", trail );
+                  trail *= express_factor_pixel;
+                  output( 10, "ptrail: %.10f\n", trail );
 		              #endif
-		              trail *= express_factor_pixel;
 
 		              //image[((i_pixel+start_y)*image_width)+i_column] += trail;
-                  image[(*is)] += trail;
+                  //image[(*is)] += trail;
+                  image[(*is)] += ( freec - im ) * express_factor_pixel;
 
 		              #ifdef __debug
-		              output( 10, å"ptrail: %.10f\n", trail );
+		              output( 10, "ptrail: %.10f\n", trail );
 		              #endif
 
                 } /* end of p_express_multiplier[i_pixel] != 0 */
                 // nevertheless that we are doing nothing, change the slicer
                 // next image element
+                ++p_express_multiplier;
                 ++is;
              } /* i_pixel loop for the trail */
-          p_express_multiplier += height +1;
+          //p_express_multiplier += height + 1;
+          ++p_express_multiplier;
         }  /* end of express loop */
 
       //#ifdef __debug
