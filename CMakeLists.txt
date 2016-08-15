@@ -1,7 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
-set(VERSION 1.3.0)
+# written by: Oliver Cordes 2016-06-07
+# changed by: Oliver Cordes 2016-08-15
+
+set(VERSION 1.3.1)
 
 # get current date
 execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
@@ -92,10 +95,18 @@ set(CPACK_SOURCE_IGNORE_FILES
 "~$"
 "\\\\.cvsignore$"
 "^${PROJECT_SOURCE_DIR}.*/CVS/"
+"^${PROJECT_SOURCE_DIR}/\\\\.git.*"
+"^${PROJECT_SOURCE_DIR}/.*\\\\.cc"
+"^${PROJECT_SOURCE_DIR}/.*\\\\.cte"
+"^${PROJECT_SOURCE_DIR}/.*\\\\.sh"
+"^${PROJECT_SOURCE_DIR}/aifa/"
+"^${PROJECT_SOURCE_DIR}/autom4te.cache/"
+"^${PROJECT_SOURCE_DIR}/config\\\\..*"
 "^${PROJECT_SOURCE_DIR}/debian/"
 "^${PROJECT_SOURCE_DIR}/build/"
 "^${PROJECT_SOURCE_DIR}/demo/"
-"^${PROJECT_SOURCE_DIR}/test_suite/data/*.fitsq"
+"^${PROJECT_SOURCE_DIR}/patrick/"
+"^${PROJECT_SOURCE_DIR}/test_suite/data/.*fits"
 "^${PROJECT_SOURCE_DIR}/tests/"
 )
 #message("CPACK_SOURCE_IGNORE_FILES = ${CPACK_SOURCE_IGNORE_FILES}")
