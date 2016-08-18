@@ -103,27 +103,37 @@ configure_file(
     "${BINARY_BUILD_DIR}/conf.py"
     @ONLY)
 
-add_custom_target(docs_html ALL
-    ${SPHINX_EXECUTABLE}
-        -q -b html
-        -c "${BINARY_BUILD_DIR}"
-        -d "${SPHINX_CACHE_DIR}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/doc/source"
-        "${SPHINX_HTML_DIR}"
-    DEPENDS ${DOC_SOURCES}
-    COMMENT "Building HTML documentation with Sphinx")
+add_custom_command(
+        OUTPUT ${SPHINX_HTML_DIR}/index.html
+        DEPENDS ${DOC_SOURCES}
+        COMMAND ${SPHINX_EXECUTABLE}
+            -q -b html
+            -c "${BINARY_BUILD_DIR}"
+            -d "${SPHINX_CACHE_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/doc/source"
+            "${SPHINX_HTML_DIR}"
+        COMMENT "Building HTML documentation with Sphinx")
 
-add_custom_target(docs_pdf ALL
-        ${SPHINX_EXECUTABLE}
+add_custom_target(docs_html ALL
+        DEPENDS ${SPHINX_HTML_DIR}/index.html
+        )
+
+
+add_custom_command(
+        OUTPUT ${SPHINX_PDF_DIR}/arctic.pdf
+        DEPENDS ${DOC_SOURCES}
+        COMMAND ${SPHINX_EXECUTABLE}
             -q -b latex
             -c "${BINARY_BUILD_DIR}"
             -d "${SPHINX_CACHE_DIR}"
             "${CMAKE_CURRENT_SOURCE_DIR}/doc/source"
             "${SPHINX_PDF_DIR}"
-        DEPENDS ${DOC_SOURCES}
         COMMAND make -C ${SPHINX_PDF_DIR} all-pdf
         COMMENT "Building PDF documentation with Sphinx")
 
+add_custom_target(docs_pdf ALL
+        DEPENDS ${SPHINX_PDF_DIR}/arctic.pdf
+        )
 
 # CPack part
 
