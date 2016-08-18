@@ -96,8 +96,6 @@ params::~params()
 
 void params::load_config( std::string filename )
 {
-  int error;
-
   output( 1, "Loading config file '%s' ...\n", filename.c_str() );
 
   std::ifstream f;
@@ -109,7 +107,9 @@ void params::load_config( std::string filename )
   if ( f.is_open() )
     {
       while ( getline(f, s) )
-	     {
+	      {
+          int error;
+
 	        // ignore empty lines and comments
 	        if ( ( s == "" ) || ( s[0] == '#' ) ) {
 	           continue;

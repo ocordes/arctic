@@ -147,39 +147,40 @@ double cte_image::get_sum_double_array( double *array, int w, int h )
 
 void cte_image::print_traps( std::valarray<double> & t, int n_species, int trap_levels )
 {
-  int i, j,c;
-
-  double d;
+  int i, j;
 
   std::string s;
 
   output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, trap_levels );
   for (j=0;j<trap_levels;j++)
-    {
-      s = "";
-      c = 0;
-      d = 0.0;
-      for (i=0;i<n_species;i++)
-	{
-	  if ( j > 0 )
+  {
+    int c;
+    double d;
+
+    s = "";
+    c = 0;
+    d = 0.0;
+    for (i=0;i<n_species;i++)
+	  {
+	    if ( j > 0 )
 	    {
 	      if ( fabs( t[(j*n_species)+i] - t[((j-1)*n_species)+i] ) < 1e-14 )
-		c++;
+		      c++;
 	    }
-	  std::stringstream str;
-	  str << std::fixed << std::setprecision( debug_precision ) << t[(j*n_species)+i] << " ";
-	  s += str.str();
-	  //s += std::to_string( t[(j*n_species)+i] ) + " ";
-	  d +=  t[(j*n_species)+i];
-	}
+	    std::stringstream str;
+	    str << std::fixed << std::setprecision( debug_precision ) << t[(j*n_species)+i] << " ";
+	    s += str.str();
+	    //s += std::to_string( t[(j*n_species)+i] ) + " ";
+	    d +=  t[(j*n_species)+i];
+	  }
 
-      std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << d;
-      s += "= " + str.str();
-      //      s += "= " + std::to_string( d );
-      if ( c < 3 )
-	output( 10, "%05i: %s\n", j, s.c_str() );
-    }
+    std::stringstream str;
+    str << std::fixed << std::setprecision( debug_precision ) << d;
+    s += "= " + str.str();
+    //      s += "= " + std::to_string( d );
+    if ( c < 3 )
+	    output( 10, "%05i: %s\n", j, s.c_str() );
+  }
 }
 
 
@@ -236,12 +237,13 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
 {
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
      {
-        int d;
-        int d2;
         int i_sum = 0;
         for (int i_express=0;i_express<express;i_express++)
           {
             int pos;
+            int d;
+            int d2;
+
             d = ( i_pixel + 1 + readout_offset);
             d2= ((h+1+readout_offset)*(i_express+1))/express;
             if ( d > d2 )
@@ -375,7 +377,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   output( 10, "Create express_multiplier...\n" );
   std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
-  int p_express_multiplier = 0;
   int express_factor_pixel = 0;
 
   create_express_multiplier( express_multiplier, express, height, readout_offset );
@@ -431,8 +432,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   for (i_column=start_x;i_column<end_x;i_column++)
     {
       // p_express_multiplier is a column pointer of the express array
-      p_express_multiplier = 0;
-
+      int p_express_multiplier = 0;
 
       for (i_express=0;i_express<express;i_express++)
         {
@@ -877,7 +877,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   // new code with variable express
   output( 10, "Create express_multiplier...\n" );
   std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
-  int p_express_multiplier = 0;
   int express_factor_pixel = 0;
 
   create_express_multiplier( express_multiplier, express, height, readout_offset );
@@ -936,7 +935,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
       // p_express_multiplier is a column pointer of the express array
-      p_express_multiplier = 0;
+      int p_express_multiplier = 0;
 
       for (i_express=0;i_express<express;++i_express)
         {
@@ -1631,12 +1630,13 @@ Warning, results may differ!\n" );
 
   for (i_pixel=0;i_pixel<image_height+1;i_pixel++)
     {
-      int _d;
-      int _d2;
       int i_sum = 0;
       for (i_express=0;i_express<express;i_express++)
         {
           int pos;
+          int _d;
+          int _d2;
+
           _d = ( i_pixel + 1 + readout_offset);
           _d2= ((image_height+1+readout_offset)*(i_express+1))/express;
           if ( _d > _d2 )
