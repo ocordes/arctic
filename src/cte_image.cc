@@ -567,8 +567,11 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 		              #ifdef __debug
 		              output( 10, "debug:  %i\n", i_pixel );
+                  //sum2, sum3 unused for the moment. Comment to keep Sonar happy.
+                  /*
 		              double sum2 = n_electrons_per_trap_total * dheight - trap_sum;
 		              double sum3 = trap_sum;
+                  */
 		              #endif
 
 		              sum = (n_electrons_per_trap_total*(cheight-1))
@@ -577,12 +580,14 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   d = dheight - (cheight-1);
                   for (j=0;j<n_species;j++)
                     {
-                      double c = 0.0;
                       int pos = (cheight-1)*n_species+j;
-			                c = n_electrons_per_trap[j] * d - traps[pos];
+			                double c = n_electrons_per_trap[j] * d - traps[pos];
 			                #ifdef __debug
-			                sum2 -= traps[pos];
+                      // sum2, sum3 unused for the moment. Comment to keep Sonar happy.
+                      /*
+                      sum2 -= traps[pos];
 			                sum3 += traps[pos];
+                      */
 			                #endif
                       if ( c > 0.0 )
                         sum += c;
@@ -1933,8 +1938,11 @@ Warning, results may differ!\n" );
 
 			  double f = 1 - ( ( trap_pot_capture_total / ntrap_fill2 ) / trap_max_fill );
 
-                          #ifdef __debug
+        #ifdef __debug
+        // t unused, comment to keep Sonar happy.
+        /*
 			  double t = ntrap.sum();
+        */
 			  #endif
 
 			  for (i=0;i<n_species;i++)
