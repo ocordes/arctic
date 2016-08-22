@@ -1179,7 +1179,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 					                               if ( cheight2 > 0 )
 					                                 {
 					                                   // first part is necessary
-					                                   new_trapl[new_nr_trapl] = trapl[j] + ( n_electrons_per_trap - trapl[j] ) * d;
+					                                   new_trapl[new_nr_trapl] = trapl[j]
+                                                 + ( n_electrons_per_trap - trapl[j] ) * d;
 					                                   new_trapl_fill[new_nr_trapl] = cheight2;
 					                                   ++new_nr_trapl;
 					                                 }
@@ -1190,7 +1191,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 					                                   for (i=0;i<n_species;++i)
                                                 {
 						                                      if ( trapl[j][i] < n_electrons_per_trap_ov[i] )
-						                                        new_trapl[new_nr_trapl][i] = trapl[j][i] + ( ( n_electrons_per_trap_ov[i]  ) - trapl[j][i] ) * d;
+						                                        new_trapl[new_nr_trapl][i] = trapl[j][i]
+                                                        + ( ( n_electrons_per_trap_ov[i]  ) - trapl[j][i] ) * d;
 						                                      else
 						                                        new_trapl[new_nr_trapl][i] = trapl[j][i];
                                                 }
