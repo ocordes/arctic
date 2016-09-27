@@ -56,14 +56,14 @@ char timestamp[20];
 
 void debug_generate_timestamp( void )
 {
-    struct tm   *timep;
-    time_t       times;
+  struct tm   *timep;
+  time_t       times;
 
-    times = time( NULL );
-    timep = localtime( &times );
+  times = time( NULL );
+  timep = localtime( &times );
 
-    snprintf( timestamp, 20, "%02i:%02i.%02i",
-	      timep->tm_hour, timep->tm_min, timep->tm_sec );
+  snprintf( timestamp, 20, "%02i:%02i.%02i",
+	          timep->tm_hour, timep->tm_min, timep->tm_sec );
 }
 
 
@@ -73,23 +73,23 @@ void debug_generate_timestamp( void )
 void debug_init( int argc, char *argv[] )
 {
   for (int i=1;i<argc;i++)
-    {
-      if ( std::strcmp( argv[i], "-d" ) == 0 )
-	{
-	  i++;
-	  if ( i == argc )
+  {
+    if ( std::strcmp( argv[i], "-d" ) == 0 )
+	  {
+	    i++;
+	    if ( i == argc )
 	    {
 	      std::cout << "Warning: no debug parameter given! Returning default values!" << std::endl;
 	      return;
 	    }
-	  else
+	    else
 	    {
 	      debug_level = atoi( argv[i] );
 	      //std::cout << "new debug level=" << debug_level << std::endl;
 	    }
-	}
+	  }
 
-    }
+  }
 }
 
 
@@ -97,27 +97,27 @@ void debug_init( int argc, char *argv[] )
 
 void output( int dlevel, const char *format, ... )
 {
+  /* be completly quiet */
+  if ( debug_level == 0 )
+    return;
+
+  if ( dlevel <= debug_level )
+  {
     va_list ap;
 
-    /* be completly quiet */
-    if ( debug_level == 0 )
-      return;
+	  /* generate output */
+	  va_start( ap, format );
+	  vsnprintf( dummy, 1000, format, ap );
+	  va_end( ap );
 
-    if ( dlevel <= debug_level )
-      {
-	/* generate output */
-	va_start( ap, format );
-	vsnprintf( dummy, 1000, format, ap );
-	va_end( ap );
-
-	if ( debug_level == 1 )
-	  printf( "%s", dummy );
-	else
+	  if ( debug_level == 1 )
+	    printf( "%s", dummy );
+	  else
 	  {
 	    debug_generate_timestamp();
 	    printf( "%s: %s", timestamp, dummy );
 	  }
 
-	fflush( stdout );
-    }
+	  fflush( stdout );
+  }
 }
