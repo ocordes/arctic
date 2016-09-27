@@ -22,7 +22,7 @@
 /* image_slice.cc
 
    written by: Oliver Cordes 2016-05-09
-   changed by: Oliver Cordes 2016-07-11
+   changed by: Oliver Cordes 2016-09-27
 
 */
 
@@ -82,22 +82,22 @@ void std::image_slice::reset( size_t col )
       // image will be accessed in x direction
 
       if ( offs >= width )
-	throw std::slice_exception( std::string( "Offset larger than image width!" ) );
+	       throw std::runtime_error( std::string( "Offset larger than image width!" ) );
 
       if ( direction )
-	{
-	  // image reverse
-	  begin_pos = (col+1)*width - 1 - offs;
-	  end_pos   = col*width -1;
-	  stride    = -1;
-	}
+	      {
+	        // image reverse
+	        begin_pos = (col+1)*width - 1 - offs;
+	        end_pos   = col*width -1;
+	        stride    = -1;
+	      }
       else
-	{
-	  // image_forward
-	  begin_pos = col*width + offs;
-	  end_pos   = (col+1)*width;
-	  stride    = 1;
-	}
+	      {
+	        // image_forward
+	        begin_pos = col*width + offs;
+	        end_pos   = (col+1)*width;
+	        stride    = 1;
+	      }
     }
   else
     {
@@ -106,22 +106,22 @@ void std::image_slice::reset( size_t col )
       // image will be accessed in y direction
 
       if ( offs >= height )
-	throw std::slice_exception( std::string( "Offset larger than image height!" ) );
+	       throw std::runtime_error( std::string( "Offset larger than image height!" ) );
 
       if ( direction )
-	{
-	  // image reverse
-	  begin_pos = (height-1-offs)*width + col;
-	  end_pos   = col - width;
-	  stride    = -width;
-	}
+	      {
+	        // image reverse
+	        begin_pos = (height-1-offs)*width + col;
+	        end_pos   = col - width;
+	        stride    = -width;
+	      }
       else
-	{
-	  // image_forward
-	  begin_pos = offs*width + col;     // first eleemt in the slice
-	  end_pos   =  height*width + col;  // outside the def, which is okay for the last element ;-)
-	  stride    = width;
-	}
+	      {
+	        // image_forward
+	        begin_pos = offs*width + col;     // first eleemt in the slice
+	        end_pos   =  height*width + col;  // outside the def, which is okay for the last element ;-)
+	        stride    = width;
+	      }
     }
 
   pos = begin_pos;
@@ -137,16 +137,14 @@ long & std::image_slice::operator++( void )
   if ( stride > 0 )
     {
       if ( pos > end_pos )
-      {
         //std::cout << "pos=" << pos << " end_pos=" << end_pos << " " << std::endl;
-	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
-}
+	      throw std::runtime_error( std::string( "Out of bounds (end_pos)!" ) );
     }
   else
     {
       //std::cout << "pos=" << pos << " end_pos=" << end_pos << std::endl;
       if ( pos < end_pos )
-	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
+	      throw std::runtime_error( std::string( "Out of bounds (end_pos)!" ) );
     }
   return pos;
 }
@@ -161,16 +159,14 @@ long std::image_slice::operator++(  int )
   if ( stride > 0 )
     {
       if ( pos > end_pos )
-      {
         //std::cout << "pos=" << pos << " end_pos=" << end_pos << " " << std::endl;
-	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
-}
+      	throw std::runtime_error( std::string( "Out of bounds (end_pos)!" ) );
     }
   else
     {
       //std::cout << "pos=" << pos << " end_pos=" << end_pos << std::endl;
       if ( pos < end_pos )
-	throw std::slice_exception( std::string( "Out of bounds (end_pos)!" ) );
+      	throw std::runtime_error( std::string( "Out of bounds (end_pos)!" ) );
     }
 
   return t;

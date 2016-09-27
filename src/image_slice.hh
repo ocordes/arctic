@@ -22,7 +22,7 @@
 /* image_slice.hh
 
    written by: Oliver Cordes 2016-05-09
-   changed by: Oliver Cordes 2016-05-11
+   changed by: Oliver Cordes 2016-09-27
 
 */
 
@@ -44,36 +44,10 @@
 namespace std
 {
   class image_slice;
-  class slice_exception;
 }
 
 
 
-// slice_exception for handling any error messages during the slicing
-// algorithm
-// the exception can be thrown with an error message
-//
-
-class std::slice_exception: public std::exception
-{
-public:
-  slice_exception( std::string s )
-  {
-    mesg = s;
-  }
-
-  //virtual ~slice_exception() _NOEXCEPT {}
-  virtual ~slice_exception() {}
-
-  virtual const char* what() const throw()
-  {
-    return mesg.c_str();
-  }
-
-private:
-  std::string mesg;
-
-};
 
 
 class std::image_slice {
