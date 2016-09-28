@@ -22,7 +22,7 @@
 /* image_slice.cc
 
    written by: Oliver Cordes 2016-05-09
-   changed by: Oliver Cordes 2016-09-27
+   changed by: Oliver Cordes 2016-09-28
 
 */
 
@@ -31,6 +31,8 @@
 #include <string>
 
 #include <iostream>
+
+#include <stdexcept>
 
 #include "image_slice.hh"
 
