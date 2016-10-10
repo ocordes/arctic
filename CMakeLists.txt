@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2016-09-27
+# changed by: Oliver Cordes 2016-10-10
 
 set(VERSION 1.3.2)
 
@@ -114,7 +114,7 @@ add_custom_command(
             "${SPHINX_HTML_DIR}"
         COMMENT "Building HTML documentation with Sphinx")
 
-add_custom_target(docs_html ALL
+add_custom_target(docs_html
         DEPENDS ${SPHINX_HTML_DIR}/index.html
         )
 
@@ -131,7 +131,7 @@ add_custom_command(
         COMMAND make -C ${SPHINX_PDF_DIR} all-pdf
         COMMENT "Building PDF documentation with Sphinx")
 
-add_custom_target(docs_pdf ALL
+add_custom_target(docs_pdf
         DEPENDS ${SPHINX_PDF_DIR}/arctic.pdf
         )
 

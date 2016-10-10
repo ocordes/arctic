@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-04
+   changed by: Oliver Cordes 2016-10-10
 
    $Id$
 
@@ -138,6 +138,10 @@ void image::write_file( void )
   time_t systime = time( NULL );
   std::string c = "CTE model applied " + std::string( ctime( & systime ) );
   pFits->pHDU().addKey( "CTE_VERS", std::string( VERSION ), c );
+  if ( parameters->neo_algorithm )
+    pFits->pHDU().addKey( "CTE_ALGO", "NEO", "Name of the algorothm used" );
+  else
+    pFits->pHDU().addKey( "CTE_ALGO", "CLASSIC", "Name of the algorothm used" );
   pFits->pHDU().addKey( "CTE_ITER", parameters->n_iterations, "Number of iterations used during CTE correction" );
   pFits->pHDU().addKey( "CTE_WELD", parameters->well_depth, "Assumed pixel well depth [electrons]" );
   pFits->pHDU().addKey( "CTE_WELN", parameters->well_notch_depth, "Assumed notch depth [electrons]" );
@@ -155,7 +159,67 @@ void image::write_file( void )
       std::string comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
       pFits->pHDU().addKey( key, parameters->trap_lifetime[i], comm );
     }
-  pFits->pHDU().addKey( "CTE_MLEV", parameters->n_levels, "N_levels parameter in ClockCharge code" );
+  pFits->pHDU().addKey( "CTE_NLEV", parameters->n_levels, "N_levels parameter in ClockCharge code" );
+
+  if ( parameters->rotate )
+    pFits->pHDU().addKey( "CTE_READ",  "SERIAL", "Readout modus" );
+  else
+    pFits->pHDU().addKey( "CTE_READ",  "PARALLEL", "Readout modus" );
+
+  if ( parameters->direction )
+    pFits->pHDU().addKey( "CTE_DIR",  "REVERSE", "READOUT direction" );
+  else
+    pFits->pHDU().addKey( "CTE_DIR",  "FORWARD", "READOUT direction" );
+
+
+  if ( parameters->rotate )
+    {
+      // special output for serial- = x- clocking
+
+      pFits->pHDU().addKey( "CTE_SNTR", parameters->trap_density.size(), "Number of charge trap species" );
+      for (unsigned int i=0;i<parameters->trap_density.size();i++)
+        {
+          std::string key  = "CTE_TS" + std::to_string( i+1 ) + "D";
+          std::string comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
+          pFits->pHDU().addKey( key, parameters->trap_density[i], comm );
+        }
+      for (unsigned int i=0;i<parameters->trap_density.size();i++)
+        {
+          std::string key  = "CTE_TS" + std::to_string( i+1 ) + "T";
+          std::string comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
+          pFits->pHDU().addKey( key, parameters->trap_lifetime[i], comm );
+        }
+      pFits->pHDU().addKey( "CTE_SNLE", parameters->n_levels, "N_levels parameter in ClockCharge code" );
+      if ( parameters->direction )
+        pFits->pHDU().addKey( "CTE_SDIR",  "REVERSE", "READOUT direction" );
+      else
+        pFits->pHDU().addKey( "CTE_SDIR",  "FORWARD", "READOUT direction" );
+    }
+  else
+    {
+      // special output for parallel- = y- clocking
+
+      pFits->pHDU().addKey( "CTE_PNTR", parameters->trap_density.size(), "Number of charge trap species" );
+      for (unsigned int i=0;i<parameters->trap_density.size();i++)
+        {
+          std::string key  = "CTE_TP" + std::to_string( i+1 ) + "D";
+          std::string comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
+          pFits->pHDU().addKey( key, parameters->trap_density[i], comm );
+        }
+      for (unsigned int i=0;i<parameters->trap_density.size();i++)
+        {
+          std::string key  = "CTE_TP" + std::to_string( i+1 ) + "T";
+          std::string comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
+          pFits->pHDU().addKey( key, parameters->trap_lifetime[i], comm );
+        }
+      pFits->pHDU().addKey( "CTE_PNLE", parameters->n_levels, "N_levels parameter in ClockCharge code" );
+      if ( parameters->direction )
+        pFits->pHDU().addKey( "CTE_PDIR",  "REVERSE", "READOUT direction" );
+      else
+        pFits->pHDU().addKey( "CTE_PDIR",  "FORWARD", "READOUT direction" );
+    }
+
+
 
   // The function PHDU& FITS::pHDU() returns a reference to the object representing
   // the primary HDU; PHDU::write( <args> ) is then used to write the data.
