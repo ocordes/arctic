@@ -351,9 +351,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   express          = parameters->express;
   readout_offset   = parameters->readout_offset;
 
-  //traps_total = 0;
-  //for (i=0;i<n_species;i++)
-  //  traps_total += trap_density[i];
+  
   traps_total = parameters->trap_density.sum();
 
 
@@ -509,27 +507,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 		                // n_levels_traps which hold always the max position
 		                // of a trap which was used before ! */
 
-		                //  for (i=n_levels_traps-1;i>=0;i--)
-		                //    {
-		                //      int to_break = 0;
-                     //
-		                //      for (j=0;j<n_species;j++)
-		                //        {
-		                //          int pos = (i*n_species)+j;
-                     //
-		                //          if ( traps[pos] > empty_trap_limit )
-		                //  	    {
-		                //              to_break = 1;
-		                //              break;
-		                //           }
-		                //          else
-		                //            traps[pos] = 0.0;
-		                //        }
-		                //      if ( to_break == 1 )
-		                //        break;
-		                //      n_levels_traps = i;
-		                //      stat_count++;
-		                //    }
 
 		                for (i=n_levels_traps-1;i>=0;i--)
                     {
@@ -985,12 +962,14 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 	            //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
               express_factor_pixel = express_multiplier[p_express_multiplier];
 
-              // Modifications of low signal behaviour
-              n_electrons_per_trap_express = n_electrons_per_trap * express_factor_pixel;
-              n_electrons_per_trap_express_total = n_electrons_per_trap_total * (double) express_factor_pixel;
 
 	            if ( express_factor_pixel != 0 )
                 {
+                  // Modifications of low signal behaviour
+                  n_electrons_per_trap_express = n_electrons_per_trap * express_factor_pixel;
+                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * (double) express_factor_pixel;
+
+
                   // extract pixel
                   im = image[ (*is) ];
 
