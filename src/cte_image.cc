@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-08-05
+   changed by: Oliver Cordes 2016-10-14
 
 
    $Id$
@@ -279,8 +279,8 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   /* CTE variables */
   double  traps_total;
   int     n_levels_traps;
-  std::valarray<double> n_electrons_per_trap;
-  double n_electrons_per_trap_total;
+  double  n_electrons_per_trap_total;
+  double  n_electrons_per_trap_express_total;
   int     i_express;
   double  release;
   double  total_capture;
@@ -360,7 +360,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
 
 
 
-  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) n_levels );
+  std::valarray<double> n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) n_levels );
   n_electrons_per_trap_total = traps_total / n_levels;
 
   sparse_pixels = get_sparse_pixels( image, traps_total );
@@ -413,7 +413,16 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   std::valarray<double> pot_capture( 0.0, n_species );
   #endif
 
+  std::valarray<double> n_electrons_per_trap_express = n_electrons_per_trap;
+  std::valarray<double> n_electrons_per_trap_express_ov = n_electrons_per_trap;
+
+
   output( 10, "Done.\n" );
+
+
+  // setup variables
+
+  double ov;
 
 
   // image slicer definitions
@@ -455,9 +464,15 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 	            // access the express array only once and use this value twice ;-)
               express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
 
+
               // check if we need to calculate a new trail for that pixel
               if ( express_factor_pixel != 0 )
                 {
+                  // Modifications of low signal behaviour
+                  n_electrons_per_trap_express = n_electrons_per_trap * express_factor_pixel;
+                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * (double) express_factor_pixel;
+
+
                   // extract pixel
                   //im = image[((i_pixel+start_y)*image_width)+i_column];
                   im = image[ (*is) ];
@@ -556,9 +571,15 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
                   cheight = ceil( dheight );
 
+                  // ov is the fraction of the last filled trap level
+                  ov = dheight - (cheight-1);
+
+                  // some helpers
+                  n_electrons_per_trap_express_ov = n_electrons_per_trap_express * ov;
 
 
-                  // calculate the number of electrons which can be captured
+                  // calculate the number of electrons which can be
+                  // captured in the traps
 
                   // opti
                   double trap_sum = 0.0;
@@ -574,14 +595,14 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   */
 		              #endif
 
-		              sum = (n_electrons_per_trap_total*(cheight-1))
+		              sum = (n_electrons_per_trap_express_total*(cheight-1))
                   //- get_sum_double_array( traps, cheight-1, n_species );
 			               - trap_sum;
                   d = dheight - (cheight-1);
                   for (j=0;j<n_species;j++)
                     {
                       int pos = (cheight-1)*n_species+j;
-			                double c = n_electrons_per_trap[j] * d - traps[pos];
+			                double c = n_electrons_per_trap_express[j] * d - traps[pos];
 			                #ifdef __debug
                       // sum2, sum3 unused for the moment. Comment to keep Sonar happy.
                       /*
@@ -605,7 +626,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   {
                      int pos = (i*n_species);
 			               for (j=0;j<n_species;j++)
-			                    pot_capture[j] += n_electrons_per_trap[j] - traps[pos+j];
+			                    pot_capture[j] += n_electrons_per_trap_express[j] - traps[pos+j];
 			            }
 
 		              output( 10, "ntrap_total : %.15f\n", traps.sum() );
@@ -623,7 +644,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
                   d = freec / total_capture;
-                  double ov = dheight - (cheight-1);
+
                   if ( d < 1.0 )
                     {
 			                #ifdef __debug
@@ -636,7 +657,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                           {
                             int pos = (i*n_species)+j;
 
-                            double c = ( n_electrons_per_trap[j] - traps[pos] ) * d;
+                            double c = ( n_electrons_per_trap_express[j] - traps[pos] ) * d;
                             traps[pos] += c;
                           }
 
@@ -644,9 +665,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                  {
                           int pos = (cheight-1)*n_species+j;
 
-                          if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
+                          if ( traps[pos] < ( n_electrons_per_trap_express_ov[j] ) )
                             {
-                              double c = ( ( n_electrons_per_trap[j] * ov ) - traps[pos] ) * d;
+                              double c = ( ( n_electrons_per_trap_express_ov[j]  ) - traps[pos] ) * d;
                               traps[pos] += c;
                             }
                         }
@@ -662,15 +683,15 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                         for (j=0;j<n_species;j++)
                           {
                             //pos = (i*n_species)+j;
-                            traps[pos] = n_electrons_per_trap[j];
+                            traps[pos] = n_electrons_per_trap_express[j];
                             ++pos;
 			                    }
 
                        for (j=0;j<n_species;++j)
                           {
                             //pos = (cheight-1)*n_species+j;
-                            if ( traps[pos] < ( n_electrons_per_trap[j] * ov ) )
-                              traps[pos] = ( n_electrons_per_trap[j] * ov );
+                            if ( traps[pos] < ( n_electrons_per_trap_express_ov[j] ) )
+                              traps[pos] = ( n_electrons_per_trap_express_ov[j] );
                             ++pos;
                           }
                     }
@@ -684,9 +705,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 		              output( 10, "ntrap_total : %f\n", traps.sum() );
 
 		              output( 10, "n_e_p_t     : %f %f %f = %f\n",
-			               n_electrons_per_trap[0],
-			               n_electrons_per_trap[1],
-			               n_electrons_per_trap[2], n_electrons_per_trap_total );
+			               n_electrons_per_trap_express[0],
+			               n_electrons_per_trap_express[1],
+			               n_electrons_per_trap_express[2], n_electrons_per_trap_express_total );
 
 
 		              std::valarray<double> pot_capture2( 0.0, n_species );
@@ -694,7 +715,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			              for (j=0;j<n_species;j++)
 			                {
 			                  int pos = (i*n_species)+j;
-			                  pot_capture2[j] += n_electrons_per_trap[j] - traps[pos];
+			                  pot_capture2[j] += n_electrons_per_trap_express[j] - traps[pos];
 			                }
 		              output( 10, "pot_capture2: %f %f %f = %f\n",
                                       pot_capture2[0], pot_capture2[1], pot_capture2[2], pot_capture2.sum() );
@@ -712,11 +733,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               #ifdef __debug
               double trail = ( freec - im );
               output( 10, "strail: %.10f\n", trail );
-              trail *= express_factor_pixel;
-              output( 10, "ptrail: %.10f\n", trail );
               #endif
 
-              image[(*is)] += ( freec - im ) * express_factor_pixel;
+              image[(*is)] += ( freec - im );
 
              } /* end of p_express_multiplier[i_pixel] != 0 */
 
@@ -968,7 +987,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
               // Modifications of low signal behaviour
               n_electrons_per_trap_express = n_electrons_per_trap * express_factor_pixel;
-              n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
+              n_electrons_per_trap_express_total = n_electrons_per_trap_total * (double) express_factor_pixel;
 
 	            if ( express_factor_pixel != 0 )
                 {
