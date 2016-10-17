@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-25
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -84,6 +84,8 @@ params::params()
   force = false;
 
   config_filename   = "";
+  working_mode      = "";
+
   output( 11, "params::params()\n" );
 }
 
@@ -97,6 +99,8 @@ params::~params()
 void params::load_config( std::string filename )
 {
   output( 1, "Loading config file '%s' ...\n", filename.c_str() );
+
+  config_filename = filename;
 
   std::ifstream f;
 
@@ -117,6 +121,9 @@ void params::load_config( std::string filename )
 
 	        // clean spaces
 	        s = s.clean_white();
+
+          // add line into condfig_entry array for saving information in FITS header
+          config_entries.push_back( s );
 
 	        //std::cout << s << std::endl;
 
@@ -323,7 +330,6 @@ int get_working_mode( int argc, char *argv[] )
     return WORKING_MODE_FITS;
 #endif
 }
-
 
 
 bool params::tobool( std::string & val )

@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-14
+   changed by: Oliver Cordes 2016-10-17
 
 
    $Id$
@@ -261,7 +261,7 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
 
 // original code from the IDL version adopted by R.Massey
 
-void cte_image::clock_charge_image( std::valarray<double> & image,
+void cte_image::clock_charge_image_classic( std::valarray<double> & image,
                                     std::valarray<long> & xrange,
                                     std::valarray<long> & yrange )
 {
@@ -351,7 +351,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   express          = parameters->express;
   readout_offset   = parameters->readout_offset;
 
-  
+
   traps_total = parameters->trap_density.sum();
 
 
@@ -467,8 +467,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               if ( express_factor_pixel != 0 )
                 {
                   // Modifications of low signal behaviour
-                  n_electrons_per_trap_express = n_electrons_per_trap * express_factor_pixel;
-                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * (double) express_factor_pixel;
+                  n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
+                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
 
 
                   // extract pixel
@@ -966,8 +966,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 	            if ( express_factor_pixel != 0 )
                 {
                   // Modifications of low signal behaviour
-                  n_electrons_per_trap_express = n_electrons_per_trap * express_factor_pixel;
-                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * (double) express_factor_pixel;
+                  n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
+                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
 
 
                   // extract pixel
@@ -2115,7 +2115,7 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 	             if (parameters->neo_algorithm == true )
 		              clock_charge_image_neo( trail, xrange, yrange );
 	             else
-		              clock_charge_image( trail, xrange, yrange );
+		              clock_charge_image_classic( trail, xrange, yrange );
 	          }
 
 
@@ -2153,7 +2153,7 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 	        if (parameters->neo_algorithm == true )
 	          clock_charge_image_neo( image, xrange, yrange );
 	        else
-	          clock_charge_image( image, xrange, yrange );
+	          clock_charge_image_classic( image, xrange, yrange );
 	      }
 
       output( 1, "Minmax(old image): %f %f\n", (*im).min(), (*im).max() );

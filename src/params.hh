@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-25
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -37,6 +37,7 @@
 
 #include <string>
 #include <valarray>
+#include <vector>
 
 #include "image_slice.hh"
 #include "strstr.hh"
@@ -63,34 +64,36 @@ protected:
   void load_config( std::string filename );
 public:
   // CTI variables
-  bool                  neo_algorithm;
-  bool                  neo_algorithm2;
-  double                well_depth;
-  double                well_notch_depth;
-  double                well_fill_power;
-  double                empty_trap_limit;
-  bool                  check_empty_traps;
-  unsigned int          n_iterations;
-  int                   express;
-  int                   n_levels;
-  bool                  unclock;
-  int                   readout_offset;
-  bool                  dark_mode;
-  std::valarray<long>   xrange;
-  std::valarray<long>   yrange;
-  int                   n_species;
-  std::valarray<double> trap_density;
-  std::valarray<double> trap_lifetime;
-  bool                  cut_upper_limit;
-  double                upper_limit;
+  bool                     neo_algorithm;
+  bool                     neo_algorithm2;
+  double                   well_depth;
+  double                   well_notch_depth;
+  double                   well_fill_power;
+  double                   empty_trap_limit;
+  bool                     check_empty_traps;
+  unsigned int             n_iterations;
+  int                      express;
+  int                      n_levels;
+  bool                     unclock;
+  int                      readout_offset;
+  bool                     dark_mode;
+  std::valarray<long>      xrange;
+  std::valarray<long>      yrange;
+  int                      n_species;
+  std::valarray<double>    trap_density;
+  std::valarray<double>    trap_lifetime;
+  bool                     cut_upper_limit;
+  double                   upper_limit;
 
   // image variables
-  bool                  rotate;
-  bool                  direction;
-  bool                  force;
+  bool                     rotate;
+  bool                     direction;
+  bool                     force;
 
   // standard variables
-  std::string           config_filename;
+  std::string              working_mode;
+  std::string              config_filename;
+  std::vector<std::string> config_entries;
 
 
   params();

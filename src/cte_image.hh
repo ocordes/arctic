@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-25
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -63,7 +63,7 @@ private:
                                     int express,
                                     int h,
                                     int readout_offset );
-  void   clock_charge_image( std::valarray<double> &,
+  void   clock_charge_image_classic( std::valarray<double> &,
 			     std::valarray<long> &,
 			     std::valarray<long> & );
   void   clock_charge_image_neo( std::valarray<double> &,

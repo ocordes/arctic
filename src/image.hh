@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-04
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -45,7 +45,7 @@ using namespace CCfits;
 
 class image{
 public:
-  image();
+  image( int argc, char *argv[] );
   virtual ~image();
   virtual int  read_file( void );
   virtual void write_file( void );
@@ -55,6 +55,7 @@ public:
   double      readkey_double( PHDU & pHDU, std::string key );
   std::string readkey_string( PHDU & pHDU, std::string key );
 protected:
+  std::string                            prgname;
   std::shared_ptr<params>                parameters;
   std::string                            infilename;
   std::string                            outfilename;

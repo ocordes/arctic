@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-29
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -39,6 +39,8 @@
 params_fits::params_fits() : params()
 {
   static_trap_definitions = 0;   //  use informations from FITS header
+
+  working_mode            = "FITS";
 }
 
 void params_fits::parse_args( std::string key, std::string val, int & error )

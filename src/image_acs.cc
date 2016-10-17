@@ -22,7 +22,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-25
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -50,7 +50,7 @@
 using namespace CCfits;
 
 
-acs_image::acs_image( int argc, char *argv[] ) : image()
+acs_image::acs_image( int argc, char *argv[] ) : image( argc, argv )
 {
   // alloctae parameter object
   parameters  = std::shared_ptr<params_acs>( new params_acs() );

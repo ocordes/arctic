@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-25
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -47,7 +47,7 @@
 
 using namespace CCfits;
 
-fits_image::fits_image( int argc, char *argv[] ) : image()
+fits_image::fits_image( int argc, char *argv[] ) : image( argc, argv )
 {
   // alloctae parameter object
   parameters  = std::shared_ptr<params_fits>( new params_fits() );

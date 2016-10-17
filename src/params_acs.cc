@@ -22,7 +22,7 @@
 /* params_acs.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-16
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -43,6 +43,8 @@
 params_acs::params_acs() : params_fits()
 {
   single_fits = 0;
+
+  working_mode = "ACS";
 }
 
 void params_acs::parse_args( std::string key, std::string val, int & error )

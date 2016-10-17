@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-06-30
+   changed by: Oliver Cordes 2016-10-17
 
    $Id$
 
@@ -40,6 +40,8 @@ params_euclid::params_euclid() : params_fits()
 {
   has_local_n_species    = false;
   has_local_trap_density = false;
+
+  working_mode = "EUCLID";
 }
 
 
