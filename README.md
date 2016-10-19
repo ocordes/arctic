@@ -17,23 +17,10 @@ Installation/Compilation:
 
 After download of the source tree, please change into the arctic directory:
 
-CMAKE tools:
 
 ```
 mkdir build; cd build
 cmake ..
-
-make
-
-make Install
-```
------
-
-automake/autoconf tools (**_DEPRECATED_**):
-
-```
-mkdir build; cd build
-../configure
 
 make
 
