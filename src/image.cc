@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-10
+   changed by: Oliver Cordes 2016-10-19
 
    $Id$
 
@@ -63,7 +63,7 @@ std::string get_working_path()
 image::image( int argc, char *argv[] )
 {
   prgname      = "";
-  for (unsigned int i=0;i<argc;++i)
+  for (int i=0;i<argc;++i)
     if ( prgname == "" )
        prgname = std::string( argv[i] );
     else
