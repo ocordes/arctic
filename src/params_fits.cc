@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-10-19
 
    $Id$
 
@@ -211,34 +211,52 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 	       b = tobool( val );
 
       if ( b )
-	    {
-	        neo_algorithm = false;
-	        neo_algorithm2 = false;
-	    }
+	       algorithm = ALGORITHM_CLASSIC;
       else
-     	{
-	       neo_algorithm = true;
-	        neo_algorithm2 = false;
-	    }
+         algorithm = ALGORITHM_NEO;
 
-      output( 10, "params: classic_algorithm=%i\n", b );
-      output( 10, "params: neo_algorithm=%i\n", neo_algorithm );
+      switch( algorithm )
+      {
+        case ALGORITHM_CLASSIC:
+          output( 10, "params: ALGORITHM = CLASSIC\n" );
+          break;
+        case ALGORITHM_NEO:
+          output( 10, "params: ALGORITHM = NEO\n" );
+          break;
+        case ALGORITHM_NEO2:
+          output( 10, "params: ALGORITHM = NEO2\n" );
+          break;
+      }
+
       error = PARSE_OK;
       return;
     }
+
   if ( key == "NEO" )
     {
       bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
-
-      neo_algorithm = b;
+	      b = tobool( val );
 
       if ( b )
-	  neo_algorithm2 = false;
+        algorithm = ALGORITHM_NEO;
+      else
+        algorithm = ALGORITHM_CLASSIC;
 
-      output( 10, "params: neo_algorithm=%i\n", neo_algorithm );
+      switch( algorithm )
+      {
+        case ALGORITHM_CLASSIC:
+          output( 10, "params: ALGORITHM = CLASSIC\n" );
+          break;
+        case ALGORITHM_NEO:
+          output( 10, "params: ALGORITHM = NEO\n" );
+          break;
+        case ALGORITHM_NEO2:
+          output( 10, "params: ALGORITHM = NEO2\n" );
+          break;
+      }
+
       error = PARSE_OK;
       return;
     }
@@ -247,14 +265,26 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
        bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
+       	b = tobool( val );
 
-      neo_algorithm2 = b;
+      if ( b )
+	      algorithm = ALGORITHM_NEO2;
+      else
+        algorithm = ALGORITHM_CLASSIC;
 
-       if ( b )
-	  neo_algorithm = false;
+        switch( algorithm )
+        {
+          case ALGORITHM_CLASSIC:
+            output( 10, "params: ALGORITHM = CLASSIC\n" );
+            break;
+          case ALGORITHM_NEO:
+            output( 10, "params: ALGORITHM = NEO\n" );
+            break;
+          case ALGORITHM_NEO2:
+            output( 10, "params: ALGORITHM = NEO2\n" );
+            break;
+        }
 
-      output( 10, "params: neo_algorithm2=%i\n", neo_algorithm2 );
       error = PARSE_OK;
       return;
     }

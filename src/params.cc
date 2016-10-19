@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-10-19
 
    $Id$
 
@@ -52,8 +52,7 @@
 
 params::params()
 {
-  neo_algorithm     = true;
-  neo_algorithm2    = false;
+  algorithm         = ALGORITHM_NEO;
   well_depth        = 84700;
   well_notch_depth  = 1e-9;
   well_fill_power   = 0.478;

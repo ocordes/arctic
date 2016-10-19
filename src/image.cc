@@ -162,10 +162,20 @@ void image::write_file( void )
   time_t systime = time( NULL );
   std::string c = "CTE model applied " + std::string( ctime( & systime ) );
   hdu.addKey( "CTE_VERS", std::string( VERSION ), c );
-  if ( parameters->neo_algorithm )
-    hdu.addKey( "CTE_ALGO", "NEO", "Name of the algorothm used" );
-  else
-    hdu.addKey( "CTE_ALGO", "CLASSIC", "Name of the algorothm used" );
+  switch( parameters->algorithm )
+  {
+    case ALGORITHM_CLASSIC:
+      hdu.addKey( "CTE_ALGO", "CLASSIC", "Name of the algorithm used" );
+      break;
+    case ALGORITHM_NEO:
+      hdu.addKey( "CTE_ALGO", "NEO", "Name of the algorithm used" );
+      break;
+    case ALGORITHM_NEO2:
+      hdu.addKey( "CTE_ALGO", "NEO2", "Name of the algorithm used" );
+      break;
+    default:
+      hdu.addKey( "CTE_ALGO", "NEO", "Name of the algorithm used" );
+  }
   hdu.addKey( "CTE_MODE", parameters->working_mode, "Working mode for getting trap information" );
   hdu.addKey( "CTE_ITER", parameters->n_iterations, "Number of iterations used during CTE correction" );
   hdu.addKey( "CTE_WELD", parameters->well_depth, "Assumed pixel well depth [electrons]" );

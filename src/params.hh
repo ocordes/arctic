@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-10-19
 
    $Id$
 
@@ -56,6 +56,12 @@
 #define PARSE_ERROR         100
 
 
+// algorithm definitions
+#define ALGORITHM_CLASSIC  1
+#define ALGORITHM_NEO      2
+#define ALGORITHM_NEO2     3
+
+
 // Defines a real type for images
 
 
@@ -64,8 +70,7 @@ protected:
   void load_config( std::string filename );
 public:
   // CTI variables
-  bool                     neo_algorithm;
-  bool                     neo_algorithm2;
+  unsigned  int            algorithm;
   double                   well_depth;
   double                   well_notch_depth;
   double                   well_fill_power;
