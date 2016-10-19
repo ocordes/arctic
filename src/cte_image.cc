@@ -918,6 +918,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   std::valarray<double> n_electrons_per_trap_express = n_electrons_per_trap;
   std::valarray<double> n_electrons_per_trap_express_ov = n_electrons_per_trap;
 
+  output( 10, "Done.\n" );
+
   // test auto variables
   int     h, h2, skip;
   //auto h = 0;
