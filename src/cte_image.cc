@@ -897,14 +897,22 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   output( 10, "Done.\n" );
 
 
+  output( 10, "Create trap structure ...\n" );
+
+  // the maximun entries in the trap level arraay should be 2x the amount of
+  // pixels in the working column, because in the worst case 2 new entries
+  // will be created per pixel!
+
+  int max_trap_levels = height * 2;
+
   // trap level information implementations
-  std::valarray<std::valarray<double>> trapl( std::valarray<double>(0.0, n_species), n_levels );
-  std::valarray<int> trapl_fill( 0, n_levels );
+  std::valarray<std::valarray<double>> trapl( std::valarray<double>(0.0, n_species), max_trap_levels );
+  std::valarray<int> trapl_fill( 0, max_trap_levels );
   long nr_trapl = 0;
 
   // helper array for the d < 0.0 mode
-  std::valarray<std::valarray<double>> new_trapl( std::valarray<double>(0.0, n_species), n_levels );
-  std::valarray<int> new_trapl_fill( 0, n_levels );
+  std::valarray<std::valarray<double>> new_trapl( std::valarray<double>(0.0, n_species), max_trap_levels );
+  std::valarray<int> new_trapl_fill( 0, max_trap_levels );
   long new_nr_trapl = 0;
 
   std::valarray<double> n_electrons_per_trap_express = n_electrons_per_trap;
