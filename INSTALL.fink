@@ -1,11 +1,11 @@
 INSTALL on MacOS X with fink
 ============================
 
-If you have a MacOS X system and the cfitsio library
-installedd with fink. Then use this command to
+If you have a MacOS X system and the cfitsio/ccfits library
+installed with fink. Then use this command to
 configure the program:
 
-env CPPFLAGS=-I/sw/include LDFLAGS=-L/sw/lib ./configure
+cd  build
+env CPPFLAGS=-I/sw/include LDFLAGS=-L/sw/lib cmake ..
 
 (assuming that you have installed the fink sources in /sw ! )
-
