@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-10-20
 
    $Id$
 
@@ -57,6 +57,10 @@ private:
 		      std::valarray<int> & trapl_fill,
 		      int n_species,
 		      int nr_trapl );
+  void   print_wml( std::valarray<std::valarray<double>> & wml,
+        	std::valarray<double> & wml_fill,
+        	int n_species,
+        	int nr_wml );
   bool   val_array_smaller( std::valarray<double> & v1,
 			    std::valarray<double> & v2 );
   void   create_express_multiplier( std::valarray<int> & express_multiplier,

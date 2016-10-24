@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-10-20
 
 
    $Id$
@@ -47,7 +47,7 @@ w
 #include <sys/time.h>
 #include <sys/resource.h>
 
-//#define __debug
+#define __debug
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -218,6 +218,44 @@ void cte_image::print_trapl( std::valarray<std::valarray<double>> & trapl,
       l += trapl_fill[j];
     }
 }
+
+
+void cte_image::print_wml( std::valarray<std::valarray<double>> & wml,
+			     std::valarray<double> & wml_fill,
+			     int n_species,
+			     int nr_wml )
+{
+  int i, j;
+  double l;
+
+  std::string s;
+
+  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, nr_wml );
+  l = 0.0;
+  //for (j=0;j<nr_trapl;j++)
+  for (j=nr_wml-1;j>=0;j--)
+    {
+      s = "";
+      for (i=0;i<n_species;i++)
+	{
+	  std::stringstream str;
+	  str << std::fixed << std::setprecision( debug_precision ) << wml[j][i] << " ";
+	  s += str.str();
+	  //s += std::to_string( trapl[j][i] ) + " ";
+	}
+
+      std::stringstream str;
+      str << std::fixed << std::setprecision( debug_precision ) << wml[j].sum() ;
+      s += "= " + str.str();
+      //s += "= " + std::to_string( trapl[j].sum()  );
+
+      //output( 10, "%05i: %s\n", j, s.c_str() );
+      output( 10, "%011.5f: %s  (x %f)\n", l * (double) parameters->n_levels, s.c_str(), wml_fill[j] );
+
+      l += wml_fill[j];
+    }
+}
+
 
 
 bool cte_image::val_array_smaller( std::valarray<double> & v1,
@@ -1341,6 +1379,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 				                        {
 				                           #ifdef __debug
 				                           output( 10, "tr_f[0],ch,skip: %i %i %i\n", trapl_fill[0], cheight, skip );
+                                   //print_trapl( trapl, trapl_fill, n_species, nr_trapl );
 				                           #endif
 
 				                           // cheight full trap levels
@@ -1654,8 +1693,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   output( 10, "Done.\n" );
 
-  double  watermark;
-  double  h, h2;
+  double  cloud_height;
+  double  h, h2, skip;
 
 
   // image slicer definitions
@@ -1748,7 +1787,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                     if ( d < 0.0 )
                       d = 0.0;
 
-                  watermark = d;
+                  cloud_height = d;
 
                   // calculate the number of electrons which can be
                   // captured  in the traps
@@ -1768,24 +1807,24 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                     // electrons then n_electrons_per_trap_express of the
 
                     // last step!
-                    if ( h2 < watermark )
+                    if ( h2 < cloud_height )
                     {
                       // this levels are going directly into the calculations
                       total_capture += ( trap_density_express_total - wml[j].sum() ) * wml_fill[j];
                     }
                     else
                     {
-                      total_capture += ( trap_density_express_total - wml[j].sum() ) * ( watermark - h );
+                      total_capture += ( trap_density_express_total - wml[j].sum() ) * ( cloud_height - h );
                     }
                     h = h2;
-                    if ( h > watermark )
+                    if ( h > cloud_height )
                       break;
                   }
 
                   // h has the height of all used levels
-                  if ( h < watermark )
+                  if ( h < cloud_height )
                   {
-                    total_capture +=  trap_density_express_total * ( watermark - h );
+                    total_capture +=  trap_density_express_total * ( cloud_height - h );
                   }
 
                   #ifdef __debug
@@ -1795,10 +1834,10 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                    traps_total2 += wml[i].sum() * wml_fill[i];
                   output( 10, "ntrap_total : %.15f\n", traps_total2 );
 
-                  print_trapl( trapl, trapl_fill, n_species, nr_trapl );
+                  print_wml( wml, wml_fill, n_species, nr_wml );
 
 
-                  output( 10, "free,dheight: %.15f %.15f\n", freec, watermark );
+                  output( 10, "free,dheight: %.15f %.15f\n", freec, cloud_height );
                   output( 10, "max_capture : %.15f\n", total_capture );
 
                   #endif
@@ -1822,9 +1861,10 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
                   // skip has the height until the new bunches
 
- //
- //                     if ( d < 1.0 )
- //                       {
+
+                  if ( d < 1.0 )
+                  {
+                    output( 10, "d < 1.0\n" );
  //                                           #ifdef __debug
  //                                           output( 10, "d < 1.0\n" );
  //                                           #endif
@@ -1970,140 +2010,111 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
  //                                                                                       }
  //                                             nr_trapl = new_nr_trapl;
  //                                             total_capture *= d;
- //                         }
- //                       else
- //                         {
- //                           // cheight full levels
- //                                           // cheight+1 partly filled levels
- //                                           //
- //                                           // trapl_fill gives the number of filled levels
- //
- //
- //                                           // prepare the stack for refilling
- //
- //                                           // remove the levels which will be completely absorbed
- //                                           // with the new filling
- //                                           skip = 0;
- //                                           h = 0;
- //                                           while ( nr_trapl != 0 )
- //                                             {
- //                                               h += trapl_fill[nr_trapl-1];
- //                                               if ( h > dheight )
- //                                                       break;
- //                                               else
- //                                                       skip = h;
- //                                               --nr_trapl;
- //                                             }
- //
- //                                           // skip now containes the number of previous filled levels which
- //                                           // will completely absorbed with the new filling, the
- //                                           // corresponding levels are removed from the stack
- //
- //
- //                                           #ifdef __debug
- //                                           output( 10, "h,nr_trapl,d: %i %i %.15f\n", h, nr_trapl, dheight );
- //                         #endif
- //
- //                                           if ( std::abs(skip - dheight) < 1e-14 )
- //                                             {
- //                                                // best solution ... but only reached, if dheight is n_levels,
- //                                                // which means a bright star or strong cosmic passed ...
- //
- //                                                // but not correct implemented ...
- //                                                #ifdef __debug
- //                                                output( 10, "skip=%i dheight=%f\n", skip, dheight );
- //                                                #endif
- //
- //                                                trapl[nr_trapl] = n_electrons_per_trap_express_ov;
- //                              trapl_fill[nr_trapl] = 1;
- //                              ++nr_trapl;
- //                              trapl_fill[nr_trapl] = cheight;
- //                              trapl[nr_trapl] = n_electrons_per_trap_express;
- //                              ++nr_trapl;
- //                                             }
- //                                           else
- //                                             {
- //                                                // normal case
- //
- //                                                // we have removed all levels from the stack which will be
- //                                                // absorbed completely during the new filling
- //
- //                              // skip is the number of levels which are already absorbed!
- //
- //                                                // we are lucky, the levels are empty because we are at the
- //                                                // start or the new dheight is larger than all previous levels
- //                                                if ( nr_trapl == 0 )
- //                                                        {
- //                                                           // an additional trap level
- //                                                           trapl_fill[1] = cheight;
- //                                                           trapl_fill[0] = 1;
- //                                                           trapl[1] = n_electrons_per_trap_express;
- //                                                           trapl[0] = n_electrons_per_trap_express_ov;
- //                                                           nr_trapl = 2;
- //                                                        }
- //                                                else
- //                                                        {
- //                                                           #ifdef __debug
- //                                                           output( 10, "tr_f[0],ch,skip: %i %i %i\n", trapl_fill[0], cheight, skip );
- //                                                           #endif
- //
- //                                                           // cheight full trap levels
- //                                                           // ov is a single level with ov * n_electrons_per_trap fill
- //
- //                                                           // skip levels are already absorbed
- //
- //                                                           // modify the first levels
- //                                                           // using cheight because this is the number of remaining levels
- //                                                           // from the prior filled trap levels
- //
- //                                   // cheight - skip are the (sub)-levels  which needs to be absorbed
- //                                   // by the next big entry
- //
- //                                   trapl_fill[nr_trapl-1] -= cheight - skip;   // absorbes levels
- //
- //            // check what to do anyway, if there is a chance to modify the
- //            // big level!
- //
- //            if ( val_array_smaller( trapl[nr_trapl-1], n_electrons_per_trap_express_ov ) )
- //            {
- //              if ( trapl_fill[nr_trapl-1] > 1 )
- //              {
- //                // split levels
- //                --trapl_fill[nr_trapl-1];
- //                trapl_fill[nr_trapl] = 1;
- //                trapl[nr_trapl] = trapl[nr_trapl-1];
- //                ++nr_trapl;
- //              }
- //
- //              // fill only the species which needs to be filled
- //              for (j=0;j<n_species;++j)
- //                // modify if there are free
- //                if ( trapl[nr_trapl-1][j] < n_electrons_per_trap_express_ov[j] )
- //                  trapl[nr_trapl-1][j] =  n_electrons_per_trap_express_ov[j];
- //
- //            }
- //
- //
- //                                    // fill the leading trap level if necessary
- //                                    if ( cheight > 0 )
- //                                      {
- //                                         trapl_fill[nr_trapl] = cheight;
- //                                         trapl[nr_trapl] = n_electrons_per_trap_express;
- //
- //                                         ++nr_trapl;
- //                                      }
- //            }
- //                      }
- // }
- //
- //           #ifdef __debug
- //           print_trapl( trapl, trapl_fill, n_species, nr_trapl );
- //           #endif
+                  } // end of then from if ( d < 1.0 ) ...
+                  else
+                  {
+                    output( 10, "d > 1.0\n");
+
+                    // cloud_height gives the number of new filling levels
+                    //
+                    // wml_fill gives the number of filled levels
 
 
-           // delete the captured exlectrons from
-                      //   the pixel value
-                      freec -= total_capture;
+                    // prepare the stack for refilling
+
+                    // remove the levels which will be completely absorbed
+                    // with the new filling
+                    skip = 0.0;
+                    h = 0.0;
+
+                    while ( nr_wml != 0 )
+                    {
+                      h += wml_fill[nr_wml-1];
+                      if ( h > cloud_height )
+                        break;
+                      else
+                        skip = h;
+                      --nr_wml;
+                    }
+                    // skip now containes the number of previous filled levels which
+                    // will completely absorbed with the new filling, the
+                    // corresponding levels are removed from the stack
+
+
+                    #ifdef __debug
+                    output( 10, "h,nr_trapl,d: %f %i %.15f\n", h, nr_wml, cloud_height );
+                    #endif
+
+                    if ( std::abs(skip - cloud_height) < 1e-14 )
+                    {
+                      // best solution ... but only reached, if dheight is n_levels,
+                      // which means a bright star or strong cosmic passed ...
+
+                      // but not correct implemented ...
+                      #ifdef __debug
+                      output( 10, "skip=%f dheight=%f\n", skip, cloud_height );
+                      #endif
+
+                      wml[nr_wml] = trap_density_express;
+                      wml_fill[nr_wml] = cloud_height;
+                      ++nr_wml;
+                    }
+                    else
+                    {
+                      // normal case
+
+                      // we have removed all levels from the stack which will be
+                      // absorbed completely during the new filling
+
+                      // skip is the number of levels which are already absorbed!
+
+                      // we are lucky, the levels are empty because we are at the
+                      // start or the new dheight is larger than all previous levels
+                      if ( nr_wml == 0 )
+                      {
+                        // an additional trap level
+                        wml[0] = trap_density_express;
+                        wml_fill[0] = cloud_height;
+                        nr_wml = 1;
+                      }
+                      else
+                      {
+
+                        #ifdef __debug
+                        output( 10, "tr_f[0],ch,skip: %f %f %f\n", wml_fill[0], cloud_height, skip );
+                        //print_wml( wml, wml_fill, n_species, nr_wml );
+                        #endif
+
+                        // skip levels are already absorbed
+
+                        // modify the first levels
+                        // using cheight because this is the number of remaining levels
+                        // from the prior filled trap levels
+
+                        // cheight - skip are the (sub)-levels  which needs to be absorbed
+                        // by the next big entry
+
+                        wml_fill[nr_wml-1] -= cloud_height - skip;   // absorbes levels
+
+                        // check what to do anyway, if there is a chance to modify the
+                        // big level!
+
+                        wml[nr_wml] = trap_density_express;
+                        wml_fill[nr_wml] = cloud_height;
+                        ++nr_wml;
+
+                      } // else from if( nr_wml == 0 )
+                    } // else from if ( std::abs(skip - cloud_height) < 1e-14 )
+                  } // else then from if ( d < 1.0 ) ...
+
+                  #ifdef __debug
+                  print_wml( wml, wml_fill, n_species, nr_wml );
+                  #endif
+
+
+                  // delete the captured exlectrons from
+                  //   the pixel value
+                  freec -= total_capture;
 
 
                                 //   // cleanup the array
@@ -2141,36 +2152,37 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                                 //        nr_trapl = j + 1;
                                 //     }
 
-                                  #ifdef __debug
-                                  print_trapl( trapl, trapl_fill, n_species, nr_trapl );
-                                  #endif
+                                //  #ifdef __debug
+                                //  print_wml( wml, wml_fill, n_species, nr_wml );
+                                //  #endif
+                                // } ? maybe wrong time
 
                     } /* end of if ( freec > well_notch_depth ) */
 
-                    #ifdef __debug
-                  double trail = ( freec - im );
-                              output( 10, "strail: %.10f\n", trail );
-                              #endif
+                #ifdef __debug
+                double trail = ( freec - im );
+                output( 10, "strail: %.10f\n", trail );
+                #endif
 
-                  image[(*is)] += ( freec - im );;
+                image[(*is)] += ( freec - im );;
 
 
-                } /* end of p_express_multiplier[i_pixel] != 0 */
-                // nevertheless that we are doing nothing, change the slicer
-                // next image element
-                ++p_express_multiplier;
-                ++is;
-             } /* i_pixel loop for the trail */
-          //p_express_multiplier += height + 1;
-          ++p_express_multiplier;
-        }  /* end of express loop */
+              } // end of if ( express_factor_pixel != 0 )
+              // nevertheless that we are doing nothing, change the slicer
+              // next image element
+              ++p_express_multiplier;
+              ++is;
+            } /* i_pixel loop for the trail */
+            //p_express_multiplier += height + 1;
+            ++p_express_multiplier;
+          }  /* end of express loop */
 
-      //#ifdef __debug
-      //output( 1, "\n" );
-      //#endif
+        //#ifdef __debug
+        //output( 1, "\n" );
+        //#endif
 
-      /* time measurement */
-      if ( ( i_column % 200 ) == 0 )
+        /* time measurement */
+        if ( ( i_column % 200 ) == 0 )
         {
           gettimeofday( &temp_time, NULL );
           getrusage( RUSAGE_SELF, &cpu_temp_time);
@@ -2186,13 +2198,13 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
         }
 
-      //output( 1, "stat_count=%i\n", stat_count );
+        //output( 1, "stat_count=%i\n", stat_count );
 
 
-            double traps_total = 0.0;
-            for (i=0;i<nr_wml;++i)
-               traps_total += wml[i].sum() * wml_fill[i];
-            output( 11, "%5i trap fill end: %f (%i)\n", i_column, traps_total, nr_wml );
+        double traps_total = 0.0;
+        for (i=0;i<nr_wml;++i)
+           traps_total += wml[i].sum() * wml_fill[i];
+        output( 11, "%5i trap fill end: %f (%i)\n", i_column, traps_total, nr_wml );
 
     } /* end of i_column loop */
 
