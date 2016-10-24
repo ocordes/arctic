@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-20
+   changed by: Oliver Cordes 2016-10-24
 
    $Id$
 
@@ -90,6 +90,7 @@ protected:
   // extern declarated variables
   bool                                 check_empty_traps;
   double                               empty_trap_limit;
+  double                               empty_trap_limit_neo2;
 };
 
 

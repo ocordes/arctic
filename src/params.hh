@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-19
+   changed by: Oliver Cordes 2016-10-24
 
    $Id$
 
@@ -75,6 +75,7 @@ public:
   double                   well_notch_depth;
   double                   well_fill_power;
   double                   empty_trap_limit;
+  double                   empty_trap_limit_neo2;
   bool                     check_empty_traps;
   unsigned int             n_iterations;
   int                      express;

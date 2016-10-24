@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-19
+   changed by: Oliver Cordes 2016-10-24
 
    $Id$
 
@@ -52,28 +52,29 @@
 
 params::params()
 {
-  algorithm         = ALGORITHM_NEO;
-  well_depth        = 84700;
-  well_notch_depth  = 1e-9;
-  well_fill_power   = 0.478;
-  check_empty_traps = true;
-  empty_trap_limit  = 1e-11;
-  n_iterations      = 1;
-  express           = 1;
-  n_levels          = 10000;
-  unclock           = true;
-  dark_mode         = false;
-  readout_offset    = 0;
-  xrange            = { 0, LONG_MAX };
-  yrange            = { 0, LONG_MAX };
-  trap_density      = { 0.0 };
-  trap_lifetime     = { 0.0 };
+  algorithm             = ALGORITHM_NEO;
+  well_depth            = 84700;
+  well_notch_depth      = 1e-9;
+  well_fill_power       = 0.478;
+  check_empty_traps     = true;
+  empty_trap_limit      = 1e-11;
+  empty_trap_limit_neo2 = 1e-6;
+  n_iterations          = 1;
+  express               = 1;
+  n_levels              = 10000;
+  unclock               = true;
+  dark_mode             = false;
+  readout_offset        = 0;
+  xrange                = { 0, LONG_MAX };
+  yrange                = { 0, LONG_MAX };
+  trap_density          = { 0.0 };
+  trap_lifetime         = { 0.0 };
 
-  cut_upper_limit   = false;
-  upper_limit       = 65536.-3;
+  cut_upper_limit       = false;
+  upper_limit           = 65536.-3;
 
   // only for reading parameters, not used in the CTE code
-  n_species         = 0;
+  n_species             = 0;
 
 
   // imaage variables

@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-20
+   changed by: Oliver Cordes 2016-10-24
 
 
    $Id$
@@ -47,7 +47,7 @@ w
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#define __debug
+//#define __debug
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -73,6 +73,7 @@ cte_image::cte_image( std::shared_ptr<params> p )
   // initialize variables
   check_empty_traps = parameters->check_empty_traps;
   empty_trap_limit = parameters->empty_trap_limit;
+  empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
 
   rotate = parameters->rotate;
   direction = parameters->direction;
@@ -1572,8 +1573,6 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
   double  freec;
   double  im;
   double  well_range;
-  int     cheight = 0;
-  double  dheight;
 
   int     sparse_pixels;
 
@@ -1693,7 +1692,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   output( 10, "Done.\n" );
 
-  double  cloud_height;
+  double  cloud_height, cloud_height2;
   double  h, h2, skip;
 
 
@@ -1864,156 +1863,99 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
                   if ( d < 1.0 )
                   {
+                    #ifdef __debug
                     output( 10, "d < 1.0\n" );
- //                                           #ifdef __debug
- //                                           output( 10, "d < 1.0\n" );
- //                                           #endif
- //
- //                                           // not easy needs a help array
- //
- //                                           new_nr_trapl = 0;
- //
- //                                           // use some helper pointer
- //                                           dheight2 = dheight;
- //                                           cheight2 = cheight;
- //
- //
- //                                           // walk through all entries
- //                                           h = 0;
- //                                           for (j=nr_trapl-1;j>=0;--j)
- //                                             {
- //                                               if ( dheight2 < 0.0 )
- //                                                       {
- //                                                         // nothing is needed anymore
- //                                                         // just copy that level
- //                                                         new_trapl[new_nr_trapl] = trapl[j];
- //                                                         new_trapl_fill[new_nr_trapl] = trapl_fill[j];
- //                                                         ++new_nr_trapl;
- //                                                       }
- //                                               else
- //                                                       {
- //                                                         // we need to modify existing levels
- //                                                         // scan each bunch of levels
- //                                                         if ( trapl_fill[j] < dheight2 )
- //                                                           {
- //                                                             // use the whole level
- //                                                             new_trapl[new_nr_trapl] = trapl[j] + ( n_electrons_per_trap_express - trapl[j] ) * d;
- //                                                             new_trapl_fill[new_nr_trapl] = trapl_fill[j];
- //                                                             ++new_nr_trapl;
- //                                                           }
- //                                                         else
- //                                                           {
- //                                                             // the complex sitiuation
- //                                                             // the whole trap level needs to be split in 3 parts
- //                                                             // the first half filled level
- //                                                             // the 1 level for ov part
- //                                                             // the untouched part
- //
- //                                                             #ifdef __debug
- //                                                             output( 10, "dheight2,trapl_fill[j],h: %.15f %i %i\n",
- //                                               dheight2, trapl_fill[j], h );
- //                                                             output( 10, "cheight2                : %i\n", cheight2 );
- //                                                             #endif
- //
- //                                                             // idea, just judge, what to do with the number of available levels
- //
- //                                                             if ( trapl_fill[j]  == 1 )
- //                                                                     {
- //                                                                       // just one level to work on, easy
- //                                                                       for (i=0;i<n_species;++i)
- //                                                                         {
- //                                                                           if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
- //                                                                                   {
- //                                                                                     new_trapl[new_nr_trapl][i] = trapl[j][i]
- //                                                                                         + (  n_electrons_per_trap_express_ov[i]  - trapl[j][i] ) * d;
- //                                                                                   }
- //                                                                           else
- //                                                                                   new_trapl[new_nr_trapl][i] = trapl[j][i];
- //                                                                         }
- //                                                                       new_trapl_fill[new_nr_trapl] = 1;
- //                                                                       ++new_nr_trapl;
- //                                                                     }
- //                                                             else
- //                                                                     {
- //                                                                       // the most default situation
- //                                                                       // need to split in 3 parts
- //                                                                       // larger modified, modified ov part, untouched part
- //
- //                                                                       if ( cheight2 > 0 )
- //                                                                         {
- //                                                                           // first part is necessary
- //                                                                           new_trapl[new_nr_trapl] = trapl[j]
- //                                                 + ( n_electrons_per_trap_express - trapl[j] ) * d;
- //                                                                           new_trapl_fill[new_nr_trapl] = cheight2;
- //                                                                           ++new_nr_trapl;
- //                                                                         }
- //
- //                                                                       if ( ov > 1e-14 )
- //                                                                       {
- //                                                                           // if ov == 0! then no additional level is needed
- //                                                                           for (i=0;i<n_species;++i)
- //                                                {
- //                                                                                      if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
- //                                                                                        new_trapl[new_nr_trapl][i] = trapl[j][i]
- //                                                        + ( ( n_electrons_per_trap_express_ov[i]  ) - trapl[j][i] ) * d;
- //                                                                                      else
- //                                                                                        new_trapl[new_nr_trapl][i] = trapl[j][i];
- //                                                }
- //                                                                            new_trapl_fill[new_nr_trapl] = 1;
- //                                                                            ++new_nr_trapl;
- //                                                                          }
- //
- //
- //                                                                         if ( cheight2 < trapl_fill[j] )
- //                                                                           {
- //                                                                             // add the last part if necessary
- //                                                                             new_trapl[new_nr_trapl] = trapl[j];
- //                                                                             new_trapl_fill[new_nr_trapl] = trapl_fill[j] - ceil( dheight2 );
- //                                                                             ++new_nr_trapl;
- //                                                                           }
- //                                                                 }
- //                                                            } // end of if ( trapl_fill[j] < dheight2 ) (else)
- //                                                        } // end of f ( dheight2 < 0.0 ) (else)
- //
- //                                                h += trapl_fill[j];
- //                                                dheight2 -= trapl_fill[j];
- //                                                cheight2 -= trapl_fill[j];
- //                                             } // end of for (j=nr_trapl-1;j>=0;--j)
- //
- //                                             if ( dheight2 > 0.0 )
- //                                               {
- //                                                 // we need a level
- //                                                 #ifdef __debug
- //                                                 output( 10, "new level needed: dheight2 = %.15f\n", dheight2 );
- //                                                 #endif
- //                                                 //int cheight2 = ceil( dheight2 ) -1 ;
- //                                                 if ( cheight2 > 0 )
- //                                                         {
- //                                                            new_trapl[new_nr_trapl] = n_electrons_per_trap_express * d;
- //                                                            new_trapl_fill[new_nr_trapl] = cheight2;
- //                                                            ++new_nr_trapl;
- //                                                         }
- //                                                 new_trapl[new_nr_trapl] = n_electrons_per_trap_express_ov * d;
- //                                                 new_trapl_fill[new_nr_trapl] = 1;
- //                                                 ++new_nr_trapl;
- //                                               }
- //
- //                                             #ifdef __debug
- //                                             output( 10, "Copying back the temporary data ..\n" );
- //                                             #endif
- //
- //                                             // copy the temporary array back
- //                                             for (j=new_nr_trapl-1,i=0;j>=0;--j,++i)
- //                                               {
- //                                                 trapl[i]      = new_trapl[j];
- //                                                 trapl_fill[i] = new_trapl_fill[j];
- //                                                                                       }
- //                                             nr_trapl = new_nr_trapl;
- //                                             total_capture *= d;
+                    #endif
+
+                    // not easy needs a help array
+
+                    new_nr_wml = 0;
+
+                    // use some helper pointer
+                    cloud_height2 = cloud_height;
+
+                    // walk through all entries
+                    h = 0.0;
+                    for (j=nr_wml-1;j>=0;--j)
+                    {
+                      if ( cloud_height2 < 0.0 )
+                      {
+                        // nothing is needed anymore
+                        // just copy that level
+                        new_wml[new_nr_wml] = wml[j];
+                        new_wml_fill[new_nr_wml] = wml_fill[j];
+                        ++new_nr_wml;
+                      }
+                      else
+                      {
+                        // we need to modify existing levels
+                        // scan each bunch of levels
+                        if ( ( wml_fill[j] < cloud_height2 )
+                              || ( fabs( wml_fill[j] - cloud_height2 ) < 1e-14 ) )
+                        {
+                          // use the whole level
+                          new_wml[new_nr_wml] = wml[j] + ( trap_density_express - wml[j] ) * d;
+                          new_wml_fill[new_nr_wml] = wml_fill[j];
+                          ++new_nr_wml;
+                        }
+                        else
+                        {
+                          // the complex sitiuation
+                          // the whole trap level needs to be split in 2 parts
+                          // the first half filled level
+                          // the untouched part
+
+                          #ifdef __debug
+                          output( 10, "dheight2,trapl_fill[j],h: %.15f %.15f %.15f\n",
+                          cloud_height2, wml_fill[j], h );
+                          #endif
+
+                          // idea, just judge, what to do with the number of available levels
+
+                          new_wml[new_nr_wml] = wml[j] + ( trap_density_express - wml[j] ) * d;
+                          new_wml_fill[new_nr_wml] = cloud_height2;
+                          ++new_nr_wml;
+                          new_wml[new_nr_wml] = wml[j];
+                          new_wml_fill[new_nr_wml] = wml_fill[j] - cloud_height2;
+                          ++new_nr_wml;
+                        }
+                      } // end else if ( cloud_height2 < 0.0 )
+
+                      h += wml_fill[j];
+                      cloud_height2 -= wml_fill[j];
+                    } // end of for (j=nr_wml-1;j>=0;--j)
+
+                    // in the case we have some trap height to fill
+                    if ( cloud_height2 > 0.0 )
+                    {
+                      // we need a level
+                      #ifdef __debug
+                      output( 10, "new level needed: dheight2 = %.15f\n", cloud_height2 );
+                      #endif
+
+                      new_wml[new_nr_wml] = trap_density_express * d;
+                      new_wml_fill[new_nr_wml] = cloud_height2;
+                      ++new_nr_wml;
+                    }
+
+                    #ifdef __debug
+                    output( 10, "Copying back the temporary data ..\n" );
+                    #endif
+
+                    // copy the temporary array back
+                    for (j=new_nr_wml-1,i=0;j>=0;--j,++i)
+                    {
+                      wml[i]      = new_wml[j];
+                      wml_fill[i] = new_wml_fill[j];
+                    }
+                    nr_wml = new_nr_wml;
+                    total_capture *= d;
                   } // end of then from if ( d < 1.0 ) ...
                   else
                   {
+                    #ifdef __debug
                     output( 10, "d > 1.0\n");
+                    #endif
 
                     // cloud_height gives the number of new filling levels
                     //
@@ -2115,6 +2057,43 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   // delete the captured exlectrons from
                   //   the pixel value
                   freec -= total_capture;
+
+
+                  // cleanup the array
+                  // removing duplicate levels ...
+
+                  if ( dark_mode  == 1 )
+                  {
+                    j = 0;
+                    for (i=1;i<nr_wml;++i)
+                    {
+                      #ifdef __debug
+                      output( 10, "i,j: %i %i\n", i, j );
+                      output( 10, "trapl[i,j] : %f %f\n", wml[i].sum(), wml[j].sum() );
+                      output( 10, "diff       : %f\n", std::abs(  wml[i].sum() - wml[j].sum() ) );
+                      #endif
+
+                      if ( std::abs( wml[i].sum() - wml[j].sum() ) < empty_trap_limit_neo2 )
+                      {
+                        double cc = wml_fill[j] + wml_fill[i];
+                        wml[j] *= wml_fill[j];
+                        wml[j] += wml[i] * wml_fill[i];
+                        wml[j] /= cc;
+                        wml_fill[j] += wml_fill[i];
+                      }
+                      else
+                      {
+                        ++j;
+                        if ( i != j )
+                        {
+                          wml[j] = wml[i];
+                          wml_fill[j] = wml_fill[i];
+                        }
+                      }
+                    } // end for (i=1;i<nr_wml;++i)
+                    nr_wml = j + 1;
+                  }
+
 
 
                                 //   // cleanup the array
