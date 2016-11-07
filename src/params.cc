@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-24
+   changed by: Oliver Cordes 2016-11-07
 
    $Id$
 
@@ -72,6 +72,8 @@ params::params()
 
   cut_upper_limit       = false;
   upper_limit           = 65536.-3;
+
+  neo2_split_limit      = 1e-14;
 
   // only for reading parameters, not used in the CTE code
   n_species             = 0;

@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-24
+   changed by: Oliver Cordes 2016-11-07
 
 
    $Id$
@@ -1565,6 +1565,7 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
   int     express;
   int     readout_offset;
   int     dark_mode;
+  double neo2_split_limit;
 
   /* CTE variables */
   int     i_express;
@@ -1632,6 +1633,8 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
   readout_offset   = parameters->readout_offset;
   dark_mode        = parameters->dark_mode;
 
+  neo2_split_limit = parameters->neo2_split_limit;
+
 
   // info about the image and algorithm
   sparse_pixels = get_sparse_pixels( image, parameters->trap_density.sum() );
@@ -1692,7 +1695,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   output( 10, "Done.\n" );
 
-  double  cloud_height, cloud_height2;
+  double  cloud_height, cloud_height2, test_height;
   double  h, h2, skip;
 
 
@@ -1904,6 +1907,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                           // the whole trap level needs to be split in 2 parts
                           // the first half filled level
                           // the untouched part
+                          // split only if both parts are larger than
+                          // neo2_split_limit!
 
                           #ifdef __debug
                           output( 10, "dheight2,trapl_fill[j],h: %.15f %.15f %.15f\n",
@@ -1912,12 +1917,19 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
                           // idea, just judge, what to do with the number of available levels
 
-                          new_wml[new_nr_wml] = wml[j] + ( trap_density_express - wml[j] ) * d;
-                          new_wml_fill[new_nr_wml] = cloud_height2;
-                          ++new_nr_wml;
-                          new_wml[new_nr_wml] = wml[j];
-                          new_wml_fill[new_nr_wml] = wml_fill[j] - cloud_height2;
-                          ++new_nr_wml;
+                          if ( cloud_height2 > neo2_split_limit )
+                          {
+                            new_wml[new_nr_wml] = wml[j] + ( trap_density_express - wml[j] ) * d;
+                            new_wml_fill[new_nr_wml] = cloud_height2;
+                            ++new_nr_wml;
+                          }
+                          test_height = wml_fill[j] - cloud_height2;
+                          if ( test_height > neo2_split_limit )
+                          {
+                            new_wml[new_nr_wml] = wml[j];
+                            new_wml_fill[new_nr_wml] = test_height;
+                            ++new_nr_wml;
+                          }
                         }
                       } // end else if ( cloud_height2 < 0.0 )
 
@@ -1926,7 +1938,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                     } // end of for (j=nr_wml-1;j>=0;--j)
 
                     // in the case we have some trap height to fill
-                    if ( cloud_height2 > 0.0 )
+                    // if ( cloud_height2 > 0.0 )
+                    if ( cloud_height2 > neo2_split_limit )
                     {
                       // we need a level
                       #ifdef __debug
@@ -2036,7 +2049,11 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                         // cheight - skip are the (sub)-levels  which needs to be absorbed
                         // by the next big entry
 
-                        wml_fill[nr_wml-1] -= cloud_height - skip;   // absorbes levels
+                        test_height = cloud_height - skip;
+                        if ( test_height < neo2_split_limit )
+                          --nr_wml;
+                        else
+                          wml_fill[nr_wml-1] -= cloud_height - skip;   // absorbes levels
 
                         // check what to do anyway, if there is a chance to modify the
                         // big level!

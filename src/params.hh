@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-24
+   changed by: Oliver Cordes 2016-11-07
 
    $Id$
 
@@ -90,6 +90,7 @@ public:
   std::valarray<double>    trap_lifetime;
   bool                     cut_upper_limit;
   double                   upper_limit;
+  double                   neo2_split_limit;
 
   // image variables
   bool                     rotate;

@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-10-19
+   changed by: Oliver Cordes 2016-11-07
 
    $Id$
 
@@ -308,6 +308,15 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       error = PARSE_OK;
       return;
     }
+
+  if ( key == "NEO2_SPLIT_LIMIT" )
+  {
+    neo2_split_limit = atof( val.c_str() );
+    output( 10, "params: neo2_split_limit=%f\n", neo2_split_limit );
+    error = PARSE_OK;
+    return;
+  }
+
   if ( key == "ROTATE" )
   {
     rotate = ~rotate;
