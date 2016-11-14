@@ -1098,11 +1098,13 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                    if ( h2 < dheight )
 			                      {
 			                         // this levels are going directly into the calculations
-			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() ) * trapl_fill[j];
+			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+                                                                 * trapl_fill[j];
 			                      }
 			                    else
 			                      {
-			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() ) * ( cheight - h );
+			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+                                                                 * ( cheight - h );
 
 			                        for (i=0;i<n_species;++i)
 				                        {
@@ -1192,7 +1194,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 				                         if ( trapl_fill[j] < dheight2 )
 				                           {
 				                             // use the whole level
-				                             new_trapl[new_nr_trapl] = trapl[j] + ( n_electrons_per_trap_express - trapl[j] ) * d;
+				                             new_trapl[new_nr_trapl] = trapl[j] 
+                                                               + ( n_electrons_per_trap_express - trapl[j] ) * d;
 				                             new_trapl_fill[new_nr_trapl] = trapl_fill[j];
 				                             ++new_nr_trapl;
 				                           }
