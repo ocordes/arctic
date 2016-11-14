@@ -2,9 +2,9 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2016-10-10
+# changed by: Oliver Cordes 2016-11-14
 
-set(VERSION 1.3.2)
+set(VERSION 1.4.0)
 
 # get current date
 execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
@@ -74,8 +74,12 @@ install(TARGETS arctic DESTINATION bin)
 
 
 
-# sphinx part
-find_package(Sphinx REQUIRED)
+# sphinx part, try to detect sphinx, but if not
+# don't create the Makefile entries
+
+find_package(Sphinx )
+
+if ( Sphinx_FOUND )
 
 if(NOT DEFINED SPHINX_THEME)
     set(SPHINX_THEME default)
@@ -135,12 +139,14 @@ add_custom_target(docs_pdf
         DEPENDS ${SPHINX_PDF_DIR}/arctic.pdf
         )
 
+endif()
+
 # CPack part
 
 # CPack version numbers for release tarball name.
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
-set(CPACK_PACKAGE_VERSION_MINOR 3)
-set(CPACK_PACKAGE_VERSION_PATCH 2)
+set(CPACK_PACKAGE_VERSION_MINOR 4)
+set(CPACK_PACKAGE_VERSION_PATCH 0)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Algorithm foR Charge Transfer Inefficency Correcton - arctic")
 set(CPACK_PACKAGE_VENDOR "Oliver Cordes/Ole Marggraf")
