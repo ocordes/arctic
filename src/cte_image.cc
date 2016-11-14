@@ -983,6 +983,14 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
 
+  // OC hallo
+  express_factor_pixel = -1;
+  int last_express_factor_pixel;
+  bool traps_saved = false;
+
+  std::valarray<std::valarray<double>> saved_trapl( std::valarray<double>(0.0, n_species), max_trap_levels );
+  std::valarray<int> saved_trapl_fill( 0, max_trap_levels );
+  long saved_nr_trapl = 0;
 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
@@ -1003,6 +1011,17 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
           for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
             {
 
+              // OC hallo
+
+              // the low signal mode produces some error with express > 1
+              // the problem is that in the express loop for express values > 1
+              // the first lines have a multiplier =0 and therefor empty traps
+              // which should have at least a filled situation ...
+
+              last_express_factor_pixel = express_factor_pixel;
+
+
+
               // inner pixel loop
 
               // check if we need to calculate a new trail for that pixel
@@ -1011,9 +1030,45 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 	            //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
               express_factor_pixel = express_multiplier[p_express_multiplier];
 
+              // OC hallo
+              //#define __debug 1
+              if ( ( last_express_factor_pixel == express_factor_pixel ) && ( traps_saved == false ) )
+              {
+                traps_saved = true;
+                #ifdef __debug
+                output( 10, "Traps will be saved!\n");
+                output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+                #endif
+
+                for (i=0;i<nr_trapl;++i)
+                {
+                  saved_trapl[i]      = trapl[i];
+                  saved_trapl_fill[i] = trapl_fill[i];
+                }
+                saved_nr_trapl = nr_trapl;
+              }
+
+
 
 	            if ( express_factor_pixel != 0 )
                 {
+                  // OC hallo
+                  if ( last_express_factor_pixel == 0 )
+                  {
+                    traps_saved = false;
+                    #ifdef __debug
+                    output( 10, "Traps will be restored!\n");
+                    output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+                    #endif
+                    for (i=0;i<saved_nr_trapl;++i)
+                    {
+                      trapl[i]      = saved_trapl[i];
+                      trapl_fill[i] = saved_trapl_fill[i];
+                    }
+                    nr_trapl = saved_nr_trapl;
+                  }
+                  #undef __debug
+
                   // Modifications of low signal behaviour
                   n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
                   n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
@@ -1194,7 +1249,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 				                         if ( trapl_fill[j] < dheight2 )
 				                           {
 				                             // use the whole level
-				                             new_trapl[new_nr_trapl] = trapl[j] 
+				                             new_trapl[new_nr_trapl] = trapl[j]
                                                                + ( n_electrons_per_trap_express - trapl[j] ) * d;
 				                             new_trapl_fill[new_nr_trapl] = trapl_fill[j];
 				                             ++new_nr_trapl;
