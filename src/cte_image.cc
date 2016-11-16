@@ -47,7 +47,7 @@ w
 #include <sys/time.h>
 #include <sys/resource.h>
 
-//#define __debug
+#define __debug
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -994,6 +994,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
+      express_factor_pixel = -1;
+      
       // p_express_multiplier is a column pointer of the express array
       int p_express_multiplier = 0;
 
@@ -1052,6 +1054,10 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 	            if ( express_factor_pixel != 0 )
                 {
+                  // Modifications of low signal behaviour
+                  n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
+                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
+
                   // OC hallo
                   if ( last_express_factor_pixel == 0 )
                   {
@@ -1062,16 +1068,15 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                     #endif
                     for (i=0;i<saved_nr_trapl;++i)
                     {
-                      trapl[i]      = saved_trapl[i];
+                      for (j=0;j<n_species;++j)
+                        if ( saved_trapl[i][j] > n_electrons_per_trap_express[j] )
+                          trapl[i][j] = n_electrons_per_trap_express[j];
+                        else
+                          trapl[i][j]      = saved_trapl[i][j];
                       trapl_fill[i] = saved_trapl_fill[i];
                     }
                     nr_trapl = saved_nr_trapl;
                   }
-                  //#undef __debug
-
-                  // Modifications of low signal behaviour
-                  n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
-                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
 
 
                   // extract pixel
