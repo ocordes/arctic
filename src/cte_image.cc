@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-07
+   changed by: Oliver Cordes 2016-11-16
 
 
    $Id$
@@ -275,26 +275,34 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
                                            int readout_offset )
 {
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
-     {
-        int i_sum = 0;
-        for (int i_express=0;i_express<express;i_express++)
-          {
-            int pos;
-            int d;
-            int d2;
+  {
+    int i_sum = 0;
+    for (int i_express=0;i_express<express;i_express++)
+    {
+      int pos;
+      int d;
+      int d2;
 
-            d = ( i_pixel + 1 + readout_offset);
-            d2= ((h+1+readout_offset)*(i_express+1))/express;
-            if ( d > d2 )
-              d = d2;
+      d = ( i_pixel + 1 + readout_offset);
+      d2= ((h+1+readout_offset)*(i_express+1))/express;
+      if ( d > d2 )
+        d = d2;
 
-            d -= i_sum;
-            i_sum += d;
+      d -= i_sum;
+      i_sum += d;
 
-            pos = (i_express*(height+1))+i_pixel;
-            express_multiplier[pos] = d;
-          }
-       }
+      pos = (i_express*(height+1))+i_pixel;
+      express_multiplier[pos] = d;
+     }
+    }
+    #ifdef __debug
+    for (int i=0; i<height;i++)
+    {
+      for (int j=0;j<express;++j)
+         std::cout << express_multiplier[j*(height+1)+i] << " ";
+      std::cout << std::endl;
+    }
+    #endif
 }
 
 
@@ -995,7 +1003,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
       express_factor_pixel = -1;
-      
+
       // p_express_multiplier is a column pointer of the express array
       int p_express_multiplier = 0;
 
@@ -1051,9 +1059,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               }
 
 
-
-	            if ( express_factor_pixel != 0 )
+              if ( express_factor_pixel != 0 )
                 {
+
                   // Modifications of low signal behaviour
                   n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
                   n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
@@ -1072,7 +1080,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                         if ( saved_trapl[i][j] > n_electrons_per_trap_express[j] )
                           trapl[i][j] = n_electrons_per_trap_express[j];
                         else
-                          trapl[i][j]      = saved_trapl[i][j];
+                          trapl[i][j] = saved_trapl[i][j];
                       trapl_fill[i] = saved_trapl_fill[i];
                     }
                     nr_trapl = saved_nr_trapl;
@@ -1181,6 +1189,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                    h = h2;
 			                    if ( h > dheight )
 			                      break;
+                          output( 10, "tc=%.15f\n", total_capture );
 			                  }
 
 		                 // h has the height of all used levels
@@ -1190,11 +1199,13 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                 }
 
 		                 #ifdef __debug
-		                 output( 10, "debug:  %i\n", i_pixel );
+		                 output( 10, "debug:  %i grep\n", i_pixel );
+                     output( 10, "express = %i  factor = %i\n", i_express, express_factor_pixel );
                      double traps_total2 = 0.0;
                      for (i=0;i<nr_trapl;++i)
                         traps_total2 += trapl[i].sum() * trapl_fill[i];
                      output( 10, "ntrap_total : %.15f\n", traps_total2 );
+                     output( 10, "n_p_t_e_t   : %.15f\n", n_electrons_per_trap_express_total );
 
 		                 print_trapl( trapl, trapl_fill, n_species, nr_trapl );
 
