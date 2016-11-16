@@ -1067,7 +1067,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                     }
                     nr_trapl = saved_nr_trapl;
                   }
-                  #undef __debug
+                  //#undef __debug
 
                   // Modifications of low signal behaviour
                   n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
@@ -1153,13 +1153,18 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                    if ( h2 < dheight )
 			                      {
 			                         // this levels are going directly into the calculations
-			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+			                        c += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                                  * trapl_fill[j];
+                              if ( c > 0.0 )
+                                total_capture += c;
 			                      }
 			                    else
 			                      {
-			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+			                        c += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                                  * ( cheight - h );
+
+                              if ( c > 0.0 )
+                                total_capture += c;
 
 			                        for (i=0;i<n_species;++i)
 				                        {
