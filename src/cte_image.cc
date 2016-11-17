@@ -47,7 +47,7 @@ w
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#define __debug
+// #define __debug
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -843,6 +843,8 @@ void cte_image::clock_charge_image_neo( std::valarray<double> & image,
 
   int     start_x, start_y, end_x, end_y;
   int     i_column, i_pixel;
+  double  i_pixelp1;     // used for the express corrections
+  double  express_correct;
 
 
   /* helpers */
@@ -1021,7 +1023,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
           for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
             {
 
-              // OC hallo
+              i_pixelp1 = i_pixel + 1;
 
               // the low signal mode produces some error with express > 1
               // the problem is that in the express loop for express values > 1
@@ -1039,6 +1041,14 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 	            // access the express array only once and use this value twice ;-)
 	            //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
               express_factor_pixel = express_multiplier[p_express_multiplier];
+
+
+              // correcttion factor
+              express_correct = (double) express_factor_pixel / i_pixelp1;
+
+              #ifdef __debug
+              output( 10, "express_correct = %f\n", express_correct );
+              #endif
 
               // OC hallo
               //#define __debug 1
@@ -1063,8 +1073,12 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                 {
 
                   // Modifications of low signal behaviour
-                  n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
-                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
+                  //n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
+                  //n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
+
+                  // express correction using i_pixel instead of express_factor_pixel
+                  n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
+                  n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
                   // OC hallo
                   if ( last_express_factor_pixel == 0 )
@@ -1076,13 +1090,15 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                     #endif
                     for (i=0;i<saved_nr_trapl;++i)
                     {
-                      for (j=0;j<n_species;++j)
-                        if ( saved_trapl[i][j] > n_electrons_per_trap_express[j] )
-                          trapl[i][j] = n_electrons_per_trap_express[j];
-                        else
-                          trapl[i][j] = saved_trapl[i][j];
+                      // for (j=0;j<n_species;++j)
+                      //   if ( saved_trapl[i][j] > n_electrons_per_trap_express[j] )
+                      //     trapl[i][j] = n_electrons_per_trap_express[j];
+                      //   else
+                      //     trapl[i][j] = saved_trapl[i][j];
+                      trapl[i] = saved_trapl[i];
                       trapl_fill[i] = saved_trapl_fill[i];
                     }
+
                     nr_trapl = saved_nr_trapl;
                   }
 
@@ -1118,6 +1134,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 		                }
 
 		              // add the released electrons to the pixel value
+
+                  // corrct for express
+                  sum *= express_correct;
                   freec += sum;
 
 
@@ -1166,18 +1185,13 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                    if ( h2 < dheight )
 			                      {
 			                         // this levels are going directly into the calculations
-			                        c += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                                  * trapl_fill[j];
-                              if ( c > 0.0 )
-                                total_capture += c;
 			                      }
 			                    else
 			                      {
-			                        c += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+			                        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                                  * ( cheight - h );
-
-                              if ( c > 0.0 )
-                                total_capture += c;
 
 			                        for (i=0;i<n_species;++i)
 				                        {
@@ -1189,7 +1203,6 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 			                    h = h2;
 			                    if ( h > dheight )
 			                      break;
-                          output( 10, "tc=%.15f\n", total_capture );
 			                  }
 
 		                 // h has the height of all used levels
@@ -1216,6 +1229,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
                      #endif
 
+                     // correct the total_capture for express
+                     total_capture *= express_correct;
+
                      if ( total_capture < 1e-14 )
                         total_capture = 1e-14;
 
@@ -1224,9 +1240,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                      // d > 1  more electrons are available
                      // d < 1  less electrons are available, in
                      //         the end d * total_capture is then used!
-
                      d = freec / total_capture;
-
 
 
 		                 // the result is all levels which are absorbed
