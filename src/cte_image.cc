@@ -1671,6 +1671,8 @@ void cte_image::clock_charge_image_neo2( std::valarray<double> & image,
 
   int     start_x, start_y, end_x, end_y;
   int     i_column, i_pixel;
+  double  i_pixelp1;     // used for the express corrections
+  double  express_correct;
 
 
   /* helpers */
@@ -1814,13 +1816,27 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                         rotate,
                         direction );
 
+
+  // define the variables for detection of the express saved states
+  express_factor_pixel = -1;
+  int last_express_factor_pixel;
+  bool traps_saved = false;
+
+  std::valarray<std::valarray<double>> saved_wml( std::valarray<double>(0.0, n_species), max_wm_levels );
+  std::valarray<double> saved_wml_fill( 0.0, max_wm_levels );
+  long saved_nr_wml = 0;
+
+
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
 
+  // start the CTI correction loops
 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
+      express_factor_pixel = -1;
+
       // p_express_multiplier is a column pointer of the express array
       int p_express_multiplier = 0;
 
@@ -1836,6 +1852,16 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
           for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
             {
 
+              i_pixelp1 = i_pixel + 1;
+
+              // the low signal mode produces some error with express > 1
+              // the problem is that in the express loop for express values > 1
+              // the first lines have a multiplier =0 and therefor empty traps
+              // which should have at least a filled situation ...
+
+              last_express_factor_pixel = express_factor_pixel;
+
+
               // inner pixel loop
 
               // check if we need to calculate a new trail for that pixel
@@ -1844,12 +1870,57 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
               //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
               express_factor_pixel = express_multiplier[p_express_multiplier];
 
+              // correcttion factor
+              express_correct = (double) express_factor_pixel / i_pixelp1;
+
+              #ifdef __debug
+              output( 10, "express_correct = %f\n", express_correct );
+              #endif
+
+              // in express >1 mode save states when an exress block ends
+              if ( ( last_express_factor_pixel == express_factor_pixel ) && ( traps_saved == false ) )
+              {
+                traps_saved = true;
+                #ifdef __debug
+                output( 10, "Traps will be saved!\n");
+                output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+                #endif
+
+                for (i=0;i<nr_wml;++i)
+                {
+                  saved_wml[i]      = wml[i];
+                  saved_wml_fill[i] = wml_fill[i];
+                }
+                saved_nr_wml = nr_wml;
+              }
+
 
               if ( express_factor_pixel != 0 )
               {
                 // Modifications of low signal behaviour
-                trap_density_express = trap_density * (double) express_factor_pixel;
-                trap_density_express_total = trap_density_total * (double) express_factor_pixel;
+                //trap_density_express = trap_density * (double) express_factor_pixel;
+                //trap_density_express_total = trap_density_total * (double) express_factor_pixel;
+
+                // express correction using i_pixel instead of express_factor_pixel
+                trap_density_express = trap_density * i_pixelp1;
+                trap_density_express_total = trap_density_total * i_pixelp1;
+
+                // restore the saved trap states
+                if ( last_express_factor_pixel == 0 )
+                {
+                  traps_saved = false;
+                  #ifdef __debug
+                  output( 10, "Traps will be restored!\n");
+                  output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+                  #endif
+                  for (i=0;i<saved_nr_wml;++i)
+                  {
+                    wml[i] = saved_wml[i];
+                    wml_fill[i] = saved_wml_fill[i];
+                  }
+
+                  nr_wml = saved_nr_wml;
+                }
 
 
                 // extract pixel
@@ -1881,6 +1952,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   // do the multiplication at the end ;-)
                   sum += sum2 * wml_fill[j];
                 }
+
+                // corrct for express
+                sum *= express_correct;
 
                 // add the released electrons to the pixel value
                 freec += sum;
@@ -1951,6 +2025,9 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                   output( 10, "max_capture : %.15f\n", total_capture );
 
                   #endif
+
+                  // correct the total_capture for express
+                  total_capture *= express_correct;
 
                   if ( total_capture < 1e-14 )
                     total_capture = 1e-14;
