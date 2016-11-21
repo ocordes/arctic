@@ -22,7 +22,7 @@
 /* arctic.cc
 
    written by: Oliver Cordes 2013-02-05
-   changed by: Oliver Cordes 2015-11-30
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
@@ -44,6 +44,39 @@
 #include "output.hh"
 
 
+void help_check( int argc, char *argv[] )
+{
+  for (int i=1;i<argc;++i)
+  {
+      if ( ( std::strcmp( argv[i], "-h" ) == 0 )
+        || ( std::strcmp( argv[i], "-?" ) == 0 )
+        || ( std::strcmp( argv[i], "--help" ) == 0 ) )
+        {
+          // print the syntax information
+          std::cout << "SYNTAX: arctic -m MODE <INFILE> <OUTFILE> <OPTIONS>" << std::endl;
+          std::cout << "  MODE is one of the following:" << std::endl;
+          std::cout << "    FITS   :  working on simple FITS files (default)" << std::endl;
+          std::cout << "    ACS    :  working on ACS files, using the observation date" << std::endl;
+          std::cout << "              for setting the trap specification" << std::endl;
+          std::cout << "    EUCLID :  working on EUCLID files in a special environment" << std::endl;
+          std::cout << std::endl;
+          std::cout << "  OPTIONS are special for different working modes:" << std::endl;
+          std::cout << "   FITS options:" << std::endl;
+          syntax_fits();
+          std::cout << std::endl;
+          std::cout << "   ACS options (inherit all FITS options):" << std::endl;
+          syntax_acs();
+          std::cout << std::endl;
+          std::cout << "   EUCLID options (inherit all FITS options):" << std::endl;
+          syntax_euclid();
+          std::cout << std::endl;
+
+          exit( 0 );
+        }
+  }
+}
+
+
 
 int main( int argc, char *argv[])
 {
@@ -52,6 +85,9 @@ int main( int argc, char *argv[])
     std::cout << "(Euclid)";
 #endif
   std::cout << std::endl;
+
+  // check for help and syntax parameter
+  help_check( argc, argv );
 
   // parse for debug parameter and inititialize the debug/output module
   debug_init( argc, argv );
@@ -67,24 +103,24 @@ int main( int argc, char *argv[])
   try {
     std::cout << "Working in ";
     switch( working_mode )
-      {
+    {
       case WORKING_MODE_FITS:
-	std::cout << "FITS mode!" << std::endl;
-	im = new fits_image( argc, argv );
-	break;
+        std::cout << "FITS mode!" << std::endl;
+	      im = new fits_image( argc, argv );
+	      break;
       case WORKING_MODE_ACS:
-	std::cout << "ACS mode!" << std::endl;
-	im = new acs_image( argc, argv );
-	break;
+	      std::cout << "ACS mode!" << std::endl;
+	      im = new acs_image( argc, argv );
+	      break;
       case WORKING_MODE_EUCLID:
-	std::cout << "Euclid mode!" << std::endl;
-	im = new euclid_image( argc, argv );
-	break;
+	      std::cout << "Euclid mode!" << std::endl;
+	      im = new euclid_image( argc, argv );
+	      break;
       default:
-	std::cout << "Standard FITS mode!" << std::endl;
-	im = new fits_image( argc, argv );
-	break;
-      }
+	      std::cout << "Standard FITS mode!" << std::endl;
+	      im = new fits_image( argc, argv );
+	      break;
+    }
   }
   catch ( char const *s )
     {

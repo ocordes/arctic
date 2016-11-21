@@ -22,7 +22,7 @@
 /* param_fits.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-15
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
@@ -52,5 +52,7 @@ public:
   virtual void check_params ( void );
 };
 
+
+void syntax_fits( void );
 
 #endif

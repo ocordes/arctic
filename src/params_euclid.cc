@@ -22,13 +22,14 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
 */
 
 #include <cstdlib>
+#include <iostream>
 
 #include "output.hh"
 #include "params_fits.hh"
@@ -105,4 +106,10 @@ void params_euclid::parse_args( std::string key, std::string val, int & error )
 
 void params_euclid::check_params ( void )
 {
+}
+
+
+void syntax_euclid( void )
+{
+  std::cout << "    none" << std::endl;
 }

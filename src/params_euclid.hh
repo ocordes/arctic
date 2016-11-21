@@ -22,7 +22,7 @@
 /* param_euclid.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-30
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
@@ -55,6 +55,9 @@ public:
   virtual void parse_args( std::string key, std::string val, int & error );
   virtual void check_params ( void );
 };
+
+
+void syntax_euclid( void );
 
 
 #endif
