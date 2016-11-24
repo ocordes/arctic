@@ -22,13 +22,15 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-11-07
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
 */
 
 #include <cstdlib>
+
+#include <iostream>
 
 #include "output.hh"
 #include "params.hh"
@@ -360,4 +362,39 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
 
 void params_fits::check_params ( void )
 {
+}
+
+
+void syntax_fits( void )
+{
+  std::cout << "    XRANGE            : specify colums to work on, comma seperated, <start>,<end>"  << std::endl;
+  std::cout << "    YRANGE            : specify rows to work on, comma seperated, <start>,<end>" << std::endl;
+  std::cout << "    WELL_DEPTH        : the CCD well depth"  << std::endl;
+  std::cout << "    WELL_NOTCH_DEPTH  : the CCD well_notch_depth"  << std::endl;
+  std::cout << "    WELL_FILL_POWER   : the CCD well_fill_power" << std::endl;
+  std::cout << "    EMPTY_TRAP_LIMIT  : specify the value to mark a trap empty" << std::endl;
+  std::cout << "    CHECK_EMPTY_TRAPS : check for empty traps (default) for the classic mode" << std::endl;
+  std::cout << "    N_ITERATIONS      : nr of iterations for the CTE correction"  << std::endl;
+  std::cout << "    EXPRESS           : express value" << std::endl;
+  std::cout << "    N_LEVELS          : specify the trap sub splitting for the classic and neo mode" << std::endl;
+  std::cout << "    CLOCK             : clock the image add the CTE trail" << std::endl;
+  std::cout << "    UNCLOCK           : unclock the image sub the CTE trail (default)" << std::endl;
+  std::cout << "    DARK_MODE         : add some optimizations for the neo and neo2 mode" << std::endl;
+  std::cout << "    READOUT_OFFSET    : skip this amount of pixels in correction direction" << std::endl;
+  std::cout << "    N_SPECIES         : nr of traps species"  << std::endl;
+  std::cout << "    TRAP_DENSITY      : specify the trap density for each specie, comma seperated" << std::endl;
+  std::cout << "    TRAP_LIFETIME     : specify the trap lifetime for each specie, comma seperated" << std::endl;
+  std::cout << "    CLASSIC           : choose the classic algorithm" << std::endl;
+  std::cout << "    NEO               : choose the NEO algorithm (default)" << std::endl;
+  std::cout << "    NEO2              : choose the NEO2 algorithm (EXPERIMENTAL)" << std::endl;
+  std::cout << "    CUT_UPPER_LIMIT   : bool , cut the upper pixel value, use with upper_limit"  << std::endl;
+  std::cout << "    UPPER_LIMIT       : cut the upper pixel value to this parameter" << std::endl;
+  std::cout << "    NEO2_SPLIT_LIMIT  : split limit for the neo2 algorithm"  << std::endl;
+  std::cout << "    ROTATE            : change from x to y or from y to xworking mode " << std::endl;
+  std::cout << "    READOUT_X         ," << std::endl;
+  std::cout << "    SERIAL            : working in seriall mode" << std::endl;
+  std::cout << "    READOUT_Y         ,"  << std::endl;
+  std::cout << "    PARALLEL          : working in parallel mode (default)" << std::endl;
+  std::cout << "    FORWARD           : working in forward mode (default)" << std::endl;
+  std::cout << "    REVERSE           : working in reverse mode" << std::endl;
 }

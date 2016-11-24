@@ -22,7 +22,7 @@
 /* param_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-06-15
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
@@ -45,7 +45,7 @@
 class params_acs : public params_fits {
 public:
   // variables
-  int single_fits;
+  
   // functions
   params_acs();
   virtual void parse_args( std::string key, std::string val, int & error );
@@ -54,5 +54,7 @@ public:
   virtual void check_params ( void );
 };
 
+
+void syntax_acs( void );
 
 #endif

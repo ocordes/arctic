@@ -22,13 +22,14 @@
 /* params_acs.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-11-21
 
    $Id$
 
 */
 
 #include <cstdlib>
+#include <iostream>
 
 #include "output.hh"
 #include "params.hh"
@@ -42,22 +43,12 @@
 
 params_acs::params_acs() : params_fits()
 {
-  single_fits = 0;
-
   working_mode = "ACS";
 }
 
 void params_acs::parse_args( std::string key, std::string val, int & error )
 {
   output( 11, "params_acs::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
-
-  if ( key == "SINGLE_FITS" )
-    {
-      single_fits = atoi( val.c_str() );
-      output( 10, "params: single_fits=%i\n", single_fits );
-      error = PARSE_OK;
-      return;
-    }
 
   params_fits::parse_args( key, val, error );
 }
@@ -154,4 +145,10 @@ void params_acs::calc_trap_config( double date )
 
 void params_acs::check_params ( void )
 {
+}
+
+
+void syntax_acs( void )
+{
+  std::cout << "    none" << std::endl;
 }
