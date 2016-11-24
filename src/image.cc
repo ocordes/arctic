@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-19
+   changed by: Oliver Cordes 2016-11-24
 
    $Id$
 
@@ -84,6 +84,23 @@ image::~image()
 }
 
 
+void image::fits_info( void )
+{
+  std::string       line;
+  std::stringstream ss;
+
+  if ( is_debug( 10 ) )
+  {
+    ss << (*FITS_image);
+
+    while ( getline( ss, line ) )
+    {
+      output( 10, "%s\n", line.c_str() );
+    }
+  }
+}
+
+
 
 int image::read_file( void )
 {
@@ -95,8 +112,23 @@ int image::read_file( void )
   try {
     FITS_image = std::unique_ptr<FITS> ( new FITS( infilename , Read, true) );
 
+    // write some information about the image
+    fits_info();
+
+
     // read all user-specifed, coordinate, and checksum keys in the image
     FITS_image->pHDU().readAllKeys();
+
+
+    if ( FITS_image->pHDU().extend() )
+    {
+      std::cerr << "File '" << infilename << "' is a multiple extension FITS";
+      std::cerr << " file which cannot be processed by arctc!" << std::endl;
+      return 1;
+    }
+
+
+    // read the image data
     FITS_image->pHDU().read( (*image_data) );
 
     // read image properties
@@ -293,59 +325,4 @@ int image::clock_charge( void )
   throw "Not implemented!";
 
   return 0;
-}
-
-
-// readKey functions with CCFits eception handling
-
-int image::readkey_int( PHDU & pHDU, std::string key )
-{
-  int i;
-
-  try {
-    pHDU.readKey( key, i );
-  }
-  catch (FitsException&)
-    {
-      std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
-      std::cerr << " Can't read the key " << key << " or key is not a int!" <<  std::endl;
-      i = 0;
-    }
-
-  return i;
-}
-
-
-double image::readkey_double( PHDU & pHDU, std::string key )
-{
-  double d;
-
-  try {
-    pHDU.readKey( key, d );
-  }
-  catch (FitsException&)
-    {
-      std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
-      std::cerr << " Can't read the key " << key << " or key is not a double!" <<  std::endl;
-      d = NAN;
-    }
-
-  return d;
-}
-
-
-std::string image::readkey_string( PHDU & pHDU, std::string key )
-{
-  std::string s;
-
-  try {
-    pHDU.readKey( key, s );
-  }
-  catch (FitsException&)
-    {
-      std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
-      std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;
-    }
-
-  return s;
 }

@@ -22,7 +22,7 @@
 /* output.c
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2015-11-30
+   changed by: Oliver Cordes 2016-11-24
 
    $Id$
 
@@ -93,15 +93,19 @@ void debug_init( int argc, char *argv[] )
 }
 
 
+bool is_debug( int dlevel )
+{
+  // be completly quiet or do nothing
+  if ( debug_level == 0 )
+    return false;
+
+  return dlevel <= debug_level;
+}
 
 
 void output( int dlevel, const char *format, ... )
 {
-  /* be completly quiet */
-  if ( debug_level == 0 )
-    return;
-
-  if ( dlevel <= debug_level )
+  if ( is_debug( dlevel) )
   {
     va_list ap;
 

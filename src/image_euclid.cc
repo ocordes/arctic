@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-11-24
 
    $Id$
 
@@ -82,7 +82,7 @@ int euclid_image::clock_charge( void )
 {
   // check the image UNITS
 
-  std::string bunit = readkey_string( FITS_image->pHDU(), "BUNIT" );
+  std::string bunit = readkey<string>( FITS_image->pHDU(), "BUNIT" );
 
   for (unsigned int i=0;i<bunit.length();i++) bunit[i] = toupper( bunit[i] );
 
@@ -99,7 +99,7 @@ int euclid_image::clock_charge( void )
 
           // get the exposure time
 
-          double exptime = readkey_double( FITS_image->pHDU(), "EXPTIMEE" );
+          double exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
 
           if ( std::isnan( exptime ) )
             {
@@ -108,7 +108,7 @@ int euclid_image::clock_charge( void )
             }
           if ( sci_mode_dark )
             {
-              double mexptime = readkey_double( FITS_image->pHDU(), "MEANEXP" );
+              double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
 
               if ( std::isnan( mexptime ) )
                 {

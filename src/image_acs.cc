@@ -22,7 +22,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-11-24
 
    $Id$
 
@@ -97,11 +97,11 @@ int acs_image::clock_charge( void )
 
 
   // first check the date keyword
-  double date = readkey_double( FITS_image->pHDU(), "DATE" );
+  double date = readkey<double>( FITS_image->pHDU(), "DATE" );
 
   if ( std::isnan( date ) )
     {
-      std::string sdate = readkey_string( FITS_image->pHDU(), "DATE" );
+      std::string sdate = readkey<std::string>( FITS_image->pHDU(), "DATE" );
       date = date2double( sdate );
     }
   else
@@ -114,7 +114,7 @@ int acs_image::clock_charge( void )
 
   // check the image UNITS
 
-  std::string bunit = readkey_string( FITS_image->pHDU(), "BUNIT" );
+  std::string bunit = readkey<std::string>( FITS_image->pHDU(), "BUNIT" );
 
   for (unsigned int i=0;i<bunit.length();i++) bunit[i] = toupper( bunit[i] );
 
@@ -131,7 +131,7 @@ int acs_image::clock_charge( void )
 
 	  // get the exposure time
 
-	  double exptime = readkey_double( FITS_image->pHDU(), "EXPTIMEE" );
+	  double exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
 
 	  if ( std::isnan( exptime ) )
 	    {
@@ -141,7 +141,7 @@ int acs_image::clock_charge( void )
 
 	  if ( sci_mode_dark )
 	    {
-	      double mexptime = readkey_double( FITS_image->pHDU(), "MEANEXP" );
+	      double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
 
 	      if ( std::isnan( mexptime ) )
 		{

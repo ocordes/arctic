@@ -22,7 +22,7 @@
 /* output.h
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2015-06-18
+   changed by: Oliver Cordes 2016-11-24
 
    $Id$
 
@@ -40,6 +40,9 @@ extern int debug_level;
 
 
 void debug_init( int argc, char *argv[] );
+
+
+bool is_debug( int );
 
 
 void output( int, const char *, ... );

@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-17
+   changed by: Oliver Cordes 2016-11-24
 
    $Id$
 
@@ -46,14 +46,14 @@ using namespace CCfits;
 class image{
 public:
   image( int argc, char *argv[] );
-  virtual ~image();
+  virtual     ~image();
+  void         fits_info( void );
   virtual int  read_file( void );
   virtual void write_file( void );
   virtual int  clock_charge( void );
 
-  int         readkey_int( PHDU & pHDU, std::string key );
-  double      readkey_double( PHDU & pHDU, std::string key );
-  std::string readkey_string( PHDU & pHDU, std::string key );
+  template <typename T>  T readkey( PHDU & pHDU, std::string key );
+
 protected:
   std::string                            prgname;
   std::shared_ptr<params>                parameters;
@@ -67,6 +67,23 @@ protected:
   long                                   image_width;
   long                                   image_height;
 };
+
+template <typename T>
+T image::readkey( PHDU & pHDU, std::string key )
+{
+  T val;
+
+  try {
+    pHDU.readKey( key, val );
+  }
+  catch (FitsException&)
+    {
+      std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
+      std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;
+    }
+
+  return val;
+}
 
 
 #endif
