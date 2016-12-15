@@ -306,6 +306,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
   if ( key == "UPPER_LIMIT" )
     {
       upper_limit = atof( val.c_str() );
+      cut_upper_limit = true;
       output( 10, "params: upper_limit=%f\n", upper_limit );
       error = PARSE_OK;
       return;
