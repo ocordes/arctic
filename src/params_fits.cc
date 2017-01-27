@@ -303,7 +303,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       return;
     }
 
-  if ( key == "UPPER_LIMIT" ) || ( key == "SATLEVEL" )
+  if ( ( key == "UPPER_LIMIT" ) || ( key == "SATLEVEL" ) )
     {
       upper_limit = atof( val.c_str() );
       cut_upper_limit = true;
