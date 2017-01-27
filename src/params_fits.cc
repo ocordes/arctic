@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-11-21
+   changed by: Oliver Cordes 2016-12-15
 
    $Id$
 
@@ -295,7 +295,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
        bool b = true;
 
       if ( val != "" )
-	b = tobool( val );
+	     b = tobool( val );
 
       cut_upper_limit = b;
       output( 10, "params: cut_upper_limit=%i\n", cut_upper_limit );
@@ -303,7 +303,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       return;
     }
 
-  if ( key == "UPPER_LIMIT" )
+  if ( key == "UPPER_LIMIT" ) || ( key == "SATLEVEL" )
     {
       upper_limit = atof( val.c_str() );
       cut_upper_limit = true;
