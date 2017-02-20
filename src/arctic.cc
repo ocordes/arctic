@@ -22,7 +22,7 @@
 /* arctic.cc
 
    written by: Oliver Cordes 2013-02-05
-   changed by: Oliver Cordes 2016-11-21
+   changed by: Oliver Cordes 2017-02-20
 
    $Id$
 
@@ -128,6 +128,7 @@ int main( int argc, char *argv[])
       exit( 1 );
     }
 
+  
   if ( im->read_file() != 0 )
     {
       std::cerr << "Program aborted!" <<  std::endl;

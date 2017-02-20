@@ -51,15 +51,13 @@ fits_image::fits_image( int argc, char *argv[] ) : image( argc, argv )
 {
   // alloctae parameter object
   parameters  = std::shared_ptr<params_fits>( new params_fits() );
+
   // initialize with command line parameters
   parameters->set_args( &argc, &argv);
 
   // default allocate image_data object
   image_data = std::shared_ptr<std::valarray<double>>( new std::valarray<double> );
 
-  // debug
-  //for (int i =1;i<argc;i++)
-  //  std::cout << i << " " << argv[i] << std::endl;
 
   if ( argc < 2 )
     {

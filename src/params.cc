@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-07
+   changed by: Oliver Cordes 2017-02-20
 
    $Id$
 
@@ -193,16 +193,16 @@ void params::set_args( int *argc, char **argv[]  )
 
   //std::cout << (*argc) << std::endl;
   while( i < nargc )
-    {
-      //std::cout << (*argv)[i] << std::endl;
+  {
+    //std::cout << (*argv)[i] << std::endl;
 
-      // check if this an option
-      if ( (*argv)[i][0] == '-' )
-	{
-	  // read at least one argument
-	  (*argc)--;
+    // check if this an option
+    if ( (*argv)[i][0] == '-' )
+	  {
+	    // read at least one argument
+	    (*argc)--;
 
-	  if ( std::strcmp( (*argv)[i], "-c" ) == 0 )
+	    if ( std::strcmp( (*argv)[i], "-c" ) == 0 )
 	    {
 	      (*argc)--;
 	      i++;
@@ -211,52 +211,57 @@ void params::set_args( int *argc, char **argv[]  )
 	      i++;
 	      continue;
 	    }
-	  if ( ( std::strcmp( (*argv)[i], "-d" ) == 0 ) || (  std::strcmp( (*argv)[i], "-m" ) == 0 ) )
+	    if ( ( std::strcmp( (*argv)[i], "-d" ) == 0 ) || (  std::strcmp( (*argv)[i], "-m" ) == 0 ) )
 	    {
 	      // ignore debug and mode definitions
 	      if ( (i+1) < nargc )
-		{
-		  (*argc)--;
-		  i++;
-		}
+		    {
+		      (*argc)--;
+		      i++;
+		    }
 	      i++;
 	      continue;
 	    }
 
-	  // default
+	    // default
 
-	  // split parameter  for further checks
+	    // split parameter  for further checks
 
-	  std::CString s( (*argv)[i] );
-	  s = s.clean_start( '-' );
-	  std::CString key = s.strtok( true, "=#\0\n" );
-	  std::CString val = s.strtok( false, "=#\0\n" );
+	    std::CString s( (*argv)[i] );
+	    s = s.clean_start( '-' );
+	    std::CString key = s.strtok( true, "=#\0\n" );
+	    std::CString val = s.strtok( false, "=#\0\n" );
 
-	  // convert key into upper cases
-	  key = key.toupper();
+	    // convert key into upper cases
+	    key = key.toupper();
 
-    error = PARSE_ERROR;
-    parse_args( key, val, error );
-    switch (error) {
-      case PARSE_OK:
-        break;
-      case PARSE_UNKNOWN:
-        std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
-        break;
-      case PARSE_ERROR:
-        std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
-        break;
-    }
-	} // end of if (*argv)[0]  == '-'
-      else
-	{
-	  (*argv)[outp] = (*argv)[i];
-	  (*argv)[i] = NULL;
-	  outp++;
-	}
+      error = PARSE_ERROR;
+      parse_args( key, val, error );
+      switch (error)
+      {
+        case PARSE_OK:
+          break;
+        case PARSE_UNKNOWN:
+          std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
+          break;
+        case PARSE_ERROR:
+          std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
+          break;
+      }
+	  } // end of if (*argv)[0]  == '-'
+    else
+	  {
+      if ( i != outp )
+      {
+	      (*argv)[outp] = (*argv)[i];
+	      (*argv)[i] = NULL;
+      }
+      outp++;
+	  }
 
-      i++;
-    }
+    i++;
+  }
+
 
   // finally check parameter for consistency
   check_params();

@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-24
+   changed by: Oliver Cordes 2017-02-20
 
    $Id$
 
@@ -76,6 +76,7 @@ image::image( int argc, char *argv[] )
 
   FITS_image   = NULL;
   image_data   = NULL;
+
 }
 
 
@@ -123,7 +124,7 @@ int image::read_file( void )
     if ( FITS_image->pHDU().extend() )
     {
       std::cerr << "File '" << infilename << "' is a multiple extension FITS";
-      std::cerr << " file which cannot be processed by arctc!" << std::endl;
+      std::cerr << " file which cannot be processed by arctic!" << std::endl;
       return 1;
     }
 
