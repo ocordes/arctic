@@ -29,7 +29,7 @@ long_options = ['neo', 'action=']   # example [ 'h1=']
 
 try:
     opts, args = getopt.gnu_getopt( sys.argv[1:], 'h?d:c:m:v', long_options )
-except getopt.GetoptError, s:
+except getopt.GetoptError as s:
     print( 'Error while parsing command parameters!' )
     syntax( 1 )
 
