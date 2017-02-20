@@ -1,7 +1,19 @@
+2017-02-20  Oliver Cordes <ocordes@astro.uni-bonn.de>
+
+  * artic 1.3.3 released
+  * working on the low signal environment
+  * fix the low signal environment express BUG
+  * rewrite some key reading functions in image class, now using templates
+  * add fits info in debug mode
+  * block the working of multi extension fits files, which otherwise causes segfaults
+  * test code for neo2 mode (watermarking)
+  * BUG fixes
+  * some more minor updates/upgrades/fixes ...
+
 2016-11-04  Oliver Cordes <ocordes@astro.uni-bonn.de>
-   
-        * arctic 1.3.2 released
-        * fix a BUG for the low signal environment
+
+  * arctic 1.3.2 released
+  * fix a BUG for the low signal environment
 	* add new FITS keywords in the output header
 	* remove the old automake environemnt, only cmake support
 	* fix minor BUGS for old gcc linux versions
@@ -12,7 +24,7 @@
 	* first clean release of the arctic code
 	* fast neo-method for CTE correction enabled
 	* add the feature for parallel and serial corrections
-	* is fully output compatible to the old acs-cte code, 
+	* is fully output compatible to the old acs-cte code,
 	  but has less errors in the calculations
 	* move the acs image handling into python (not completed yet!)
 
@@ -27,4 +39,3 @@
 
 	* arctic 1.1.0 released
 	* first version of arctic -> adopted from acs-cte project version 0.9.11
-

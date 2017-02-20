@@ -2,9 +2,9 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2016-11-17
+# changed by: Oliver Cordes 2017-02-20
 
-set(VERSION 1.3.3alpha2)
+set(VERSION 1.3.3)
 
 # get current date
 execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
@@ -146,7 +146,7 @@ endif()
 # CPack version numbers for release tarball name.
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 3)
-set(CPACK_PACKAGE_VERSION_PATCH 3alpha2)
+set(CPACK_PACKAGE_VERSION_PATCH 3)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Algorithm foR Charge Transfer Inefficency Correcton - arctic")
 set(CPACK_PACKAGE_VENDOR "Oliver Cordes/Ole Marggraf")
