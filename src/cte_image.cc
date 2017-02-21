@@ -2306,10 +2306,10 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
                                 //        j = 0;
                                 //        for (i=1;i<nr_trapl;++i)
                                 //          {
-                                // #ifdef __debug
-                                //             output( 10, "i,j: %i %i\n", i, j );
-                                //             output( 10, "trapl[i,j] : %f %f\n", trapl[i].sum(), trapl[j].sum() );
-                                //             output( 10, "diff       : %f\n", std::abs(  trapl[i].sum() - trapl[j].sum() ) );
+              // #ifdef __debug
+              //             output( 10, "i,j: %i %i\n", i, j );
+              //             output( 10, "trapl[i,j] : %f %f\n", trapl[i].sum(), trapl[j].sum() );
+              //             output( 10, "diff       : %f\n", std::abs(  trapl[i].sum() - trapl[j].sum() ) );
                                 //             #endif
                                 //
                                 //             if ( std::abs( trapl[i].sum() - trapl[j].sum() ) < empty_trap_limit  )

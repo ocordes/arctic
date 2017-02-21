@@ -49,6 +49,10 @@
 #include "strstr.hh"
 
 
+std::string algorithm_names[] = { "CLASSIC",
+                                  "NEO",
+                                  "NEO2" };
+
 
 params::params()
 {

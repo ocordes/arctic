@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-07
+   changed by: Oliver Cordes 2017-02-21
 
    $Id$
 
@@ -57,9 +57,12 @@
 
 
 // algorithm definitions
-#define ALGORITHM_CLASSIC  1
-#define ALGORITHM_NEO      2
-#define ALGORITHM_NEO2     3
+#define ALGORITHM_CLASSIC  0
+#define ALGORITHM_NEO      1
+#define ALGORITHM_NEO2     2
+
+// cooresponding names 
+extern std::string algorithm_names[];
 
 
 // Defines a real type for images

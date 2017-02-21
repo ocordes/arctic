@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-24
+   changed by: Oliver Cordes 2017-02-21
 
    $Id$
 
@@ -53,6 +53,12 @@ public:
   virtual int  clock_charge( void );
 
   template <typename T>  T readkey( PHDU & pHDU, std::string key );
+
+private:
+  void         update_header( PHDU & hdu);
+  void         update_header_serial( PHDU & hdu );
+  void         update_header_parallel( PHDU & hdu );
+
 
 protected:
   std::string                            prgname;
