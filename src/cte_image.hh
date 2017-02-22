@@ -43,39 +43,40 @@
 class cte_image {
 public:
   cte_image( std::shared_ptr<params> p);
+  virtual ~cte_image() {};
   void   clock_charge( std::shared_ptr<std::valarray<double>>,
 		       long, long,
 		       std::valarray<long> &,
 		       std::valarray<long> & );
-private:
+  virtual void clock_charge_setup( void );
+  virtual void clock_charge_clear( void );
+
+  virtual void clock_charge_save_traps( void );
+  virtual void clock_charge_restore_traps( void );
+  virtual double clock_charge_pixel( double, double, int );
+  virtual double clock_charge_trap_info( void );
+//private:
   double get_difftime( struct timeval start, struct timeval end );
   long   get_sparse_pixels( std::valarray<double> &, double );
   void   limit_to_max( std::valarray<double> &, double );
+
+  void   clock_charge_image( std::valarray<double> &,
+			                       std::valarray<long> &,
+			                       std::valarray<long> & );
+
   double get_sum_double_array( double *array, int width, int height );
   void   print_traps( std::valarray<double> & t, int n_species, int trap_levels );
   void   print_trapl( std::valarray<std::valarray<double>> & trapl,
 		      std::valarray<int> & trapl_fill,
 		      int n_species,
 		      int nr_trapl );
-  void   print_wml( std::valarray<std::valarray<double>> & wml,
-        	std::valarray<double> & wml_fill,
-        	int n_species,
-        	int nr_wml );
   bool   val_array_smaller( std::valarray<double> & v1,
 			    std::valarray<double> & v2 );
   void   create_express_multiplier( std::valarray<int> & express_multiplier,
                                     int express,
                                     int h,
                                     int readout_offset );
-  void   clock_charge_image_classic( std::valarray<double> &,
-			     std::valarray<long> &,
-			     std::valarray<long> & );
-  void   clock_charge_image_neo( std::valarray<double> &,
-				 std::valarray<long> &,
-				 std::valarray<long> & );
-  void   clock_charge_image_neo2( std::valarray<double> &,
-				  std::valarray<long> &,
-				  std::valarray<long> & );
+
 protected:
   std::shared_ptr<params>              parameters;
 
@@ -87,10 +88,16 @@ protected:
   bool                                 rotate;
   bool                                 direction;
 
-  // extern declarated variables
-  bool                                 check_empty_traps;
-  double                               empty_trap_limit;
-  double                               empty_trap_limit_neo2;
+  // CTE local parameters
+  int                                  n_species;
+  int                                  n_levels;
+  double                               well_depth;
+  double                               well_notch_depth;
+  double                               well_fill_power;
+  double                               well_range;
+  int                                  express;
+  int                                  readout_offset;
+  double                               traps_total;
 };
 
 
