@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-10-24
+   changed by: Oliver Cordes 2017-02-23
 
    $Id$
 
@@ -60,22 +60,22 @@ public:
   long   get_sparse_pixels( std::valarray<double> &, double );
   void   limit_to_max( std::valarray<double> &, double );
 
+  void   clock_charge_column( std::valarray<double> & image,
+                                       long,
+                                       long,
+                                       long );
   void   clock_charge_image( std::valarray<double> &,
 			                       std::valarray<long> &,
 			                       std::valarray<long> & );
 
   double get_sum_double_array( double *array, int width, int height );
-  void   print_traps( std::valarray<double> & t, int n_species, int trap_levels );
-  void   print_trapl( std::valarray<std::valarray<double>> & trapl,
-		      std::valarray<int> & trapl_fill,
-		      int n_species,
-		      int nr_trapl );
-  bool   val_array_smaller( std::valarray<double> & v1,
-			    std::valarray<double> & v2 );
+
+
   void   create_express_multiplier( std::valarray<int> & express_multiplier,
                                     int express,
                                     int h,
                                     int readout_offset );
+  void   create_exponential_factor( void );
 
 protected:
   std::shared_ptr<params>              parameters;
@@ -87,6 +87,7 @@ protected:
 
   bool                                 rotate;
   bool                                 direction;
+  std::image_slice                     is;
 
   // CTE local parameters
   int                                  n_species;
@@ -98,6 +99,8 @@ protected:
   int                                  express;
   int                                  readout_offset;
   double                               traps_total;
+  std::valarray<int>                    express_multiplier;
+  std::valarray<double>                exponential_factor;
 };
 
 

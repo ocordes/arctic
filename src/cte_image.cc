@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-21
+   changed by: Oliver Cordes 2017-02-23
 
 
    $Id$
@@ -57,11 +57,14 @@ w
 
 
 
-// define some macros for the neo code
-
-#define newtrap( new_h, new_val) ( trapl_fill[nr_trapl] = new_h; trapl[nr_trapl] = new_val; ++nr_trapl; )
-
-// endof macros
+void minmax_limit( std::valarray<long> & xrange, long min, long max )
+{
+  if (  xrange.size() >= 2 )
+  {
+    if ( xrange[0] < min ) xrange[0] = min;
+    if ( xrange[1] > max ) xrange[1] = max;
+  }
+}
 
 
 
@@ -138,114 +141,12 @@ void cte_image::limit_to_max( std::valarray<double> & v, double limit )
 }
 
 
-
-double cte_image::get_sum_double_array( double *array, int w, int h )
-{
-  double sum = 0.0;
-
-  int    totel;
-  int    i;
-
-  totel = w * h;
-
-  for (i=0;i<totel;i++)
-    sum += array[i];
-
-  return sum;
-}
-
-
-void cte_image::print_traps( std::valarray<double> & t, int n_species, int trap_levels )
-{
-  int i, j;
-
-  std::string s;
-
-  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, trap_levels );
-  for (j=0;j<trap_levels;j++)
-  {
-    int c;
-    double d;
-
-    s = "";
-    c = 0;
-    d = 0.0;
-    for (i=0;i<n_species;i++)
-	  {
-	    if ( j > 0 )
-	    {
-	      if ( fabs( t[(j*n_species)+i] - t[((j-1)*n_species)+i] ) < 1e-14 )
-		      c++;
-	    }
-	    std::stringstream str;
-	    str << std::fixed << std::setprecision( debug_precision ) << t[(j*n_species)+i] << " ";
-	    s += str.str();
-	    //s += std::to_string( t[(j*n_species)+i] ) + " ";
-	    d +=  t[(j*n_species)+i];
-	  }
-
-    std::stringstream str;
-    str << std::fixed << std::setprecision( debug_precision ) << d;
-    s += "= " + str.str();
-    //      s += "= " + std::to_string( d );
-    if ( c < 3 )
-	    output( 10, "%05i: %s\n", j, s.c_str() );
-  }
-}
-
-
-void cte_image::print_trapl( std::valarray<std::valarray<double>> & trapl,
-			     std::valarray<int> & trapl_fill,
-			     int n_species,
-			     int nr_trapl )
-{
-  int i, j, l;
-
-  std::string s;
-
-  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, nr_trapl );
-  l = 0;
-  //for (j=0;j<nr_trapl;j++)
-  for (j=nr_trapl-1;j>=0;j--)
-    {
-      s = "";
-      for (i=0;i<n_species;i++)
-	{
-	  std::stringstream str;
-	  str << std::fixed << std::setprecision( debug_precision ) << trapl[j][i] << " ";
-	  s += str.str();
-	  //s += std::to_string( trapl[j][i] ) + " ";
-	}
-
-      std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << trapl[j].sum() ;
-      s += "= " + str.str();
-      //s += "= " + std::to_string( trapl[j].sum()  );
-
-      //output( 10, "%05i: %s\n", j, s.c_str() );
-      output( 10, "%05i: %s  (x %05i)\n", l, s.c_str(), trapl_fill[j] );
-
-      l += trapl_fill[j];
-    }
-}
-
-
-
-bool cte_image::val_array_smaller( std::valarray<double> & v1,
-				  std::valarray<double> & v2 )
-{
-  for( unsigned int i=0; i<v1.size();i++)
-    if ( v1[i] < v2[i] )
-      return true;
-  return false;
-}
-
-
 void cte_image::create_express_multiplier( std::valarray<int> & express_multiplier,
                                            int express,
                                            int h,
                                            int readout_offset )
 {
+  output( 10, "Create express_multiplier...\n" );
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
   {
     int i_sum = 0;
@@ -275,6 +176,19 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
       std::cout << std::endl;
     }
     #endif
+  output( 10, "Done.\n" );
+}
+
+
+void cte_image::create_exponential_factor( void )
+{
+  output( 10, "Create exponential factor ...\n" );
+  exponential_factor = std::valarray<double> ( 0.0, n_species*n_levels );
+
+  for (int i=0;i<n_levels;++i)
+    for (int j=0;j<n_species;++j)
+      exponential_factor[(i*n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
+  output( 10, "Done.\n" );
 }
 
 
@@ -305,6 +219,140 @@ double cte_image::clock_charge_trap_info( void )
   return 0.0;
 }
 
+
+// template for saving the trap structure
+void cte_image::clock_charge_save_traps( void )
+{
+}
+
+
+// template for restoring the trap structure
+void cte_image::clock_charge_restore_traps( void )
+{
+}
+
+
+void cte_image::clock_charge_column( std::valarray<double> & image,
+                                     long i_column,
+                                     long start_y,
+                                     long end_y )
+{
+  double im, freec;
+  double express_correct;
+
+  int express_factor_pixel = -1;
+  int last_express_factor_pixel;
+  bool traps_saved = false;
+
+  int  i_express, i_pixel, i_pixelp1;
+
+
+  // p_express_multiplier is a column pointer of the express array
+  int p_express_multiplier = 0;
+
+  for (i_express=0;i_express<express;++i_express)
+    {
+      // traps are empty
+      clock_charge_clear();
+
+      // good question if this is really necessary, because the array is used via nr_trapl as an indication
+      // how much levels are really used, these levels have then also valid entries ...
+      //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
+      //trapl_fill = std::valarray<int> ( 0, n_levels );
+      is.reset( i_column ); // initialize the image slicer
+
+      for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
+        {
+
+          i_pixelp1 = i_pixel + 1;
+
+          // the low signal mode produces some error with express > 1
+          // the problem is that in the express loop for express values > 1
+          // the first lines have a multiplier =0 and therefor empty traps
+          // which should have at least a filled situation ...
+
+          last_express_factor_pixel = express_factor_pixel;
+
+
+
+          // inner pixel loop
+
+          // check if we need to calculate a new trail for that pixel
+
+          // access the express array only once and use this value twice ;-)
+          //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
+          express_factor_pixel = express_multiplier[p_express_multiplier];
+
+
+          // correcttion factor
+          express_correct = (double) express_factor_pixel / i_pixelp1;
+
+          #ifdef __debug
+          output( 10, "express_correct = %f\n", express_correct );
+          #endif
+
+          // in express >1 mode save states when an exress block ends
+          if ( ( last_express_factor_pixel == express_factor_pixel ) && ( traps_saved == false ) )
+          {
+            traps_saved = true;
+            #ifdef __debug
+            output( 10, "Traps will be saved!\n");
+            output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+            #endif
+
+            clock_charge_save_traps();
+          }
+
+
+          if ( express_factor_pixel != 0 )
+            {
+              // restore the saved trap states
+              if ( last_express_factor_pixel == 0 )
+              {
+                traps_saved = false;
+                #ifdef __debug
+                output( 10, "Traps will be restored!\n");
+                output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+                #endif
+
+                clock_charge_restore_traps();
+              }
+
+
+              // extract pixel
+              im = image[ (*is) ];
+
+              // shape pixel value
+              if ( im > well_depth )
+                im = well_depth;
+              else
+                if ( im < 0.0 )
+                  im = 0.0;
+
+              // handle one single pixel
+              freec = clock_charge_pixel( im, express_correct, i_pixelp1 );
+
+
+              #ifdef __debug
+              double trail = ( freec - im );
+              output( 10, "strail: %.10f\n", trail );
+              #endif
+
+              image[(*is)] += ( freec - im );;
+
+
+            } /* end of p_express_multiplier[i_pixel] != 0 */
+            // nevertheless that we are doing nothing, change the slicer
+            // next image element
+            ++p_express_multiplier;
+            ++is;
+         } /* i_pixel loop for the trail */
+      //p_express_multiplier += height + 1;
+      ++p_express_multiplier;
+    }  /* end of express loop */
+}
+
+
 // perfoming the CTI correction with clock_change_image
 
 void cte_image::clock_charge_image( std::valarray<double> & image,
@@ -316,29 +364,11 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   // only once ...
 
   /* CTE variables */
-  double  n_electrons_per_trap_total;
-  double  n_electrons_per_trap_express_total;
-  int     i_express;
-  double  release;
-  double  total_capture;
-  double  freec;
-  double  im;
-  double  well_range;
-  int     cheight = 0;
-  double  dheight;
-
   int     sparse_pixels;
 
   int     start_x, start_y, end_x, end_y;
-  int     i_column, i_pixel;
-  double  i_pixelp1;     // used for the express corrections
-  double  express_correct;
+  int     i_column;
 
-
-  /* helpers */
-  int     i, j;
-  double  d;
-  double  sum, sum2;
 
   /* time measurement */
   struct timeval start_time;
@@ -389,21 +419,12 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   // general setups and inits
 
   // new code with variable express
-  output( 10, "Create express_multiplier...\n" );
-  std::valarray<int> express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
-  int express_factor_pixel = 0;
-
+  express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
   create_express_multiplier( express_multiplier, express, height, readout_offset );
 
+  // create the exponentia factors
+  create_exponential_factor();
 
-  output( 10, "Create exponential factor ...\n" );
-  std::valarray<double> exponential_factor( 0.0, n_species*n_levels );
-
-  for (i=0;i<n_levels;++i)
-    for (j=0;j<n_species;++j)
-      exponential_factor[(i*n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
-
-  output( 10, "Done.\n" );
 
   // run the algorithm specific setups
   clock_charge_setup();
@@ -411,18 +432,11 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
   // image slicer definitions
-  std::image_slice is( image_width,
-                        image_height,
-                        0,
-                        rotate,
-                        direction );
-
-
-
-  // define the variables for detection of the express saved states
-  express_factor_pixel = -1;
-  int last_express_factor_pixel;
-  bool traps_saved = false;
+  is = std::image_slice( image_width,
+                         image_height,
+                         0,
+                         rotate,
+                         direction );
 
 
   // initialize the time measurement
@@ -433,111 +447,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
-      express_factor_pixel = -1;
-
-      // p_express_multiplier is a column pointer of the express array
-      int p_express_multiplier = 0;
-
-      for (i_express=0;i_express<express;++i_express)
-        {
-          // traps are empty
-	        clock_charge_clear();
-
-	        // good question if this is really necessary, because the array is used via nr_trapl as an indication
-	        // how much levels are really used, these levels have then also valid entries ...
-	        //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
-	        //trapl_fill = std::valarray<int> ( 0, n_levels );
-          is.reset( i_column ); // initialize the image slicer
-
-          for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
-            {
-
-              i_pixelp1 = i_pixel + 1;
-
-              // the low signal mode produces some error with express > 1
-              // the problem is that in the express loop for express values > 1
-              // the first lines have a multiplier =0 and therefor empty traps
-              // which should have at least a filled situation ...
-
-              last_express_factor_pixel = express_factor_pixel;
-
-
-
-              // inner pixel loop
-
-              // check if we need to calculate a new trail for that pixel
-
-	            // access the express array only once and use this value twice ;-)
-	            //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
-              express_factor_pixel = express_multiplier[p_express_multiplier];
-
-
-              // correcttion factor
-              express_correct = (double) express_factor_pixel / i_pixelp1;
-
-              #ifdef __debug
-              output( 10, "express_correct = %f\n", express_correct );
-              #endif
-
-              // in express >1 mode save states when an exress block ends
-              if ( ( last_express_factor_pixel == express_factor_pixel ) && ( traps_saved == false ) )
-              {
-                traps_saved = true;
-                #ifdef __debug
-                output( 10, "Traps will be saved!\n");
-                output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
-                #endif
-
-                clock_charge_save_traps();
-              }
-
-
-              if ( express_factor_pixel != 0 )
-                {
-                  // restore the saved trap states
-                  if ( last_express_factor_pixel == 0 )
-                  {
-                    traps_saved = false;
-                    #ifdef __debug
-                    output( 10, "Traps will be restored!\n");
-                    output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
-                    #endif
-
-                    clock_charge_restore_traps();
-                  }
-
-
-                  // extract pixel
-                  im = image[ (*is) ];
-
-                  // shape pixel value
-                  if ( im > well_depth )
-                    im = well_depth;
-                  else
-                    if ( im < 0.0 )
-                      im = 0.0;
-
-                  // handle one single pixel
-                  freec = clock_charge_pixel( im, express_correct, i_pixelp1 );
-
-
-		              #ifdef __debug
-                  double trail = ( freec - im );
-		              output( 10, "strail: %.10f\n", trail );
-		              #endif
-
-                  image[(*is)] += ( freec - im );;
-
-
-                } /* end of p_express_multiplier[i_pixel] != 0 */
-                // nevertheless that we are doing nothing, change the slicer
-                // next image element
-                ++p_express_multiplier;
-                ++is;
-             } /* i_pixel loop for the trail */
-          //p_express_multiplier += height + 1;
-          ++p_express_multiplier;
-        }  /* end of express loop */
+      clock_charge_column( image, i_column, start_y, end_y );
 
       //#ifdef __debug
       //output( 1, "\n" );
@@ -620,20 +530,8 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
 
   // check and liit the range variable
-  if (  xrange.size() >= 2 )
-    {
-      if ( xrange[0] < 0 )
-	       xrange[0] = 0;
-      if ( xrange[1] > width )
-	       xrange[1] = width;
-    }
-  if (  yrange.size() >= 2 )
-    {
-      if ( yrange[0] < 0 )
-	       yrange[0] = 0;
-      if ( yrange[1] > height )
-	       yrange[1] = height;
-    }
+  minmax_limit( xrange, 0, width );
+  minmax_limit( yrange, 0, height );
 
 
   if ( parameters->unclock )
