@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-23
+   changed by: Oliver Cordes 2017-02-24
 
 
    $Id$
@@ -57,13 +57,21 @@ w
 
 
 
-void minmax_limit( std::valarray<long> & xrange, long min, long max )
+void minmax_limit_array( std::valarray<long> & xrange, long min, long max )
 {
   if (  xrange.size() >= 2 )
   {
     if ( xrange[0] < min ) xrange[0] = min;
     if ( xrange[1] > max ) xrange[1] = max;
   }
+}
+
+void minmax_limit( double & val, double min, double max )
+{
+  if ( val < min )
+    val = min;
+  else if ( val > max )
+    val = max;
 }
 
 
@@ -204,12 +212,33 @@ void cte_image::clock_charge_clear( void )
 }
 
 
-
-double cte_image::clock_charge_pixel( double freec, double express_correct, int i_pixelp1 )
+double cte_image::clock_charge_pixel_release( void )
 {
-  // handle a single pixel and return its value
+  return 0.0;
+}
 
-  return freec;
+
+double cte_image::clock_charge_pixel_total_capture( double el_height, int i_pixelp1 )
+{
+  return 0.0;
+}
+
+
+void cte_image::clock_charge_pixel_capture_ov( double d )
+{
+  // handle a single pixel
+}
+
+
+void cte_image::clock_charge_pixel_capture_full( void )
+{
+  // handle a single pixel
+}
+
+
+void cte_image::clock_charge_pixel_cleanup( void )
+{
+
 }
 
 
@@ -237,7 +266,9 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
                                      long start_y,
                                      long end_y )
 {
-  double im, freec;
+  double im, sum, d, freec;
+  double el_height;              // height of electron cloud
+  double total_capture;
   double express_correct;
 
   int express_factor_pixel = -1;
@@ -323,14 +354,58 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
               im = image[ (*is) ];
 
               // shape pixel value
-              if ( im > well_depth )
-                im = well_depth;
-              else
-                if ( im < 0.0 )
-                  im = 0.0;
+              minmax_limit( im, 0.0, well_depth );
 
-              // handle one single pixel
-              freec = clock_charge_pixel( im, express_correct, i_pixelp1 );
+
+              sum = clock_charge_pixel_release();
+              freec = im + sum * express_correct;
+
+              // Capture any free electrons in the vicinity of empty traps
+
+              if ( freec > well_notch_depth )
+                {
+                  el_height = pow(((freec - well_notch_depth ) / well_range ),well_fill_power);
+                  minmax_limit( el_height , 0.0, 1.0 );
+
+                  // calculate the total_capture
+                  total_capture = clock_charge_pixel_total_capture( el_height, i_pixelp1 );
+
+                  // correct the total_capture for express
+                  total_capture *= express_correct;
+
+                  // limit the total_capture
+                  if ( total_capture < 1e-14 )
+                    total_capture = 1e-14;
+
+                  //  d gives a hint of how much electrons are available
+                  // for the capturing process
+                  // d > 1  more electrons are available
+                  // d < 1  less electrons are available, in
+                  //         the end d * total_capture is then used!
+                  d = freec / total_capture;
+                  if ( d < 1.0 )
+                  {
+                    #ifdef __debug
+                    output( 10, "d < 1.0\n" );
+                    #endif
+
+                    clock_charge_pixel_capture_ov( d );
+                  }
+                  else
+                  {
+                    #ifdef __debug
+                    output( 10, "d >= 1.0\n" );
+                    #endif
+
+                    clock_charge_pixel_capture_full();
+                  }
+
+                  // remove the captured electrons
+                  freec -= total_capture;
+
+                  // cleanup trap structure
+                  clock_charge_pixel_cleanup();
+                }
 
 
               #ifdef __debug
@@ -530,8 +605,8 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
 
   // check and liit the range variable
-  minmax_limit( xrange, 0, width );
-  minmax_limit( yrange, 0, height );
+  minmax_limit_array( xrange, 0, width );
+  minmax_limit_array( yrange, 0, height );
 
 
   if ( parameters->unclock )

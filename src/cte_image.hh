@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-23
+   changed by: Oliver Cordes 2017-02-24
 
    $Id$
 
@@ -53,7 +53,11 @@ public:
 
   virtual void clock_charge_save_traps( void );
   virtual void clock_charge_restore_traps( void );
-  virtual double clock_charge_pixel( double, double, int );
+  virtual double clock_charge_pixel_release( void );
+  virtual double clock_charge_pixel_total_capture( double, int );
+  virtual void clock_charge_pixel_capture_ov( double );
+  virtual void clock_charge_pixel_capture_full( void );
+  virtual void   clock_charge_pixel_cleanup( void );
   virtual double clock_charge_trap_info( void );
 //private:
   double get_difftime( struct timeval start, struct timeval end );

@@ -1,7 +1,6 @@
 /* (C) Copyright 2013,2014,205,2016 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
-w
     This file is part of arctic project.
 
     arctic is free software: you can redistribute it and/or modify
@@ -22,7 +21,7 @@ w
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-23
+   changed by: Oliver Cordes 2017-02-24
 
 
    $Id$
@@ -207,28 +206,10 @@ void cte_image_neo::clock_charge_restore_traps( void )
 }
 
 
-double cte_image_neo::clock_charge_pixel( double freec, double express_correct, int i_pixelp1 )
+double cte_image_neo::clock_charge_pixel_release( void )
 {
-  int          i, j;
-
-  double       release, total_capture;
-
-  double       sum, sum2, c, d, h, h2, ov, skip;
-
-  double       dheight, dheight2;
-  unsigned int cheight, cheight2;
-
-
-
-  // prepare the work
-
-  // Modifications of low signal behaviour
-  //n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
-  //n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
-
-  // express correction using i_pixel instead of express_factor_pixel
-  n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
-  n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
+  static double sum = 0.0;
+  static double sum2, release;
 
   // Release any trapped electrons, using the appropriate decay half-life
 
@@ -236,143 +217,129 @@ double cte_image_neo::clock_charge_pixel( double freec, double express_correct, 
   // trapped electrons relased exponentially
 
   sum = 0.0;
-  for (j=0;j<nr_trapl;++j)
+  for (int j=0;j<nr_trapl;++j)
+  {
+    sum2 = 0.0;
+    for (int i=0;i<n_species;++i)
     {
-      sum2 = 0.0;
-      for (i=0;i<n_species;++i)
-        {
-         release = trapl[j][i] * exponential_factor[i];
-         trapl[j][i] -= release;
-         sum2 += release;
-        }
-      // do the multiplication at the end ;-)
-      sum += sum2 * (double) trapl_fill[j];
+      release = trapl[j][i] * exponential_factor[i];
+      trapl[j][i] -= release;
+      sum2 += release;
     }
+    // do the multiplication at the end ;-)
+    sum += sum2 * (double) trapl_fill[j];
+  }
 
-  // add the released electrons to the pixel value
+  return sum;
+}
 
-  // corrct for express
-  sum *= express_correct;
-  freec += sum;
+// prepare the electron caputer by calculating the total_capture
+double cte_image_neo::clock_charge_pixel_total_capture( double el_height, int i_pixelp1 )
+{
+   double total_capture = 0.0;
+   double c;
 
+   int    i, j, h, h2;
 
-  // Capture any free electrons in the vicinity of empty traps
+   // prepare the work
 
-  if ( freec > well_notch_depth )
-    {
-      d = pow(((freec - well_notch_depth ) / well_range ),well_fill_power);
-      if ( d > 1.0 )
-        d =  1.0;
-      else
-        if ( d < 0.0 )
-          d = 0.0;
+   // Modifications of low signal behaviour
+   //n_electrons_per_trap_express = n_electrons_per_trap * (double) express_factor_pixel;
+   //n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
 
-      dheight = n_levels * d;
+   // express correction using i_pixel instead of express_factor_pixel
+   n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
+   n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
+   // calculate the height in ( affected levels )
+   dheight = n_levels * el_height;
 
+   // cheight is the last full filled trap level
+   cheight = ceil( dheight ) - 1;
 
-      // cheight is the last full filled trap level
-      cheight = ceil( dheight ) - 1;
+   // ov is the fraction of the last filled trap level
+   ov = dheight - cheight;
 
-      // ov is the fraction of the last filled trap level
-      ov = dheight - cheight;
+   // some helpers
+   n_electrons_per_trap_express_ov = n_electrons_per_trap_express * ov;
 
-      // some helpers
-      n_electrons_per_trap_express_ov = n_electrons_per_trap_express * ov;
+   // calculate the number of electrons which can be
+   // captured  in the traps
 
-      // calculate the number of electrons which can be
-      // captured  in the traps
+   //total_capture = 0.0;
 
-      total_capture = 0.0;
+   // scan all levels
+   h = 0;
+   for (j=nr_trapl-1;j>=0;--j)
+   {
+     h2 = h + trapl_fill[j];
 
-      // scan all levels
-      h = 0;
-      for (j=nr_trapl-1;j>=0;--j)
-        {
-          h2 = h + trapl_fill[j];
-
-
-          // don't need to check for max. because
-          // n_electrons_per_trap_express is always higher or
-          // equal then the last step -> structure of the
-          // express array, and the trap cannot hold more
-          // electrons then n_electrons_per_trap_express of the
-          // last step!
-          if ( h2 < dheight )
-            {
-               // this levels are going directly into the calculations
-              total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+     // don't need to check for max. because
+     // n_electrons_per_trap_express is always higher or
+     // equal then the last step -> structure of the
+     // express array, and the trap cannot hold more
+     // electrons then n_electrons_per_trap_express of the
+     // last step!
+     if ( h2 < dheight )
+     {
+       // this levels are going directly into the calculations
+       total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                  * trapl_fill[j];
-            }
-          else
-            {
-              total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
+     }
+     else
+     {
+       total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                  * ( cheight - h );
 
-              for (i=0;i<n_species;++i)
-                {
-                  c = n_electrons_per_trap_express_ov[i]  - trapl[j][i];
-                  if ( c > 0.0 )
-                    total_capture += c;
-                }
-            }
-          h = h2;
-          if ( h > dheight )
-            break;
-        }
-
-     // h has the height of all used levels
-     if ( h < dheight )
+       for (i=0;i<n_species;++i)
        {
-         total_capture +=  n_electrons_per_trap_express_total * ( dheight - h );
+         c = n_electrons_per_trap_express_ov[i]  - trapl[j][i];
+         if ( c > 0.0 )
+           total_capture += c;
        }
+     }
+     h = h2;
+     if ( h > dheight )
+       break;
+   }
 
-     #ifdef __debug
-     output( 10, "debug:  %i grep\n", i_pixel );
-     output( 10, "express = %i  factor = %i\n", i_express, express_factor_pixel );
-     double traps_total2 = 0.0;
-     for (i=0;i<nr_trapl;++i)
-        traps_total2 += trapl[i].sum() * trapl_fill[i];
-     output( 10, "ntrap_total : %.15f\n", traps_total2 );
-     output( 10, "n_p_t_e_t   : %.15f\n", n_electrons_per_trap_express_total );
+   // h has the height of all used levels
+   if ( h < dheight )
+   {
+     total_capture +=  n_electrons_per_trap_express_total * ( dheight - h );
+   }
 
-     print_trapl( trapl, trapl_fill, n_species, nr_trapl );
+   #ifdef __debug
+   output( 10, "debug:  %i grep\n", i_pixel );
+   output( 10, "express = %i  factor = %i\n", i_express, express_factor_pixel );
+   double traps_total2 = 0.0;
+   for (i=0;i<nr_trapl;++i)
+      traps_total2 += trapl[i].sum() * trapl_fill[i];
+   output( 10, "ntrap_total : %.15f\n", traps_total2 );
+   output( 10, "n_p_t_e_t   : %.15f\n", n_electrons_per_trap_express_total );
 
-
-     output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
-     output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight );
-     output( 10, "max_capture : %.15f\n", total_capture );
-
-     #endif
-
-     // correct the total_capture for express
-     total_capture *= express_correct;
-
-     if ( total_capture < 1e-14 )
-        total_capture = 1e-14;
-
-     //  d gives a hint of how much electrons are available
-     // for the capturing process
-     // d > 1  more electrons are available
-     // d < 1  less electrons are available, in
-     //         the end d * total_capture is then used!
-     d = freec / total_capture;
+   print_trapl( trapl, trapl_fill, n_species, nr_trapl );
 
 
-     // the result is all levels which are absorbed
-     // by the new dheight are gone
-     // the first level may be modified
+   output( 10, "free,dheight: %.15f %.15f\n", freec, dheight );
+   output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight );
+   output( 10, "max_capture : %.15f\n", total_capture );
 
-     // skip has the height until the new bunches
+   #endif
+
+  return total_capture;
+}
 
 
-     if ( d < 1.0 )
-       {
-         #ifdef __debug
-         output( 10, "d < 1.0\n" );
-         #endif
+void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
-         // not easy needs a help array
+{
+  int          i, j, h;
+
+  double       dheight2;
+  unsigned int cheight2;
+
+
 
          new_nr_trapl = 0;
 
@@ -513,10 +480,22 @@ double cte_image_neo::clock_charge_pixel( double freec, double express_correct, 
              trapl_fill[i] = new_trapl_fill[j];
                                    }
          nr_trapl = new_nr_trapl;
-         total_capture *= d;
-       }
-     else
-       {
+
+
+
+      #ifdef __debug
+      print_trapl( trapl, trapl_fill, n_species, nr_trapl );
+      #endif
+
+}
+
+
+void cte_image_neo::clock_charge_pixel_capture_full( void )
+{
+  int          j, h, skip;
+
+
+
          // cheight full levels
          // cheight+1 partly filled levels
          //
@@ -638,60 +617,58 @@ double cte_image_neo::clock_charge_pixel( double freec, double express_correct, 
                      }
              }
            }
-        }
+
 
       #ifdef __debug
       print_trapl( trapl, trapl_fill, n_species, nr_trapl );
       #endif
-
-      // delete the captured exlectrons from
-      //   the pixel value
-      freec -= total_capture;
-
-
-      // cleanup the array
-      // - removing/merge duplicated levels ...
-      // maybe it is better to stop the scanning after the first valid level?
-      if ( dark_mode  == 1 )
-        {
-           j = 0;
-           for (i=1;i<nr_trapl;++i)
-             {
-                #ifdef __debug
-                output( 10, "i,j: %i %i\n", i, j );
-                output( 10, "trapl[i,j] : %f %f\n", trapl[i].sum(), trapl[j].sum() );
-                output( 10, "diff       : %f\n", std::abs(  trapl[i].sum() - trapl[j].sum() ) );
-                #endif
-
-                if ( std::abs( trapl[i].sum() - trapl[j].sum() ) < empty_trap_limit  )
-                  {
-                     int cc = trapl_fill[j] + trapl_fill[i];
-                     trapl[j] *= trapl_fill[j];
-                     trapl[j] += trapl[i] * (double) trapl_fill[i];
-                     trapl[j] /= cc;
-                     trapl_fill[j] += trapl_fill[i];
-                  }
-                else
-                  {
-                     ++j;
-                     if ( i != j )
-                       {
-                          trapl[j] = trapl[i];
-                          trapl_fill[j] = trapl_fill[i];
-                       }
-                  }
-             }
-           nr_trapl = j + 1;
-        }
-
-      #ifdef __debug
-      print_trapl( trapl, trapl_fill, n_species, nr_trapl );
-      #endif
-
-    } /* end of if ( freec > well_notch_depth ) */
-
-    return freec;
 }
+
+
+void cte_image_neo::clock_charge_pixel_cleanup( void )
+{
+  int i, j;
+
+        // cleanup the array
+        // - removing/merge duplicated levels ...
+        // maybe it is better to stop the scanning after the first valid level?
+        if ( dark_mode  == 1 )
+          {
+             j = 0;
+             for (i=1;i<nr_trapl;++i)
+               {
+                  #ifdef __debug
+                  output( 10, "i,j: %i %i\n", i, j );
+                  output( 10, "trapl[i,j] : %f %f\n", trapl[i].sum(), trapl[j].sum() );
+                  output( 10, "diff       : %f\n", std::abs(  trapl[i].sum() - trapl[j].sum() ) );
+                  #endif
+
+                  if ( std::abs( trapl[i].sum() - trapl[j].sum() ) < empty_trap_limit  )
+                    {
+                       int cc = trapl_fill[j] + trapl_fill[i];
+                       trapl[j] *= trapl_fill[j];
+                       trapl[j] += trapl[i] * (double) trapl_fill[i];
+                       trapl[j] /= cc;
+                       trapl_fill[j] += trapl_fill[i];
+                    }
+                  else
+                    {
+                       ++j;
+                       if ( i != j )
+                         {
+                            trapl[j] = trapl[i];
+                            trapl_fill[j] = trapl_fill[i];
+                         }
+                    }
+               }
+             nr_trapl = j + 1;
+         }
+
+        #ifdef __debug
+        print_trapl( trapl, trapl_fill, n_species, nr_trapl );
+        #endif
+}
+
 
 
 // gives a total number of how much electrons are located in the traps

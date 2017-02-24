@@ -22,7 +22,7 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-23
+   changed by: Oliver Cordes 2017-02-24
 
    $Id$
 
@@ -45,12 +45,16 @@ class cte_image_neo : public cte_image {
 public:
   cte_image_neo( std::shared_ptr<params> p);
 
-  virtual void clock_charge_setup( void );
-  virtual void clock_charge_clear( void );
+  virtual void   clock_charge_setup( void );
+  virtual void   clock_charge_clear( void );
 
-  virtual void clock_charge_save_traps( void );
-  virtual void clock_charge_restore_traps( void );
-  virtual double clock_charge_pixel( double, double, int );
+  virtual void   clock_charge_save_traps( void );
+  virtual void   clock_charge_restore_traps( void );
+  virtual double clock_charge_pixel_release( void );
+  virtual double clock_charge_pixel_total_capture( double, int );
+  virtual void   clock_charge_pixel_capture_ov( double );
+  virtual void   clock_charge_pixel_capture_full( void );
+  virtual void   clock_charge_pixel_cleanup( void );
   virtual double clock_charge_trap_info( void );
 
 private:
@@ -60,9 +64,6 @@ private:
 		      int nr_trapl );
   bool   val_array_smaller( std::valarray<double> & v1,
 			    std::valarray<double> & v2 );
-  void   clock_charge_image_neo( std::valarray<double> &,
-				 std::valarray<long> &,
-				 std::valarray<long> & );
 protected:
   // extern declarated variables
   bool                                 check_empty_traps;
@@ -87,6 +88,9 @@ protected:
   std::valarray<double>                n_electrons_per_trap_express;
   double                               n_electrons_per_trap_express_total;
   std::valarray<double>                n_electrons_per_trap_express_ov;
+  double                               dheight;
+  unsigned int                         cheight;
+  double                               ov;
 };
 
 
