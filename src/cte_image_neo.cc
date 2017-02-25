@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-24
+   changed by: Oliver Cordes 2017-02-25
 
 
    $Id$
@@ -66,7 +66,9 @@
 
 
 
-cte_image_neo::cte_image_neo( std::shared_ptr<params> p ) : cte_image( p )
+cte_image_neo::cte_image_neo( std::shared_ptr<params> p,
+                              long w, long h )
+                              : cte_image( p, w, h )
 {
   check_empty_traps = parameters->check_empty_traps;
   empty_trap_limit = parameters->empty_trap_limit;

@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-21
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -41,6 +41,10 @@
 
 
 #include "config.h"
+#include "cte_image.hh"
+#include "cte_image_classic.hh"
+#include "cte_image_neo.hh"
+#include "cte_image_watermark.hh"
 #include "image.hh"
 #include "output.hh"
 
@@ -156,7 +160,7 @@ void image::update_header_serial( PHDU & hdu )
   // used for writing key words
   std::string key;
   std::string comm;
-  
+
   // special output for serial- = x- clocking
 
   hdu.addKey( "CTE_SNTR", parameters->trap_density.size(), "Number of charge trap species" );
@@ -329,9 +333,47 @@ void image::write_file( void )
 }
 
 
-int image::clock_charge( void )
+int image::clock_charge_prepare( void )
 {
   throw "Not implemented!";
+
+  return 0;
+}
+
+
+int image::clock_charge( void )
+{
+  int ret = clock_charge_prepare();
+
+  if ( ret != 0 ) return ret;
+
+  std::shared_ptr<std::valarray<long>> xrange( new std::valarray<long> ( parameters->xrange ) );
+  std::shared_ptr<std::valarray<long>> yrange( new std::valarray<long> ( parameters->yrange ) );
+
+  // create a CTE obejct with the parameter class
+  cte_image *cte;
+
+  switch( parameters->algorithm )
+  {
+    case ALGORITHM_CLASSIC:
+      cte = new cte_image( parameters, image_width, image_height );
+      break;
+    case ALGORITHM_NEO:
+      cte = new cte_image_neo( parameters, image_width, image_height );
+      break;
+    case ALGORITHM_NEO2:
+      cte = new cte_image( parameters, image_width, image_height );
+      break;
+    default:
+      cte = new cte_image( parameters, image_width, image_height );
+      break;
+  }
+
+    // do the unclock thing ...
+  cte->clock_charge( image_data, (*xrange), (*yrange) );
+
+  // free the cte image
+  delete cte;
 
   return 0;
 }

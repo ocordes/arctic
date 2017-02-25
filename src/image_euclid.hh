@@ -22,7 +22,7 @@
 /* image_euclid.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-04
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -48,7 +48,7 @@ class euclid_image : public image{
 public:
   euclid_image( int argc, char *argv[] );
   virtual ~euclid_image();
-  virtual int  clock_charge( void );
+  virtual int  clock_charge_prepare( void );
 private:
   bool                                   sci_mode_dark;
 

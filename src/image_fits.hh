@@ -22,7 +22,7 @@
 /* image_fits.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-07-04
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -49,7 +49,7 @@ class fits_image : public image{
 public:
   fits_image( int argc, char *argv[] );
   virtual ~fits_image();
-  virtual int  clock_charge( void );
+  virtual int  clock_charge_prepare( void );
 };
 
 

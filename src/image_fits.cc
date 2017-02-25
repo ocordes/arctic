@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-22
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -79,37 +79,7 @@ fits_image::~fits_image()
 }
 
 
-int fits_image::clock_charge( void )
+int fits_image::clock_charge_prepare( void )
 {
-  std::shared_ptr<std::valarray<long>> xrange( new std::valarray<long> ( parameters->xrange ) );
-  std::shared_ptr<std::valarray<long>> yrange( new std::valarray<long> ( parameters->yrange ) );
-
-  // create a CTE obejct with the parameter class
-
-  cte_image *cte;
-
-  switch( parameters->algorithm )
-  {
-    case ALGORITHM_CLASSIC:
-      cte = new cte_image( parameters );
-      break;
-    case ALGORITHM_NEO:
-      cte = new cte_image_neo( parameters );
-      break;
-    case ALGORITHM_NEO2:
-      cte = new cte_image( parameters );
-      break;
-    default:
-      cte = new cte_image( parameters );
-      break;
-  }
-
-  // do the unclock thing ...
-  cte->clock_charge( image_data, image_width, image_height,
-                    (*xrange), (*yrange) );
-
-  // free the cte image
-  delete cte;
-
   return 0;
 }

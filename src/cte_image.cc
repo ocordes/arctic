@@ -77,7 +77,9 @@ void minmax_limit( double & val, double min, double max )
 
 
 
-cte_image::cte_image( std::shared_ptr<params> p )
+cte_image::cte_image( std::shared_ptr<params> p,
+                      long w,
+                      long h )
 {
   parameters = p;
 
@@ -106,6 +108,48 @@ cte_image::cte_image( std::shared_ptr<params> p )
   output( 1, " Nr  density  lifetime\n" );
   for (int i=0;i<p->n_species;i++)
     output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
+
+
+  // sets the image parameters according to the rotation paramater
+
+  image_width = w;
+  image_height = h;
+
+  if ( rotate == image_readout_y )
+  {
+    width  = w;
+    height = h;
+  }
+  else
+  {
+    // the image is rotated
+    width = h;
+    height = w;
+  }
+
+
+  // general setups and inits
+
+  // new code with variable express
+  express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
+  create_express_multiplier( express_multiplier, express, height, readout_offset );
+
+  // create the exponentia factors
+  create_exponential_factor();
+
+
+  // run the algorithm specific setups
+  clock_charge_setup();
+
+
+
+  // image slicer definitions
+  is = std::image_slice( image_width,
+                         image_height,
+                         0,
+                         rotate,
+                         direction );
+
 }
 
 
@@ -573,29 +617,11 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
 void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
-			      long w, long h,
 			      std::valarray<long> & xrange,
 			      std::valarray<long> & yrange )
 {
   output( 11, "cte_image::clock_charge\n" );
 
-
-  // sets the image parameters according to the rotation paramater
-
-  image_width = w;
-  image_height = h;
-
-  if ( rotate == image_readout_y )
-  {
-    width  = w;
-    height = h;
-  }
-  else
-  {
-    // the image is rotated
-    width = h;
-    height = w;
-  }
 
 
   // make a local copy of the image data

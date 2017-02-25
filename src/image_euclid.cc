@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-24
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -78,7 +78,7 @@ euclid_image::~euclid_image()
 }
 
 
-int euclid_image::clock_charge( void )
+int euclid_image::clock_charge_prepare( void )
 {
   // check the image UNITS
 
@@ -132,18 +132,6 @@ int euclid_image::clock_charge( void )
         }
     }
 
-  // code adopted from the ACS part
-
-
-  std::shared_ptr<std::valarray<long>> xrange( new std::valarray<long> ( parameters->xrange ) );
-  std::shared_ptr<std::valarray<long>> yrange( new std::valarray<long> ( parameters->yrange ) );
-
-  // create a CTE obejct with the parameter class
-  cte_image cte( parameters );
-
-  // do the unclock thing ...
-  cte.clock_charge( image_data, image_width, image_height,
-                    (*xrange), (*yrange) );
 
   return 0;
 }

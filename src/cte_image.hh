@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-24
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -42,10 +42,9 @@
 
 class cte_image {
 public:
-  cte_image( std::shared_ptr<params> p);
+  cte_image( std::shared_ptr<params>, long, long );
   virtual ~cte_image() {};
   void   clock_charge( std::shared_ptr<std::valarray<double>>,
-		       long, long,
 		       std::valarray<long> &,
 		       std::valarray<long> & );
   virtual void clock_charge_setup( void );
@@ -69,8 +68,8 @@ public:
                                        long,
                                        long );
   void   clock_charge_image( std::valarray<double> &,
-			                       std::valarray<long> &,
-			                       std::valarray<long> & );
+                            std::valarray<long> &,
+                            std::valarray<long> & );
 
   double get_sum_double_array( double *array, int width, int height );
 

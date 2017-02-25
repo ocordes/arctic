@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-21
+   changed by: Oliver Cordes 2017-02-25
 
    $Id$
 
@@ -50,7 +50,8 @@ public:
   void         fits_info( void );
   virtual int  read_file( void );
   virtual void write_file( void );
-  virtual int  clock_charge( void );
+  virtual int  clock_charge_prepare( void );
+  int          clock_charge( void );
 
   template <typename T>  T readkey( PHDU & pHDU, std::string key );
 
