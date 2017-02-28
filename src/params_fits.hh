@@ -22,7 +22,7 @@
 /* param_fits.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-21
+   changed by: Oliver Cordes 2017-02-28
 
    $Id$
 
@@ -48,7 +48,8 @@ public:
   int     static_trap_definitions;
   // functions
   params_fits();
-  virtual void parse_args( std::string key, std::string val, int & error );
+  int parse_args_image( std::string &, std::string & );
+  virtual void parse_args( std::string & key, std::string & val, int & error );
   virtual void check_params ( void );
 };
 

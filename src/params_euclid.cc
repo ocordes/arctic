@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-11-21
+   changed by: Oliver Cordes 2017-02-28
 
    $Id$
 
@@ -76,7 +76,7 @@ void params_euclid::set_args( int *argc, char **argv[]  )
   }
 }
 
-void params_euclid::parse_args( std::string key, std::string val, int & error )
+void params_euclid::parse_args( std::string & key, std::string & val, int & error )
 {
   output( 11, "params_euclid::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
   params_fits::parse_args( key, val, error );

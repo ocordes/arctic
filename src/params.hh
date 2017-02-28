@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-21
+   changed by: Oliver Cordes 2017-02-28
 
    $Id$
 
@@ -61,7 +61,7 @@
 #define ALGORITHM_NEO      1
 #define ALGORITHM_NEO2     2
 
-// cooresponding names 
+// cooresponding names
 extern std::string algorithm_names[];
 
 
@@ -109,9 +109,10 @@ public:
   params();
   virtual ~params();
 
-  virtual void parse_args( std::string, std::string, int & );
+  virtual void parse_args( std::string &, std::string &, int & );
   virtual void check_params ( void );
 
+  void parse_error_msg( int, std::string &, std::string & );
   void set_args(  int *argc, char **argv[] );
 
   std::valarray<double> str2array( std::CString );

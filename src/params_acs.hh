@@ -22,7 +22,7 @@
 /* param_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2016-11-21
+   changed by: Oliver Cordes 2017-02-28
 
    $Id$
 
@@ -45,10 +45,10 @@
 class params_acs : public params_fits {
 public:
   // variables
-  
+
   // functions
   params_acs();
-  virtual void parse_args( std::string key, std::string val, int & error );
+  virtual void parse_args( std::string &, std::string &, int & );
 
   void calc_trap_config( double date );
   virtual void check_params ( void );

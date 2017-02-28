@@ -18,4 +18,4 @@ while [ -n "$1" ]; do
   esac
 done
 
-arctic -d 10 --out_float -c test_opt.cte ${INFILE} ${OUTFILE} -m ACS $args
+arctic -d 10 -c test_opt.cte ${INFILE} ${OUTFILE} -m ACS $args

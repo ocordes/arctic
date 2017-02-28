@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2016-12-15
+   changed by: Oliver Cordes 2017-02-28
 
    $Id$
 
@@ -38,6 +38,9 @@
 #include "strstr.hh"
 
 
+#define min_limit( x ) if ( ( x ) < 0 ) x = 0
+#define output_range( x ) for (unsigned int n=0;n<x.size();n++) output( 10, "   %i\n", x[n] )
+
 params_fits::params_fits() : params()
 {
   static_trap_definitions = 0;   //  use informations from FITS header
@@ -45,40 +48,53 @@ params_fits::params_fits() : params()
   working_mode            = "FITS";
 }
 
-void params_fits::parse_args( std::string key, std::string val, int & error )
+int params_fits::parse_args_image( std::string & key, std::string & val )
+{
+  if ( key == "XRANGE" )
+  {
+    xrange = str2array_long( val );
+    output( 10, "params: xrange=\n" );
+    output_range( xrange );
+
+    // correct an check values
+    xrange[0]--;
+    min_limit( xrange[0] );
+
+    return PARSE_OK;
+  }
+
+  if ( key == "YRANGE" )
+  {
+    yrange = str2array_long( val );
+    output( 10, "params: yrange=\n" );
+    output_range( yrange );
+
+    // correct an check values
+    yrange[0]--;
+    min_limit( yrange[0] );
+
+    return PARSE_OK;
+  }
+
+  if ( key == "READOUT_OFFSET" )
+  {
+    readout_offset = atoi( val.c_str() );
+    output( 10, "params: readout_offset=%i\n", readout_offset );
+    return PARSE_OK;
+  }
+
+  return PARSE_ERROR;
+}
+
+
+void params_fits::parse_args( std::string & key, std::string & val, int & error )
 {
   output( 11, "params_fits::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
 
-  if ( key == "XRANGE" )
-    {
-      xrange = str2array_long( val );
-      output( 10, "params: xrange=\n" );
-      for (unsigned int n=0;n<xrange.size();n++) output( 10, "   %i\n", xrange[n] );
+  error = parse_args_image( key, val );
 
-      // correct an check values
-      xrange[0]--;
 
-      if ( xrange[0] < 0 )
-        xrange[0] = 0;
 
-      error = PARSE_OK;
-      return;
-    }
-  if ( key == "YRANGE" )
-    {
-      yrange = str2array_long( val );
-      output( 10, "params: yrange=\n" );
-      for (unsigned int n=0;n<yrange.size();n++) output( 10, "   %i\n", yrange[n] );
-
-      // correct an check values
-      yrange[0]--;
-
-      if ( yrange[0] < 0 )
-        yrange[0] = 0;
-
-      error = PARSE_OK;
-      return;
-    }
   if ( key == "WELL_DEPTH" )
     {
       well_depth = atof( val.c_str() );
@@ -173,13 +189,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       error = PARSE_OK;
       return;
     }
-  if ( key == "READOUT_OFFSET" )
-    {
-      readout_offset = atoi( val.c_str() );
-      output( 10, "params: readout_offset=%i\n", readout_offset );
-      error = PARSE_OK;
-      return;
-    }
+
   if ( key == "N_SPECIES" )
     {
       n_species = atoi( val.c_str() );
@@ -192,7 +202,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       static_trap_definitions = 1;           // overwrite FITS informations
       trap_density = str2array( val );
       output( 10, "params: trap_density=\n" );
-      for (unsigned int n=0;n<trap_density.size();n++) output( 10, "   %f\n", trap_density[n] );
+      output_range( trap_density );
       error = PARSE_OK;
       return;
     }
@@ -201,7 +211,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       static_trap_definitions = 1;           // overwrite FITS informations
       trap_lifetime = str2array( val );
       output( 10, "params: trap_lifetime=\n" );
-      for (unsigned int n=0;n<trap_lifetime.size();n++) output( 10, "   %f\n", trap_lifetime[n] );
+      output_range( trap_lifetime );
       error = PARSE_OK;
       return;
     }
@@ -217,18 +227,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       else
          algorithm = ALGORITHM_NEO;
 
-      switch( algorithm )
-      {
-        case ALGORITHM_CLASSIC:
-          output( 10, "params: ALGORITHM = CLASSIC\n" );
-          break;
-        case ALGORITHM_NEO:
-          output( 10, "params: ALGORITHM = NEO\n" );
-          break;
-        case ALGORITHM_NEO2:
-          output( 10, "params: ALGORITHM = NEO2\n" );
-          break;
-      }
+      output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );
 
       error = PARSE_OK;
       return;
@@ -246,22 +245,12 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       else
         algorithm = ALGORITHM_CLASSIC;
 
-      switch( algorithm )
-      {
-        case ALGORITHM_CLASSIC:
-          output( 10, "params: ALGORITHM = CLASSIC\n" );
-          break;
-        case ALGORITHM_NEO:
-          output( 10, "params: ALGORITHM = NEO\n" );
-          break;
-        case ALGORITHM_NEO2:
-          output( 10, "params: ALGORITHM = NEO2\n" );
-          break;
-      }
+      output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );
 
       error = PARSE_OK;
       return;
     }
+
   if ( key == "NEO2" )
     {
        bool b = true;
@@ -274,18 +263,7 @@ void params_fits::parse_args( std::string key, std::string val, int & error )
       else
         algorithm = ALGORITHM_CLASSIC;
 
-        switch( algorithm )
-        {
-          case ALGORITHM_CLASSIC:
-            output( 10, "params: ALGORITHM = CLASSIC\n" );
-            break;
-          case ALGORITHM_NEO:
-            output( 10, "params: ALGORITHM = NEO\n" );
-            break;
-          case ALGORITHM_NEO2:
-            output( 10, "params: ALGORITHM = NEO2\n" );
-            break;
-        }
+      output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );
 
       error = PARSE_OK;
       return;

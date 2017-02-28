@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-20
+   changed by: Oliver Cordes 2017-02-28
 
    $Id$
 
@@ -167,7 +167,7 @@ void params::load_config( std::string filename )
 // use this virtual function only for declaration
 // it schould never be called!!!
 
-void params::parse_args( std::string, std::string, int & )
+void params::parse_args( std::string &, std::string &, int & )
 {
   throw "Not implemented!";
 }
@@ -184,6 +184,21 @@ void params::check_params( void )
   throw "Not implemented!";
 }
 
+
+void params::parse_error_msg( int status, std::string & key, std::string & val )
+{
+  switch ( status )
+  {
+    case PARSE_OK:
+      break;
+    case PARSE_UNKNOWN:
+      std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
+      break;
+    case PARSE_ERROR:
+      std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
+      break;
+  }
+}
 
 
 void params::set_args( int *argc, char **argv[]  )
@@ -203,26 +218,24 @@ void params::set_args( int *argc, char **argv[]  )
     // check if this an option
     if ( (*argv)[i][0] == '-' )
 	  {
-	    // read at least one argument
-	    (*argc)--;
+      // read at least one argument
+      (*argc)--;
 
-	    if ( std::strcmp( (*argv)[i], "-c" ) == 0 )
+	    if ( ( std::strcmp( (*argv)[i], "-c" ) == 0 ) ||
+           ( std::strcmp( (*argv)[i], "-d" ) == 0 ) ||
+           ( std::strcmp( (*argv)[i], "-m" ) == 0 ) )
 	    {
-	      (*argc)--;
-	      i++;
-	      std::string s = (*argv)[i];
-	      load_config( s );
-	      i++;
-	      continue;
-	    }
-	    if ( ( std::strcmp( (*argv)[i], "-d" ) == 0 ) || (  std::strcmp( (*argv)[i], "-m" ) == 0 ) )
-	    {
-	      // ignore debug and mode definitions
-	      if ( (i+1) < nargc )
-		    {
-		      (*argc)--;
-		      i++;
-		    }
+        // check if one more argument is available
+        if ( (i+1) < nargc )
+        {
+	        (*argc)--;
+	        i++;
+          if ( (*argv)[i-1][1] == 'c' )
+          {
+	          std::string s = (*argv)[i];
+	          load_config( s );
+          }
+        }
 	      i++;
 	      continue;
 	    }
@@ -241,17 +254,7 @@ void params::set_args( int *argc, char **argv[]  )
 
       error = PARSE_ERROR;
       parse_args( key, val, error );
-      switch (error)
-      {
-        case PARSE_OK:
-          break;
-        case PARSE_UNKNOWN:
-          std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
-          break;
-        case PARSE_ERROR:
-          std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
-          break;
-      }
+      parse_error_msg( error, key, val );
 	  } // end of if (*argv)[0]  == '-'
     else
 	  {
