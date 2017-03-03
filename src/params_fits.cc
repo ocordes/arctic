@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-02-28
+   changed by: Oliver Cordes 2017-03-03
 
    $Id$
 
@@ -86,55 +86,59 @@ int params_fits::parse_args_image( std::string & key, std::string & val )
   return PARSE_ERROR;
 }
 
+int params_fits::parse_args_cte( std::string & key, std::string & val )
+{
+  if ( key == "WELL_DEPTH" )
+    {
+      well_depth = atof( val.c_str() );
+      output( 10, "params: well_depth=%f\n", well_depth );
+      return PARSE_OK;;
+    }
+
+  if ( key == "WELL_NOTCH_DEPTH" )
+    {
+      well_notch_depth = atof( val.c_str() );
+      output( 10, "params: well_notch_depth=%e\n", well_notch_depth );
+      return PARSE_OK;;
+    }
+
+  if ( key == "WELL_FILL_POWER" )
+    {
+      well_fill_power = atof( val.c_str() );
+      output( 10, "params: well_fill_power=%f\n", well_fill_power );
+      return PARSE_OK;;
+    }
+
+    if ( key == "EMPTY_TRAP_LIMIT" )
+      {
+        empty_trap_limit = atof( val.c_str() );
+        output( 10, "params: empty_trap_limit=%f\n", empty_trap_limit );
+        return PARSE_OK;
+      }
+
+    if ( key == "CHECK_EMPTY_TRAPS" )
+      {
+        bool b = true;
+
+        if ( val != "" )
+  	       b = tobool( val );
+        check_empty_traps = b;
+
+        output( 10, "params: check_empty_traps=%i\n", check_empty_traps );
+        return PARSE_OK;
+      }
+
+
+  return PARSE_ERROR;
+}
+
 
 void params_fits::parse_args( std::string & key, std::string & val, int & error )
 {
   output( 11, "params_fits::parse_args( key=%s, val=%s)\n", key.c_str(), val.c_str() );
 
   error = parse_args_image( key, val );
-
-
-
-  if ( key == "WELL_DEPTH" )
-    {
-      well_depth = atof( val.c_str() );
-      output( 10, "params: well_depth=%f\n", well_depth );
-      error = PARSE_OK;
-      return;
-    }
-  if ( key == "WELL_NOTCH_DEPTH" )
-    {
-      well_notch_depth = atof( val.c_str() );
-      output( 10, "params: well_notch_depth=%e\n", well_notch_depth );
-      error = PARSE_OK;
-      return;
-    }
-  if ( key == "WELL_FILL_POWER" )
-    {
-      well_fill_power = atof( val.c_str() );
-      output( 10, "params: well_fill_power=%f\n", well_fill_power );
-      error = PARSE_OK;
-      return;
-    }
-  if ( key == "EMPTY_TRAP_LIMIT" )
-    {
-      empty_trap_limit = atof( val.c_str() );
-      output( 10, "params: empty_trap_limit=%f\n", empty_trap_limit );
-      error = PARSE_OK;
-      return;
-    }
-  if ( key == "CHECK_EMPTY_TRAPS" )
-    {
-      bool b = true;
-
-      if ( val != "" )
-	       b = tobool( val );
-      check_empty_traps = b;
-
-      output( 10, "params: check_empty_traps=%i\n", check_empty_traps );
-      error = PARSE_OK;
-      return;
-    }
+  error = parse_args_cte( key, val );
 
 
   if ( key == "N_ITERATIONS" )
