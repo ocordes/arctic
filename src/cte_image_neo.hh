@@ -22,7 +22,7 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-03-06
 
    $Id$
 
@@ -58,12 +58,10 @@ public:
   virtual double clock_charge_trap_info( void );
 
 private:
-  void   print_trapl( std::valarray<std::valarray<double>> & trapl,
-		      std::valarray<int> & trapl_fill,
-		      int n_species,
-		      int nr_trapl );
+  void   print_trapl( void );
   bool   val_array_smaller( std::valarray<double> & v1,
 			    std::valarray<double> & v2 );
+  void   clock_charge_pixel_capture_ov_modify( int, double );
 protected:
   // extern declarated variables
   bool                                 check_empty_traps;

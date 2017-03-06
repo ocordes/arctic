@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-03-06
 
    $Id$
 
@@ -356,7 +356,7 @@ int image::clock_charge( void )
   switch( parameters->algorithm )
   {
     case ALGORITHM_CLASSIC:
-      cte = new cte_image( parameters );
+      cte = new cte_image_classic( parameters );
       break;
     case ALGORITHM_NEO:
       cte = new cte_image_neo( parameters );
@@ -365,7 +365,7 @@ int image::clock_charge( void )
       cte = new cte_image( parameters );
       break;
     default:
-      cte = new cte_image( parameters );
+      cte = new cte_image_neo( parameters );
       break;
   }
 

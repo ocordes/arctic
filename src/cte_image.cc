@@ -404,9 +404,20 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
               // shape pixel value
               minmax_limit( im, 0.0, well_depth );
 
+              #ifdef __debug
+              output( 10, "debug : %i\n" , i_pixel );
+              output( 10, "--------------------------------\n" );
+              output( 10, "freec       : %f\n", im );
+              #endif
 
               sum = clock_charge_pixel_release();
               freec = im + sum * express_correct;
+
+              #ifdef __debug
+              output( 10, "release     : %f\n", sum );
+              output( 10, "express_corr: %f\n", express_correct );
+              output( 10, "freec       : %f\n", freec );
+              #endif
 
               // Capture any free electrons in the vicinity of empty traps
 
@@ -454,6 +465,10 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
                   // cleanup trap structure
                   clock_charge_pixel_cleanup();
                 }
+
+              #ifdef __debug
+              output( 1, "--------------------------------\n" );
+              #endif
 
 
               #ifdef __debug
@@ -539,7 +554,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
 
-  
+
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
