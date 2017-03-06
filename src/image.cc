@@ -356,18 +356,21 @@ int image::clock_charge( void )
   switch( parameters->algorithm )
   {
     case ALGORITHM_CLASSIC:
-      cte = new cte_image( parameters, image_width, image_height );
+      cte = new cte_image( parameters );
       break;
     case ALGORITHM_NEO:
-      cte = new cte_image_neo( parameters, image_width, image_height );
+      cte = new cte_image_neo( parameters );
       break;
     case ALGORITHM_NEO2:
-      cte = new cte_image( parameters, image_width, image_height );
+      cte = new cte_image( parameters );
       break;
     default:
-      cte = new cte_image( parameters, image_width, image_height );
+      cte = new cte_image( parameters );
       break;
   }
+
+  // setup all variables inside the cte structure
+  cte->setup( image_width, image_height );
 
     // do the unclock thing ...
   cte->clock_charge( image_data, (*xrange), (*yrange) );

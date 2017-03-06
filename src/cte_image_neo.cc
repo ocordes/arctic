@@ -66,9 +66,8 @@
 
 
 
-cte_image_neo::cte_image_neo( std::shared_ptr<params> p,
-                              long w, long h )
-                              : cte_image( p, w, h )
+cte_image_neo::cte_image_neo( std::shared_ptr<params> p )
+                            : cte_image( p  )
 {
   check_empty_traps = parameters->check_empty_traps;
   empty_trap_limit = parameters->empty_trap_limit;

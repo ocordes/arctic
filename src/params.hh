@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-28
+   changed by: Oliver Cordes 2017-03-06
 
    $Id$
 
@@ -117,11 +117,10 @@ public:
 
   std::valarray<double> str2array( std::CString );
   std::valarray<long> str2array_long( std::CString );
-
-  bool  tobool( std::string & );
 };
 
 
+bool  tobool( std::string &, bool );
 int get_working_mode( int argc, char *argv[] );
 
 

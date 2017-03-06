@@ -43,7 +43,7 @@
 
 class cte_image_neo : public cte_image {
 public:
-  cte_image_neo( std::shared_ptr<params>, long, long );
+  cte_image_neo( std::shared_ptr<params> );
 
   virtual void   clock_charge_setup( void );
   virtual void   clock_charge_clear( void );

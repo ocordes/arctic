@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-28
+   changed by: Oliver Cordes 2017-03-06
 
    $Id$
 
@@ -346,9 +346,13 @@ int get_working_mode( int argc, char *argv[] )
 }
 
 
-bool params::tobool( std::string & val )
+// helper functions
+
+bool tobool( std::string & val, bool defaults )
 {
   int b = false;
+
+  if ( val == "" ) return defaults;
 
   std::CString s = val;
   s = s.toupper();

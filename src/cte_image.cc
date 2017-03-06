@@ -77,12 +77,15 @@ void minmax_limit( double & val, double min, double max )
 
 
 
-cte_image::cte_image( std::shared_ptr<params> p,
-                      long w,
-                      long h )
+cte_image::cte_image( std::shared_ptr<params> p )
 {
   parameters = p;
 
+}
+
+
+void cte_image::setup( long w, long h )
+{
   // initialize variables
 
   n_species        = parameters->trap_density.size();
@@ -106,7 +109,7 @@ cte_image::cte_image( std::shared_ptr<params> p,
 
   output( 1, "Model has %i trap species:\n", parameters->n_species );
   output( 1, " Nr  density  lifetime\n" );
-  for (int i=0;i<p->n_species;i++)
+  for (int i=0;i<parameters->n_species;i++)
     output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
 
 
@@ -247,6 +250,7 @@ void cte_image::create_exponential_factor( void )
 void cte_image::clock_charge_setup( void )
 {
   // nothing to do in the base class
+  output( 10, "Hallo Berta\n" );
 }
 
 
@@ -535,29 +539,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
 
-  // general setups and inits
-
-  // new code with variable express
-  express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
-  create_express_multiplier( express_multiplier, express, height, readout_offset );
-
-  // create the exponentia factors
-  create_exponential_factor();
-
-
-  // run the algorithm specific setups
-  clock_charge_setup();
-
-
-
-  // image slicer definitions
-  is = std::image_slice( image_width,
-                         image_height,
-                         0,
-                         rotate,
-                         direction );
-
-
+  
   // initialize the time measurement
   gettimeofday( &start_time, NULL );
   getrusage( RUSAGE_SELF, &cpu_start_time );
