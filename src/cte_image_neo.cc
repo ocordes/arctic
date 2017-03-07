@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-03-07
 
 
    $Id$
@@ -126,8 +126,7 @@ bool cte_image_neo::val_array_smaller( std::valarray<double> & v1,
 
 void cte_image_neo::clock_charge_setup( void  )
 {
-  if ( parameters->algorithm == ALGORITHM_NEO )
-    output( 1, "Using Olli's neo algorithm!\n" );
+  output( 1, "Using Olli's neo algorithm!\n" );
 
   if ( dark_mode )
     output( 1, " Using Dark_mode optimization!\n" );
@@ -362,6 +361,11 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
 
   // walk through all entries
+
+  // idea to walk through the array not in a  static way,
+  //  decide what is next, modify old levvels and go to
+  // the next issue ...
+
   h = 0;
   for (j=nr_trapl-1;j>=0;--j)
   {

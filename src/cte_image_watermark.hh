@@ -22,7 +22,7 @@
 /* cte_image_watermark.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-20-22
+   changed by: Oliver Cordes 2017-03-07
 
    $Id$
 
@@ -40,57 +40,51 @@
 
 #include "params.hh"
 
-class cte_image_watermark {
+class cte_image_watermark : public cte_image {
 public:
   cte_image_watermark( std::shared_ptr<params> p);
-  void   clock_charge( std::shared_ptr<std::valarray<double>>,
-		       long, long,
-		       std::valarray<long> &,
-		       std::valarray<long> & );
+
+  virtual void   clock_charge_setup( void );
+  virtual void   clock_charge_clear( void );
+
+  virtual void   clock_charge_save_traps( void );
+  virtual void   clock_charge_restore_traps( void );
+  virtual double clock_charge_pixel_release( void );
+  virtual double clock_charge_pixel_total_capture( double, int );
+  virtual void   clock_charge_pixel_capture_ov( double );
+  virtual void   clock_charge_pixel_capture_full( void );
+  virtual void   clock_charge_pixel_cleanup( void );
+  virtual double clock_charge_trap_info( void );
 private:
-  double get_difftime( struct timeval start, struct timeval end );
-  long   get_sparse_pixels( std::valarray<double> &, double );
-  void   limit_to_max( std::valarray<double> &, double );
-  double get_sum_double_array( double *array, int width, int height );
-  void   print_traps( std::valarray<double> & t, int n_species, int trap_levels );
-  void   print_trapl( std::valarray<std::valarray<double>> & trapl,
-		      std::valarray<int> & trapl_fill,
-		      int n_species,
-		      int nr_trapl );
-  void   print_wml( std::valarray<std::valarray<double>> & wml,
-        	std::valarray<double> & wml_fill,
-        	int n_species,
-        	int nr_wml );
-  bool   val_array_smaller( std::valarray<double> & v1,
-			    std::valarray<double> & v2 );
-  void   create_express_multiplier( std::valarray<int> & express_multiplier,
-                                    int express,
-                                    int h,
-                                    int readout_offset );
-  void   clock_charge_image_classic( std::valarray<double> &,
-			     std::valarray<long> &,
-			     std::valarray<long> & );
-  void   clock_charge_image_neo( std::valarray<double> &,
-				 std::valarray<long> &,
-				 std::valarray<long> & );
-  void   clock_charge_image_neo2( std::valarray<double> &,
-				  std::valarray<long> &,
-				  std::valarray<long> & );
+  void   print_wml( void ); 
 protected:
-  std::shared_ptr<params>              parameters;
-
-  long                                 image_width;
-  long                                 image_height;
-  long                                 width;
-  long                                 height;
-
-  bool                                 rotate;
-  bool                                 direction;
-
   // extern declarated variables
   bool                                 check_empty_traps;
   double                               empty_trap_limit;
   double                               empty_trap_limit_neo2;
+  double                               neo2_split_limit;
+
+  int                                  dark_mode;
+
+  // trap definitions
+  std::valarray<std::valarray<double>> wml;
+  std::valarray<double>               wml_fill;
+  long                                nr_wml;
+
+  std::valarray<std::valarray<double>> new_wml;
+  std::valarray<double>               new_wml_fill;
+  long                                new_nr_wml;
+
+  std::valarray<std::valarray<double>> saved_wml;
+  std::valarray<double>               saved_wml_fill;
+  long                                saved_nr_wml;
+
+  std::valarray<double>               trap_density;
+  double                              trap_density_total;
+  std::valarray<double>               trap_density_express;
+  double                              trap_density_express_total;
+
+  double                              cloud_height;
 };
 
 

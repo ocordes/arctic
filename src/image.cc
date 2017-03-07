@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-06
+   changed by: Oliver Cordes 2017-03-07
 
    $Id$
 
@@ -362,7 +362,7 @@ int image::clock_charge( void )
       cte = new cte_image_neo( parameters );
       break;
     case ALGORITHM_NEO2:
-      cte = new cte_image( parameters );
+      cte = new cte_image_watermark( parameters );
       break;
     default:
       cte = new cte_image_neo( parameters );
