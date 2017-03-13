@@ -48,7 +48,7 @@ w
 #include <sys/time.h>
 #include <sys/resource.h>
 
-//#define __debug
+// #define __debug
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -215,7 +215,7 @@ double cte_image_classic::clock_charge_pixel_total_capture( double el_height, in
   // prepare the work
 
   // express correction using i_pixel instead of express_factor_pixel
-   n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
+   n_electrons_per_trap_express = n_electrons_per_trap * (double) i_pixelp1;
    n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
    // calculate the height in ( affected levels )
@@ -289,7 +289,7 @@ void   cte_image_classic::clock_charge_pixel_capture_ov( double d )
     }
   for (j=0;j<n_species;++j)
   {
-    pos = (cheight-1)*n_species+j;
+    pos = cheight*n_species+j;
 
     if ( traps[pos] < ( n_electrons_per_trap_express_ov[j] ) )
     {

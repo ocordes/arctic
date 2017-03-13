@@ -408,6 +408,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
               output( 10, "debug : %i\n" , i_pixel );
               output( 10, "--------------------------------\n" );
               output( 10, "freec       : %f\n", im );
+              output( 10, "................................\n" );
               #endif
 
               sum = clock_charge_pixel_release();

@@ -342,155 +342,9 @@ void cte_image_neo::clock_charge_pixel_capture_ov_modify( int j, double d )
   ++new_nr_trapl;
 }
 
-
-void cte_image_neo::clock_charge_pixel_capture_ov( double d )
-
+void cte_image_neo::clock_charge_pixel_capture_ov_copyback_temp( void )
 {
-  int          i, j, h;
-
-  double       dheight2;
-  unsigned int cheight2;
-
-
-
-  new_nr_trapl = 0;
-
-  // use some helper pointer
-  dheight2 = dheight;
-  cheight2 = cheight;
-
-
-  // walk through all entries
-
-  // idea to walk through the array not in a  static way,
-  //  decide what is next, modify old levvels and go to
-  // the next issue ...
-
-  h = 0;
-  for (j=nr_trapl-1;j>=0;--j)
-  {
-    if ( dheight2 < 0.0 )
-    {
-      // nothing is needed anymore
-      // just copy that level
-      new_trapl[new_nr_trapl] = trapl[j];
-      new_trapl_fill[new_nr_trapl] = trapl_fill[j];
-      ++new_nr_trapl;
-
-    }
-    else
-    {
-      // we need to modify existing levels
-      // scan each bunch of levels
-      if ( trapl_fill[j] < dheight2 )
-      {
-        // use the whole level
-        new_trapl[new_nr_trapl] = trapl[j]
-                                  + ( n_electrons_per_trap_express - trapl[j] ) * d;
-        new_trapl_fill[new_nr_trapl] = trapl_fill[j];
-        ++new_nr_trapl;
-      }
-      else
-      {
-        // the complex sitiuation
-        // the whole trap level needs to be split in 3 parts
-        // the first half filled level
-        // the 1 level for ov part
-        // the untouched part
-
-        #ifdef __debug
-        output( 10, "dheight2,trapl_fill[j],h: %.15f %i %i\n",
-                               dheight2, trapl_fill[j], h );
-        output( 10, "cheight2                : %i\n", cheight2 );
-        #endif
-
-        // idea, just judge, what to do with the number of available levels
-
-        if ( trapl_fill[j]  == 1 )
-        {
-          // just one level to work on, easy
-          clock_charge_pixel_capture_ov_modify( j, d );
-          // for (i=0;i<n_species;++i)
-          // {
-          //   if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
-          //   {
-          //     new_trapl[new_nr_trapl][i] = trapl[j][i]
-          //                            + (  n_electrons_per_trap_express_ov[i]  - trapl[j][i] ) * d;
-          //   }
-          //   else
-          //     new_trapl[new_nr_trapl][i] = trapl[j][i];
-          // }
-          // new_trapl_fill[new_nr_trapl] = 1;
-          // ++new_nr_trapl;
-        }
-        else
-        {
-          // the most default situation
-          // need to split in 3 parts
-          // larger modified, modified ov part, untouched part
-          if ( cheight2 > 0 )
-          {
-            // first part is necessary
-            new_trapl[new_nr_trapl] = trapl[j]
-                                 + ( n_electrons_per_trap_express - trapl[j] ) * d;
-            new_trapl_fill[new_nr_trapl] = cheight2;
-            ++new_nr_trapl;
-          }
-
-          if ( ov > 1e-14 )
-          {
-            // if ov == 0! then no additional level is needed
-            clock_charge_pixel_capture_ov_modify( j, d );
-            // for (i=0;i<n_species;++i)
-            // {
-            //   if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
-            //     new_trapl[new_nr_trapl][i] = trapl[j][i]
-            //                             + ( ( n_electrons_per_trap_express_ov[i]  ) - trapl[j][i] ) * d;
-            //   else
-            //     new_trapl[new_nr_trapl][i] = trapl[j][i];
-            // }
-            // new_trapl_fill[new_nr_trapl] = 1;
-            // ++new_nr_trapl;
-          }
-
-
-          if ( cheight2 < trapl_fill[j] )
-          {
-            // add the last part if necessary
-            new_trapl[new_nr_trapl] = trapl[j];
-            new_trapl_fill[new_nr_trapl] = trapl_fill[j] - ceil( dheight2 );
-            ++new_nr_trapl;
-          }
-        }
-      } // end of if ( trapl_fill[j] < dheight2 ) (else)
-    } // end of f ( dheight2 < 0.0 ) (else)
-
-    h += trapl_fill[j];
-    dheight2 -= trapl_fill[j];
-    cheight2 -= trapl_fill[j];
-  } // end of for (j=nr_trapl-1;j>=0;--j)
-
-  if ( dheight2 > 0.0 )
-  {
-    // we need a level
-    #ifdef __debug
-    output( 10, "new level needed: dheight2 = %.15f\n", dheight2 );
-    #endif
-    //int cheight2 = ceil( dheight2 ) -1 ;
-    if ( cheight2 > 0 )
-    {
-      new_trapl[new_nr_trapl] = n_electrons_per_trap_express * d;
-      new_trapl_fill[new_nr_trapl] = cheight2;
-      ++new_nr_trapl;
-    }
-    new_trapl[new_nr_trapl] = n_electrons_per_trap_express_ov * d;
-    new_trapl_fill[new_nr_trapl] = 1;
-    ++new_nr_trapl;
-  }
-
-  #ifdef __debug
-  output( 10, "Copying back the temporary data ..\n" );
-  #endif
+  int i, j;
 
   // copy the temporary array back
   for (j=new_nr_trapl-1,i=0;j>=0;--j,++i)
@@ -499,12 +353,131 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
     trapl_fill[i] = new_trapl_fill[j];
   }
   nr_trapl = new_nr_trapl;
+}
 
+void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
+{
+  int  j;
+
+  // d is the fraction of electrons [0,1] which is used
+  // to fill the trap levels
+  // dheight is the height of the electron cloud
+  // cheight = ceil( dheight ) - 1
+
+  new_nr_trapl = 0;
+
+  j = nr_trapl-1;     /* start with the first trap element */
+  #ifdef __debug
+  output( 10, "trap loop\n");
+  #endif
+  while ( dheight > 0.0 )
+  {
+    #ifdef __debug
+    output( 10, "dheight       : %f\n", dheight );
+    output( 10, "cheight       : %i\n", cheight );
+    output( 10, "trapl_fill[j] : %i\n", trapl_fill[j] );
+    #endif
+    if ( j < 0 )
+    {
+      // add a missing level
+      if ( cheight > 0 )
+      {
+        new_trapl[new_nr_trapl] = n_electrons_per_trap_express * d;
+        new_trapl_fill[new_nr_trapl] = cheight;
+        ++new_nr_trapl;
+      }
+      new_trapl[new_nr_trapl] = n_electrons_per_trap_express_ov * d;
+      new_trapl_fill[new_nr_trapl] = 1;
+      ++new_nr_trapl;
+
+      break;
+    }
+    if ( dheight > trapl_fill[j] )
+    {
+      // use the whole level
+      new_trapl[new_nr_trapl] = trapl[j]
+                                + ( n_electrons_per_trap_express - trapl[j] ) * d;
+      new_trapl_fill[new_nr_trapl] = trapl_fill[j];
+      ++new_nr_trapl;
+
+      // correc the values
+      dheight -= trapl_fill[j];
+      cheight -= trapl_fill[j];
+      --j;
+      continue;
+    }
+    if ( trapl_fill[j]  == 1 )
+    {
+      // just one level to work on, easy
+      clock_charge_pixel_capture_ov_modify( j, d );
+
+      dheight -= trapl_fill[j];
+      cheight -= trapl_fill[j];
+      --j;
+      continue;
+    }
+
+    // last step the split: the trapl_fill is hight than dheight
+
+    #ifdef __debug
+    //output( 10, "cheight       : %i\n", cheight );
+    output( 10, "split 3 parts\n" );
+    #endif
+    if ( cheight > 0 )
+    {
+      // first part is necessary
+      new_trapl[new_nr_trapl] = trapl[j]
+                           + ( n_electrons_per_trap_express - trapl[j] ) * d;
+      new_trapl_fill[new_nr_trapl] = cheight;
+      ++new_nr_trapl;
+    }
+
+    if ( ov > 1e-14 )
+    {
+      // if ov == 0! then no additional level is needed
+      clock_charge_pixel_capture_ov_modify( j, d );
+      // for (i=0;i<n_species;++i)
+      // {
+      //   if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
+      //     new_trapl[new_nr_trapl][i] = trapl[j][i]
+      //                             + ( ( n_electrons_per_trap_express_ov[i]  ) - trapl[j][i] ) * d;
+      //   else
+      //     new_trapl[new_nr_trapl][i] = trapl[j][i];
+      // }
+      // new_trapl_fill[new_nr_trapl] = 1;
+      // ++new_nr_trapl;
+    }
+
+    trapl_fill[j] -= ceil( dheight );
+    if ( trapl_fill[j] == 0 ) --j;      // fix BUG which was also in the 1st implementation
+
+    dheight = 0.0;
+  }
+
+  while ( j >= 0 )
+  {
+    // nothing is needed anymore
+    // just copy that level
+    #ifdef __debug
+    output( 10, "j             : %i\n", j);
+    output( 10, "trapl_fill[j] : %i\n", trapl_fill[j] );
+    #endif
+    new_trapl[new_nr_trapl] = trapl[j];
+    new_trapl_fill[new_nr_trapl] = trapl_fill[j];
+    ++new_nr_trapl;
+
+    --j;
+  }
+
+  // copy the temporary array back
+  clock_charge_pixel_capture_ov_copyback_temp();
 
   #ifdef __debug
   print_trapl();
   #endif
+
+  return;
 
 }
 
