@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-24
+   changed by: Oliver Cordes 2017-03-13
 
 
    $Id$
