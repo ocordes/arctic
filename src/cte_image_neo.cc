@@ -245,7 +245,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, int i_
    //n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
 
    // express correction using i_pixel instead of express_factor_pixel
-   n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
+   n_electrons_per_trap_express = n_electrons_per_trap * (double) i_pixelp1;
    n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
    // calculate the height in ( affected levels )
@@ -666,10 +666,10 @@ void cte_image_neo::clock_charge_pixel_cleanup( void )
 // gives a total number of how much electrons are located in the traps
 double cte_image_neo::clock_charge_trap_info( void )
 {
-  double traps_total = 0.0;
+  double total = 0.0;
 
   for (unsigned int i=0;i<nr_trapl;++i)
-     traps_total += trapl[i].sum() * trapl_fill[i];
+     total += trapl[i].sum() * trapl_fill[i];
 
-  return traps_total;
+  return total;
 }

@@ -338,10 +338,10 @@ void   cte_image_classic::clock_charge_pixel_cleanup( void )
 
 double cte_image_classic::clock_charge_trap_info( void )
 {
-  double traps_total = 0.0;
+  double total = 0.0;
 
   for (int i=0;i<n_levels_traps*n_species;++i)
-    traps_total += traps[i];
+    total += traps[i];
 
-  return traps_total;
+  return total;
 }

@@ -23,7 +23,7 @@ class arctic_prg( object ):
         #print cmd
         try:
             ret = subprocess.call( cmd, shell=True )
-        except OSError, e:
+        except OSError as e:
             ret = -1
 
         return ret
