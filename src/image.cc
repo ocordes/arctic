@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-07
+   changed by: Oliver Cordes 2017-03-13
 
    $Id$
 
@@ -124,8 +124,9 @@ int image::read_file( void )
     // read all user-specifed, coordinate, and checksum keys in the image
     FITS_image->pHDU().readAllKeys();
 
+    // check tghe number of axis and check if extensions are available
 
-    if ( FITS_image->pHDU().extend() )
+    if ( ( FITS_image->pHDU().axes() < 2 ) && ( FITS_image->pHDU().extend() ) )
     {
       std::cerr << "File '" << infilename << "' is a multiple extension FITS";
       std::cerr << " file which cannot be processed by arctic!" << std::endl;
