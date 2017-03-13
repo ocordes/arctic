@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-24
+   changed by: Oliver Cordes 2017-03-13
 
 
    $Id$
@@ -135,7 +135,7 @@ void cte_image::setup( long w, long h )
 
   // new code with variable express
   express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
-  create_express_multiplier( express_multiplier, express, height, readout_offset );
+  create_express_multiplier( express_multiplier,  height );
 
   // create the exponentia factors
   create_exponential_factor();
@@ -196,10 +196,8 @@ void cte_image::limit_to_max( std::valarray<double> & v, double limit )
 }
 
 
-void cte_image::create_express_multiplier( std::valarray<int> & express_multiplier,
-                                           int express,
-                                           int h,
-                                           int readout_offset )
+void cte_image::create_express_multiplier( std::valarray<int> & emp,
+                                           int h )
 {
   output( 10, "Create express_multiplier...\n" );
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
@@ -220,14 +218,14 @@ void cte_image::create_express_multiplier( std::valarray<int> & express_multipli
       i_sum += d;
 
       pos = (i_express*(height+1))+i_pixel;
-      express_multiplier[pos] = d;
+      emp[pos] = d;
      }
     }
     #ifdef __debug
     for (int i=0; i<height;i++)
     {
       for (int j=0;j<express;++j)
-         std::cout << express_multiplier[j*(height+1)+i] << " ";
+         std::cout << emp[j*(height+1)+i] << " ";
       std::cout << std::endl;
     }
     #endif
@@ -266,13 +264,13 @@ double cte_image::clock_charge_pixel_release( void )
 }
 
 
-double cte_image::clock_charge_pixel_total_capture( double el_height, int i_pixelp1 )
+double cte_image::clock_charge_pixel_total_capture( double,  int )
 {
   return 0.0;
 }
 
 
-void cte_image::clock_charge_pixel_capture_ov( double d )
+void cte_image::clock_charge_pixel_capture_ov( double )
 {
   // handle a single pixel
 }

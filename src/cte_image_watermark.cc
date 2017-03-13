@@ -227,7 +227,7 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   double h, h2;
 
   // express correction using i_pixel instead of express_factor_pixel
-  trap_density_express = trap_density * i_pixelp1;
+  trap_density_express = trap_density * (double) i_pixelp1;
   trap_density_express_total = trap_density_total * i_pixelp1;
 
   cloud_height = el_height;
@@ -573,10 +573,10 @@ void   cte_image_watermark::clock_charge_pixel_cleanup( void )
 
 double cte_image_watermark::clock_charge_trap_info( void )
 {
-  double traps_total = 0.0;
+  double total = 0.0;
 
   for (unsigned int i=0;i<nr_wml;++i)
-     traps_total += wml[i].sum() * wml_fill[i];
+     total += wml[i].sum() * wml_fill[i];
 
-  return traps_total;
+  return total;
 }

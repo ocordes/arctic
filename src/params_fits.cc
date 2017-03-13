@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-03-06
+   changed by: Oliver Cordes 2017-03-13
 
    $Id$
 
@@ -278,7 +278,7 @@ void params_fits::parse_args_traps( std::string & key, std::string & val, int & 
 }
 
 
-void params_fits::parse_args_imagedir( std::string & key, std::string & val, int & error )
+void params_fits::parse_args_imagedir( std::string & key, std::string &, int & error )
 {
   if ( key == "ROTATE" )
   {
