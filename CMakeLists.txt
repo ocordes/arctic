@@ -2,7 +2,15 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-02-20
+# changed by: Oliver Cordes 2017-03-16
+
+# add local cmake modules
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
+
+# include UnitTestHelper
+include( UnitTestHelpers )
+
 
 set(VERSION 1.3.3)
 
@@ -24,8 +32,6 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-# add local cmake modules
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 
 # define the target and parameter
 
@@ -38,8 +44,11 @@ file(GLOB_RECURSE sources src/*.cc src/*.h)
 IF(CMAKE_COMPILER_IS_GNUCC)
     ADD_DEFINITIONS(-Wall -Wextra -Wshadow)
 ENDIF()
+add_library( libarctic STATIC ${sources} )
+set_target_properties( libarctic PROPERTIES OUTPUT_NAME artic )
 
-add_executable( arctic ${sources} )
+add_executable( arctic src/arctic.cc )
+target_link_libraries( arctic libarctic )
 
 # just for example add some compiler flags
 #target_compile_options( arctic  PUBLIC  -g -O2 -std=gnu++11 -Wall )
@@ -72,7 +81,12 @@ include_directories(${PROJECT_BINARY_DIR})
 # install part
 install(TARGETS arctic DESTINATION bin)
 
-
+# unit_test part
+## find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+add_unit_test( Boost_SHE_ArCTIC_julian_test unittests/SHE_ArCTIC_julian.cc src
+                     LINK_LIBRARIES libarctic boost_unit_test_framework TYPE Boost
+                     #LINK_LIBRARIES libarctic TYPE Boost
+                    )
 
 # sphinx part, try to detect sphinx, but if not
 # don't create the Makefile entries

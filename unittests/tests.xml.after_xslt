@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><testsuite tests="6" errors="0" failures="0" skipped="0" name="Master Test Suite">
+<testcase classname="SHE_ArCTIC_strstr::la" name="la" filename="test.cc" time="0.000076"/>
+<testcase classname="SHE_ArCTIC_strstr::strstr_strtok_test1" name="strstr_strtok_test1" filename="arctic_strstr.cc" time="0.000111"/>
+<testcase classname="SHE_ArCTIC_strstr::strstr_clean_start_test1" name="strstr_clean_start_test1" filename="arctic_strstr.cc" time="0.000047"/>
+<testcase classname="SHE_ArCTIC_strstr::strstr_clean_char_test1" name="strstr_clean_char_test1" filename="arctic_strstr.cc" time="0.000058"/>
+<testcase classname="SHE_ArCTIC_strstr::strstr_clean_white_test1" name="strstr_clean_white_test1" filename="arctic_strstr.cc" time="0.00004"/>
+<testcase classname="SHE_ArCTIC_strstr::strstr_toupper_test1" name="strstr_toupper_test1" filename="arctic_strstr.cc" time="0.000046"/>
+</testsuite>
