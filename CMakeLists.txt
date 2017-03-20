@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-03-16
+# changed by: Oliver Cordes 2017-03-20
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -12,7 +12,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 include( UnitTestHelpers )
 
 
-set(VERSION 1.3.3)
+set(VERSION 1.3.4)
 
 # get current date
 execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
@@ -37,33 +37,37 @@ endif()
 
 # these instructions search the directory tree when cmake is
 # invoked and put all files that match the pattern in the variables
-# `sources`
+# `sources` and `target_sources`
 
 file(GLOB_RECURSE sources src/*.cc src/*.h)
+file(GLOB_RECURSE target_sources "src/arctic.cc" )
+# remove the target file(s)
+list(REMOVE_ITEM sources ${target_sources} )
 
+# for Linux gcc compiler only
 IF(CMAKE_COMPILER_IS_GNUCC)
     ADD_DEFINITIONS(-Wall -Wextra -Wshadow)
 ENDIF()
+
+# compile all sources into a static libarctic.a file
 add_library( libarctic STATIC ${sources} )
 set_target_properties( libarctic PROPERTIES OUTPUT_NAME artic )
-
-add_executable( arctic src/arctic.cc )
-target_link_libraries( arctic libarctic )
-
-# just for example add some compiler flags
-#target_compile_options( arctic  PUBLIC  -g -O2 -std=gnu++11 -Wall )
-target_compile_options( arctic  PUBLIC  -g -O3 -Wall )
-
-
-
+target_compile_options( libarctic  PUBLIC  -g -O3 -Wall )
 # this lets me include files relative to the root src dir with a <> pair
-target_include_directories( arctic PUBLIC src )
-
+target_include_directories( libarctic PUBLIC src )
 
 # add libraries
 find_package(CCFITS REQUIRED)
-include_directories(${CCFITS_INCLUDE_DIR})
-target_link_libraries( arctic ${CCFITS_LIBRARIES})
+
+# compile the main program arctic
+arctic_add_executable( arctic ${target_sources}
+                       LINK_LIBRARIES CCfits libarctic
+                       INCLUDE_DIRS CCfits libarctic
+                      )
+target_compile_options( arctic  PUBLIC  -g -O3 -Wall )
+
+# this lets me include files relative to the root src dir with a <> pair
+##target_include_directories( arctic PUBLIC src )
 
 
 # os configuration file
@@ -83,10 +87,16 @@ install(TARGETS arctic DESTINATION bin)
 
 # unit_test part
 ## find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-add_unit_test( Boost_SHE_ArCTIC_julian_test unittests/SHE_ArCTIC_julian.cc src
-                     LINK_LIBRARIES libarctic boost_unit_test_framework TYPE Boost
-                     #LINK_LIBRARIES libarctic TYPE Boost
-                    )
+add_unit_test( Boost_arctic_julian_test unittests/arctic_julian.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_strstr_test unittests/arctic_strstr.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_image_slice_test unittests/arctic_image_slice.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+
 
 # sphinx part, try to detect sphinx, but if not
 # don't create the Makefile entries

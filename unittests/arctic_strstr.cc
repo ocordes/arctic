@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_SUITE( CString )
 
 BOOST_AUTO_TEST_CASE( strtok )
 {
-  std::CString test_str1 = "this,is,comma,delimited,,,"; 
+  std::CString test_str1 = "this,is,comma,delimited,,,";
   std::CString test_str2 = ",,,more,commas;";
   std::CString test_str3 = "no delimiters?";
   std::CString test_str4 = "";
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( strstr_clean_char_test1 )
   std::CString test_str3 = "";
   std::CString test_str4 = "Euclid Go!";
 
-  BOOST_CHECK_EQUAL( test_str1.clean_char('e'), "lckr Erdbrmarmlad");  
+  BOOST_CHECK_EQUAL( test_str1.clean_char('e'), "lckr Erdbrmarmlad");
   BOOST_CHECK_EQUAL( test_str2.clean_char('X'), "");
   BOOST_CHECK_EQUAL( test_str3.clean_char('o'), "");
   BOOST_CHECK_EQUAL( test_str4.clean_char('Z'), "Euclid Go!");

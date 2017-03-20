@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "SHE_ArCTIC/image_slice.hh"
+#include "image_slice.hh"
 
 
 BOOST_AUTO_TEST_SUITE( image_slice_test_suite )
