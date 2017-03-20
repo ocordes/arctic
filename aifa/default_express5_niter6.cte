@@ -1,0 +1,17 @@
+# Default CTE parameters extracted from the IDL code
+#  
+# written: Oliver Cordes 2013-02-06
+# changed: Oliver Cordes 2013-02-06
+#
+# $Id$
+#
+#WELL_DEPTH = 84700
+WELL_DEPTH = 84700.0
+WELL_NOTCH_DEPTH = 1e-9  #  old value  96.5 
+#WELL_FILL_POWER = 0.465 # old
+# from acs_cte-0.9.7: ./acs-cte --DUMP (14.10.2013)
+WELL_FILL_POWER = 0.478
+#XRANGE = 1,2
+#YRANGE = 1,2
+#N_ITERATIONS = 6
+EXPRESS = 5
