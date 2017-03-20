@@ -49,15 +49,16 @@ IF(CMAKE_COMPILER_IS_GNUCC)
     ADD_DEFINITIONS(-Wall -Wextra -Wshadow)
 ENDIF()
 
+# add libraries
+find_package(CCFITS REQUIRED)
+
 # compile all sources into a static libarctic.a file
 add_library( libarctic STATIC ${sources} )
 set_target_properties( libarctic PROPERTIES OUTPUT_NAME artic )
 target_compile_options( libarctic  PUBLIC  -g -O3 -Wall )
 # this lets me include files relative to the root src dir with a <> pair
 target_include_directories( libarctic PUBLIC src )
-
-# add libraries
-find_package(CCFITS REQUIRED)
+target_link_libraries( libarctic  ${CCFITS_LIBRARIES})
 
 # compile the main program arctic
 arctic_add_executable( arctic ${target_sources}
