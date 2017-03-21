@@ -3,10 +3,10 @@ Created on Jun 27, 2011
 
 @author: mplajner
 '''
-import xmlModule
+import EnvConfig.xmlModule as xmlModule
 import os
 from time import gmtime, strftime
-import Variable
+import EnvConfig.Variable as Variable
 import EnvConfig  # @UnresolvedImport
 import logging
 

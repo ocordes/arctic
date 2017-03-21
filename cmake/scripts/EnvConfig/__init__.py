@@ -12,7 +12,7 @@ path = ['.']
 if 'ENVXMLPATH' in os.environ:
     path.extend(os.environ['ENVXMLPATH'].split(os.pathsep))
 
-import Control
+import EnvConfig.Control
 
 
 class EnvError(RuntimeError):
@@ -181,7 +181,12 @@ class Script(object):
 
         # apply all the actions
         for action, args in self.opts.actions:
-            apply(getattr(control, action), args)
+            print(  getattr(control, action), args)
+            #apply(getattr(control, action), args)
+            f = getattr( control, action )
+            f( *args )
+            #function(*args, **keywords) instead of apply(function, args, keywords)
+
 
         # extract the result env dictionary
         env = control.vars()
@@ -217,7 +222,7 @@ class Script(object):
             template = {'sh':  "export %s='%s'",
                         'csh': "setenv %s '%s'"}.get(self.opts.shell, "%s=%s")
             for nv in sorted(self.env.items()):
-                print template % nv
+                print( template % nv )
 
     def runCmd(self):
         '''

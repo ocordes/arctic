@@ -428,7 +428,7 @@ function( add_unit_test name )
   add_test(NAME ${package}.${name}
              WORKING_DIRECTORY ${${name}_UNIT_TEST_WORKING_DIRECTORY}
              COMMAND ${env_cmd} ${extra_env} --xml ${env_xml}
-             ${executable}${exec_suffix})
+             ${CMAKE_CURRENT_BINARY_DIR}/${executable}${exec_suffix})
 
   set_property(TEST ${package}.${name} APPEND PROPERTY LABELS UnitTest ${package} Binary)
   if(NOT ${${name}_UNIT_TEST_TYPE} STREQUAL "None")

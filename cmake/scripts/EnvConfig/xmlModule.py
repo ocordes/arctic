@@ -1,12 +1,23 @@
 '''
 Created on Jul 2, 2011
 
+for arctic:
+
+Modified: 2017-03-21 Oliver Cordes
+- add python3 support
+
 @author: mplajner
 '''
 
 from xml.dom import minidom
 import logging
-from cPickle import load, dump
+import sys
+
+print( sys.version )
+if (sys.version_info > (3, 0)):
+    from pickle import load, dump
+else:
+    from cPickle import load, dump
 from hashlib import md5  # pylint: disable=E0611
 import os
 
@@ -31,13 +42,16 @@ class XMLFile(object):
         isFilename = type(path) is str
         if isFilename:
             checksum = md5()
-            checksum.update(open(path, 'rb').read())
+            checksum.update(open(path, 'rb' ).read())
             checksum = checksum.digest()
 
             cpath = path + "c"  # preparsed file
             try:
-                f = open(cpath, 'rb')
-                oldsum, data = load(f)
+                f = open(cpath, 'rb' )
+                if (sys.version_info > (3, 0)):
+                   oldsum, data = load(f, encoding='latin1')
+                else:
+                   oldsum, data = load(f)
                 if oldsum == checksum:
                     return data
             except IOError:
