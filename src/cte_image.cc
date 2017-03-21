@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-13
+   changed by: Oliver Cordes 2017-03-21
 
 
    $Id$
@@ -677,7 +677,7 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
       // no iteration is necessary , the calculated CTI is correct
 
       // do something
-      clock_charge_image( trail, xrange, yrange );
+      clock_charge_image( image, xrange, yrange );
 
       output( 1, "Minmax(old image): %f %f\n", (*im).min(), (*im).max() );
       output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
@@ -685,5 +685,4 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
   // copy the data back into the original image
   (*im) = image;
-  //(*im) = (*trail);
 }
