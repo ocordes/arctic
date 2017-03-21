@@ -97,7 +97,7 @@ add_unit_test( Boost_arctic_strstr_test unittests/arctic_strstr.cc
 add_unit_test( Boost_arctic_image_slice_test unittests/arctic_image_slice.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
-add_unit_test( Boost_arctic_image_slice_test unittests/arctic_image_slice.cc
+add_unit_test( Boost_arctic_params_test unittests/arctic_params.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
 
