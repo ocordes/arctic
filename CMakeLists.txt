@@ -175,7 +175,7 @@ endif()
 # CPack version numbers for release tarball name.
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 3)
-set(CPACK_PACKAGE_VERSION_PATCH 3)
+set(CPACK_PACKAGE_VERSION_PATCH 4)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Algorithm foR Charge Transfer Inefficency Correcton - arctic")
 set(CPACK_PACKAGE_VENDOR "Oliver Cordes/Ole Marggraf")
@@ -203,6 +203,8 @@ set(CPACK_SOURCE_IGNORE_FILES
 "^${PROJECT_SOURCE_DIR}/patrick/"
 "^${PROJECT_SOURCE_DIR}/test_suite/data/.*fits"
 "^${PROJECT_SOURCE_DIR}/tests/"
+"\\\\.pyc$"
+"\\\\.pyo$"
 )
 #message("CPACK_SOURCE_IGNORE_FILES = ${CPACK_SOURCE_IGNORE_FILES}")
 include(CPack)
