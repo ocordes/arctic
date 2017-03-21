@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "SHE_ArCTIC/params.hh"
+#include "params.hh"
 
 
 BOOST_AUTO_TEST_SUITE( params_test_suite )

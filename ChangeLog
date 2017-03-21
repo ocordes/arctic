@@ -1,3 +1,12 @@
+2017-03-21  Oliver Cordes <ocordes@astro.uni-bonn.de>
+  * arctic 1.3.4 released
+  * FIX BUG in cte_image.cc: in unclocking mode the corrections were not aaplied
+  * rewrite the code to fulfill the EUCLID coding standards,
+    make the code much more readable -> the code itself need some cleanup
+  * integrate Ole's unittests from EUCLID into the repository
+  * cmake integration of unittests was done by using the EuclidEnv code,
+    rewritten and adopted for python3
+
 2017-02-20  Oliver Cordes <ocordes@astro.uni-bonn.de>
 
   * artic 1.3.3 released

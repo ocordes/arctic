@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-03-20
+# changed by: Oliver Cordes 2017-03-21
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -97,6 +97,10 @@ add_unit_test( Boost_arctic_strstr_test unittests/arctic_strstr.cc
 add_unit_test( Boost_arctic_image_slice_test unittests/arctic_image_slice.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
+add_unit_test( Boost_arctic_image_slice_test unittests/arctic_image_slice.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+
 
 
 # sphinx part, try to detect sphinx, but if not
