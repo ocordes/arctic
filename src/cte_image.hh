@@ -45,7 +45,7 @@ public:
   cte_image( std::shared_ptr<params> );
   void     setup( long, long );
   virtual ~cte_image() {};
-  void   clock_charge( std::shared_ptr<std::valarray<double>>,
+  void   clock_charge( std::shared_ptr<std::valarray<double> >,
 		       std::valarray<long> &,
 		       std::valarray<long> & );
   virtual void clock_charge_setup( void );
