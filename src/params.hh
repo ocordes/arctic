@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-06
+   changed by: Oliver Cordes 2017-03-26
 
    $Id$
 
@@ -86,8 +86,10 @@ public:
   bool                     unclock;
   int                      readout_offset;
   bool                     dark_mode;
-  std::valarray<long>      xrange;
-  std::valarray<long>      yrange;
+  long                     start_x;
+  long                     end_x;
+  long                     start_y;
+  long                     end_y;
   int                      n_species;
   std::valarray<double>    trap_density;
   std::valarray<double>    trap_lifetime;
@@ -117,6 +119,7 @@ public:
 
   std::valarray<double> str2array( std::CString );
   std::valarray<long> str2array_long( std::CString );
+  void str2minmax_long( std::CString, long &, long & );
 };
 
 

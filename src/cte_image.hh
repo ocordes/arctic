@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-13
+   changed by: Oliver Cordes 2017-03-26
 
    $Id$
 
@@ -45,9 +45,7 @@ public:
   cte_image( std::shared_ptr<params> );
   void     setup( long, long );
   virtual ~cte_image() {};
-  void   clock_charge( std::shared_ptr<std::valarray<double> >,
-		       std::valarray<long> &,
-		       std::valarray<long> & );
+  void   clock_charge( std::shared_ptr<std::valarray<double> > );
   virtual void clock_charge_setup( void );
   virtual void clock_charge_clear( void );
 
@@ -65,12 +63,8 @@ public:
   void   limit_to_max( std::valarray<double> &, double );
 
   void   clock_charge_column( std::valarray<double> & image,
-                                       long,
-                                       long,
                                        long );
-  void   clock_charge_image( std::valarray<double> &,
-                            std::valarray<long> &,
-                            std::valarray<long> & );
+  void   clock_charge_image( std::valarray<double> & );
 
   double get_sum_double_array( double *array, int width, int height );
 
@@ -101,8 +95,12 @@ protected:
   int                                  express;
   int                                  readout_offset;
   double                               traps_total;
-  std::valarray<int>                    express_multiplier;
+  std::valarray<int>                   express_multiplier;
   std::valarray<double>                exponential_factor;
+  long                                 start_x;
+  long                                 end_x;
+  long                                 start_y;
+  long                                 end_y;
 };
 
 

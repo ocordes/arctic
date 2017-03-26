@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-21
+   changed by: Oliver Cordes 2017-03-26
 
 
    $Id$
@@ -57,7 +57,7 @@ w
 
 
 
-void minmax_limit_array( std::valarray<long> & xrange, long min, long max )
+void minmax_limit_array2( std::valarray<long> & xrange, long min, long max )
 {
   if (  xrange.size() >= 2 )
   {
@@ -66,7 +66,7 @@ void minmax_limit_array( std::valarray<long> & xrange, long min, long max )
   }
 }
 
-void minmax_limit( double & val, double min, double max )
+void minmax_limit_double( double & val, double min, double max )
 {
   if ( val < min )
     val = min;
@@ -74,6 +74,13 @@ void minmax_limit( double & val, double min, double max )
     val = max;
 }
 
+void minmax_limit_long( long & val, long min, long max )
+{
+  if ( val < min )
+    val = min;
+  else if ( val > max )
+    val = max;
+}
 
 
 
@@ -98,6 +105,11 @@ void cte_image::setup( long w, long h )
   readout_offset   = parameters->readout_offset;
 
   traps_total      = parameters->trap_density.sum();
+
+  start_x          = parameters->start_x;
+  end_x            = parameters->end_x;
+  start_y          = parameters->start_y;
+  end_y            = parameters->end_y;
 
 
   rotate = parameters->rotate;
@@ -308,9 +320,7 @@ void cte_image::clock_charge_restore_traps( void )
 
 
 void cte_image::clock_charge_column( std::valarray<double> & image,
-                                     long i_column,
-                                     long start_y,
-                                     long end_y )
+                                     long i_column )
 {
   double im, sum, d, freec;
   double el_height;              // height of electron cloud
@@ -400,7 +410,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
               im = image[ (*is) ];
 
               // shape pixel value
-              minmax_limit( im, 0.0, well_depth );
+              minmax_limit_double( im, 0.0, well_depth );
 
               #ifdef __debug
               output( 10, "debug : %i\n" , i_pixel );
@@ -423,7 +433,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
               if ( freec > well_notch_depth )
                 {
                   el_height = pow(((freec - well_notch_depth ) / well_range ),well_fill_power);
-                  minmax_limit( el_height , 0.0, 1.0 );
+                  minmax_limit_double( el_height , 0.0, 1.0 );
 
                   // calculate the total_capture
                   total_capture = clock_charge_pixel_total_capture( el_height, i_pixelp1 );
@@ -492,9 +502,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
 
 // perfoming the CTI correction with clock_change_image
 
-void cte_image::clock_charge_image( std::valarray<double> & image,
-				    std::valarray<long> & xrange,
-				    std::valarray<long> & yrange )
+void cte_image::clock_charge_image( std::valarray<double> & image )
 {
   // local variables copied from parameter set
   // makes the code faster, since the access of the class pointer is
@@ -503,7 +511,6 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   /* CTE variables */
   int     sparse_pixels;
 
-  int     start_x, start_y, end_x, end_y;
   int     i_column;
 
 
@@ -517,28 +524,6 @@ void cte_image::clock_charge_image( std::valarray<double> & image,
   struct rusage  cpu_temp_time;
   double  cpu_diff_time;
 
-  // copy dimension parameters
-  if ( xrange.size() <  2 )
-    {
-      start_x = 0;
-      end_x = width;
-    }
-  else
-    {
-      start_x = xrange[0];
-      end_x = xrange[1];
-    }
-
-  if ( yrange.size() < 2 )
-    {
-      start_y = 0;
-      end_y = height;
-    }
-  else
-    {
-      start_y = yrange[0];
-      end_y = yrange[1];
-    }
 
   output( 10, "start_x=%i end_x=%i\n", start_x, end_x );
   output( 10, "start_y=%i end_y=%i\n", start_y, end_y );
@@ -562,7 +547,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   for (i_column=start_x;i_column<end_x;++i_column)
     {
-      clock_charge_column( image, i_column, start_y, end_y );
+      clock_charge_column( image, i_column );
 
       //#ifdef __debug
       //output( 1, "\n" );
@@ -612,9 +597,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
 
-void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
-			      std::valarray<long> & xrange,
-			      std::valarray<long> & yrange )
+void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im )
 {
   output( 11, "cte_image::clock_charge\n" );
 
@@ -627,8 +610,10 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
 
   // check and liit the range variable
-  minmax_limit_array( xrange, 0, width );
-  minmax_limit_array( yrange, 0, height );
+  minmax_limit_long( start_x, 0, width );
+  minmax_limit_long( end_x, 0, width );
+  minmax_limit_long( start_y, 0, height );
+  minmax_limit_long( end_y, 0, height );
 
 
   if ( parameters->unclock )
@@ -647,7 +632,7 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
 
 	          trail = image;
 
-            clock_charge_image( trail, xrange, yrange );
+            clock_charge_image( trail );
 
 
 	          // do some statistics after work
@@ -677,7 +662,7 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im,
       // no iteration is necessary , the calculated CTI is correct
 
       // do something
-      clock_charge_image( image, xrange, yrange );
+      clock_charge_image( image );
 
       output( 1, "Minmax(old image): %f %f\n", (*im).min(), (*im).max() );
       output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );

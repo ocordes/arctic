@@ -348,8 +348,6 @@ int image::clock_charge( void )
 
   if ( ret != 0 ) return ret;
 
-  std::shared_ptr<std::valarray<long>> xrange( new std::valarray<long> ( parameters->xrange ) );
-  std::shared_ptr<std::valarray<long>> yrange( new std::valarray<long> ( parameters->yrange ) );
 
   // create a CTE obejct with the parameter class
   cte_image *cte;
@@ -374,7 +372,7 @@ int image::clock_charge( void )
   cte->setup( image_width, image_height );
 
     // do the unclock thing ...
-  cte->clock_charge( image_data, (*xrange), (*yrange) );
+  cte->clock_charge( image_data );
 
   // free the cte image
   delete cte;

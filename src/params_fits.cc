@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-03-13
+   changed by: Oliver Cordes 2017-03-26
 
    $Id$
 
@@ -55,26 +55,24 @@ void params_fits::parse_args_image( std::string & key, std::string & val, int & 
 {
   if ( key == "XRANGE" )
   {
-    xrange = str2array_long( val );
-    output( 10, "params: xrange=\n" );
-    output_range( xrange );
+    str2minmax_long( val, start_x, end_x );
+    output( 10, "params: xrange=%i,%i\n", start_x, end_x );
 
     // correct an check values
-    xrange[0]--;
-    min_limit( xrange[0] );
+    --start_x;
+    min_limit( start_x );
 
     error = PARSE_OK;
   }
 
   if ( key == "YRANGE" )
   {
-    yrange = str2array_long( val );
-    output( 10, "params: yrange=\n" );
-    output_range( yrange );
+    str2minmax_long( val, start_y, end_y );
+    output( 10, "params: yrange=%i,%i\n", start_y, end_y );
 
     // correct an check values
-    yrange[0]--;
-    min_limit( yrange[0] );
+    --start_y;
+    min_limit( start_y );
 
     error = PARSE_OK;
   }

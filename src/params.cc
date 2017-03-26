@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-06
+   changed by: Oliver Cordes 2017-03-26
 
    $Id$
 
@@ -69,8 +69,10 @@ params::params()
   unclock               = true;
   dark_mode             = false;
   readout_offset        = 0;
-  xrange                = { 0, LONG_MAX };
-  yrange                = { 0, LONG_MAX };
+  start_x               = 0;
+  end_x                 = LONG_MAX;
+  start_y               = 0;
+  end_y                 = LONG_MAX;
   trap_density          = { 0.0 };
   trap_lifetime         = { 0.0 };
 
@@ -303,6 +305,20 @@ std::valarray<long> params::str2array_long( std::CString s )
 
   return std::valarray<long> ( &temp_vec[0], temp_vec.size() );
 }
+
+
+void params::str2minmax_long( std::CString s, long & min, long & max )
+{
+  min = 0;
+  max = 0;
+
+  std::CString p = s.strtok( true, "," );
+  if ( p != "" )
+    min = atoi( p.c_str() );
+    p = s.strtok( false, "," );
+  if ( p != "" )
+    max = atoi( p.c_str() );
+  }
 
 
 

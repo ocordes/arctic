@@ -1,4 +1,8 @@
 %module arctic
+
+// written by: Oliver Cordes 2017-03-23
+// changed by: Oliver Cordes 2017-03-26
+
 %{
 #define SWIG_FILE_WITH_INIT
 #include "cte_image.hh"
@@ -39,8 +43,10 @@ public:
   bool                     unclock;
   int                      readout_offset;
   bool                     dark_mode;
-  std::valarray<long>      xrange;
-  std::valarray<long>      yrange;
+  long                     start_x;
+  long                     end_x;
+  long                     start_y;
+  long                     end_y;
   int                      n_species;
   std::valarray<double>    trap_density;
   std::valarray<double>    trap_lifetime;
