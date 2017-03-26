@@ -9,6 +9,7 @@
 #include "params.hh"
 #include "params_fits.hh"
 #include "test_valarray.hh"
+#include <string.h>
 %}
 
 %include "std_string.i"
@@ -73,16 +74,21 @@ public:
   };
 
 
-%apply (int DIM1, int* IN_ARRAY1) {(size_t len_, int* vec_)}
+%apply (int DIM1, int* INPLACE_ARRAY1) {(size_t len_, int* vec_)}
 
 void test_function( std::valarray<int> & );
 
 %rename (test_function) my_test_function;
 %inline %{
 void my_test_function(size_t len_, int* vec_) {
-    std::valarray<int> v;
+    std::valarray<int> v( vec_, len_ );
 
     test_function(v);
+
+    // back copy ...
+    //for( unsigned int i=0;i<v.size();++i)
+    //  vec_[i] = v[i];
+    memcpy( vec_, &v[0], sizeof( int ) * v.size() );
 }
 %}
 
