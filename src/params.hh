@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-26
+   changed by: Oliver Cordes 2017-04-03
 
    $Id$
 
@@ -69,8 +69,6 @@ extern std::string algorithm_names[];
 
 
 class params {
-protected:
-  void load_config( std::string filename );
 public:
   // CTI variables
   unsigned  int            algorithm;
@@ -111,6 +109,7 @@ public:
   params();
   virtual ~params();
 
+  void load_config( std::string filename );
   virtual void parse_args( std::string &, std::string &, int & );
   virtual void check_params ( void );
 

@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-03-21
+# changed by: Oliver Cordes 2017-04-03
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -54,7 +54,7 @@ find_package(CCFITS REQUIRED)
 
 # compile all sources into a static libarctic.a file
 add_library( libarctic STATIC ${sources} )
-set_target_properties( libarctic PROPERTIES OUTPUT_NAME artic )
+set_target_properties( libarctic PROPERTIES OUTPUT_NAME arctic )
 target_compile_options( libarctic  PUBLIC  -g -O3 -Wall )
 # this lets me include files relative to the root src dir with a <> pair
 target_include_directories( libarctic PUBLIC src )
