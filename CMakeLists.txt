@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-04-03
+# changed by: Oliver Cordes 2017-04-04
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -12,7 +12,12 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 include( UnitTestHelpers )
 
 
-set(VERSION 1.3.4)
+set(VERSION 1.3.5alpha)
+
+
+if(UNIX AND NOT APPLE)
+   set(LINUX TRUE)
+endif()
 
 # get current date
 execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
@@ -55,7 +60,16 @@ find_package(CCFITS REQUIRED)
 # compile all sources into a static libarctic.a file
 add_library( libarctic STATIC ${sources} )
 set_target_properties( libarctic PROPERTIES OUTPUT_NAME arctic )
-target_compile_options( libarctic  PUBLIC  -g -O3 -Wall )
+target_compile_options( libarctic  PUBLIC  -g -O3 -Wall)
+
+if(LINUX) 
+   #message(STATUS ">>> Linux")
+   target_compile_options( libarctic PUBLIC -fPIC )
+else()
+   #message(STATUS ">>> Not Linux")
+   # stuff that should happen not on Linux 
+endif()
+
 # this lets me include files relative to the root src dir with a <> pair
 target_include_directories( libarctic PUBLIC src )
 target_link_libraries( libarctic  ${CCFITS_LIBRARIES})
@@ -175,7 +189,7 @@ endif()
 # CPack version numbers for release tarball name.
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 3)
-set(CPACK_PACKAGE_VERSION_PATCH 4)
+set(CPACK_PACKAGE_VERSION_PATCH 5)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Algorithm foR Charge Transfer Inefficency Correcton - arctic")
 set(CPACK_PACKAGE_VENDOR "Oliver Cordes/Ole Marggraf")
@@ -203,6 +217,12 @@ set(CPACK_SOURCE_IGNORE_FILES
 "^${PROJECT_SOURCE_DIR}/patrick/"
 "^${PROJECT_SOURCE_DIR}/test_suite/data/.*fits"
 "^${PROJECT_SOURCE_DIR}/tests/"
+"^${PROJECT_SOURCE_DIR}/python/build/"
+"^${PROJECT_SOURCE_DIR}/python/arctic.py/"
+"^${PROJECT_SOURCE_DIR}/python/_arctic.so"
+"^${PROJECT_SOURCE_DIR}/python/.*fits"
+"^${PROJECT_SOURCE_DIR}/python/.*cpp"
+"^${PROJECT_SOURCE_DIR}/python/pyfragments.swg"
 "\\\\.pyc$"
 "\\\\.pyo$"
 )
