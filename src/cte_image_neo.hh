@@ -22,7 +22,7 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-13
+   changed by: Oliver Cordes 2017-04-04
 
    $Id$
 
@@ -43,6 +43,7 @@
 
 class cte_image_neo : public cte_image {
 public:
+  cte_image_neo( void );
   cte_image_neo( std::shared_ptr<params> );
 
   virtual void   clock_charge_setup( void );

@@ -222,7 +222,6 @@ set(CPACK_SOURCE_IGNORE_FILES
 "^${PROJECT_SOURCE_DIR}/python/_arctic.so"
 "^${PROJECT_SOURCE_DIR}/python/.*fits"
 "^${PROJECT_SOURCE_DIR}/python/.*cpp"
-"^${PROJECT_SOURCE_DIR}/python/pyfragments.swg"
 "\\\\.pyc$"
 "\\\\.pyo$"
 )

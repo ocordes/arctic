@@ -1,7 +1,7 @@
 %module arctic
 
 // written by: Oliver Cordes 2017-03-23
-// changed by: Oliver Cordes 2017-04-03
+// changed by: Oliver Cordes 2017-04-04
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -28,12 +28,19 @@
 import_array();
 %}
 
-%apply (int DIM1, double* INPLACE_ARRAY1) {(size_t len_, double* vec_)}
+%apply (int DIM1, double* INPLACE_ARRAY1) {(size_t dim, double* vec)}
+%apply (int DIM1, double* IN_ARRAY1) {(size_t dim1, double* vec1), (size_t dim2, double* vec2 )}
+%apply (int DIM1, int DIM2, double* INPLACE_FARRAY2 ) {( size_t dim1, size_t dim2, double *vec )}
 
-// Very simple C++ example for linked list
+%rename (clock_charge) clock_charge2;
+
+// cte_image class
 
 class cte_image {
 public:
+  std::shared_ptr<params>              parameters;
+  
+  cte_image( void );
   cte_image( std::shared_ptr<params> );
   void     setup( long, long );
   virtual ~cte_image();
@@ -41,20 +48,37 @@ public:
 };
 
 %extend cte_image {
-  void clock_charge2 ( size_t len_, double* vec_ )
+  void clock_charge2( size_t dim1, size_t dim2, double *vec )
   {
-    std::cout <<  "Requested len is " << len_ << std::endl;
+    std::cout << "Requested size is " << dim1 << "x" << dim2 << std::endl;
 
-    std::shared_ptr<std::valarray<double>> v = std::shared_ptr<std::valarray<double>>( new std::valarray<double>(vec_, len_ ) );
+    std::shared_ptr<std::valarray<double>> v = std::shared_ptr<std::valarray<double>>( new std::valarray<double>(vec, dim1*dim2 ) );
 
     $self->cte_image::clock_charge( v );
 
-    memcpy( vec_, &((*v)[0]), sizeof( double ) * v->size() );
+    memcpy( vec, &((*v)[0]), sizeof( double ) * v->size() );
+  }
+
+  void set_traps( size_t dim1, double *vec1, size_t dim2, double *vec2 )
+  {
+    if ( dim1 != dim2 )
+    {
+      std::cout << "set_traps: array size mismatch! Both arrays need to have the same size!" << std::endl;
+    }
+    else
+    {
+      $self->parameters->trap_density  = std::valarray<double>( vec1, dim1 );
+      $self->parameters->trap_lifetime = std::valarray<double>( vec2, dim2 );
+      $self->parameters->n_species     = dim1;
+    }
   }
 }
 
+%ignore clock_charge2;
+
 class cte_image_neo : public cte_image {
   public:
+    cte_image_neo( void );
     cte_image_neo( std::shared_ptr<params> );
 
 };

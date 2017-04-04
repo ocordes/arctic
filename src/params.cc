@@ -59,7 +59,7 @@ params::params()
   algorithm             = ALGORITHM_NEO;
   well_depth            = 84700;
   well_notch_depth      = 1e-9;
-  well_fill_power       = 0.478;
+  well_fill_power       = 0.465;
   check_empty_traps     = true;
   empty_trap_limit      = 1e-11;
   empty_trap_limit_neo2 = 1e-6;

@@ -7,11 +7,6 @@ from astropy.io import fits
 
 # main
 
-p = arctic.params_acs()
-p.load_config( '../aifa/test_opt.cte' )
-
-
-
 hdulist = fits.open('../demo/jbke01rkq_drkA.fits')
 
 hdulist.info()
@@ -23,13 +18,17 @@ date = hdulist[0].header['DATE']
 date += +2452334.5
 
 # fill the julian date into paramter class
-p.calc_trap_config( date )
-
 
 print( data.shape )
 
 # setup the CTE object
-c = arctic.cte_image_neo( p )
+c = arctic.cte_image_neo()
+print c.parameters
+trap_density  = [ 0.293314, 0.780633, 0.658226 ]
+trap_lifetime = [ 0.740000, 7.700000, 37.000000 ]
+
+c.set_traps( trap_density, trap_lifetime )
+
 c.setup( data.shape[0], data.shape[1] )
 
 adata = data.astype( np.float64 )

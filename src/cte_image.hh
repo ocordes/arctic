@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-26
+   changed by: Oliver Cordes 2017-04-04
 
    $Id$
 
@@ -42,6 +42,9 @@
 
 class cte_image {
 public:
+  std::shared_ptr<params>              parameters;
+
+  cte_image ( void );
   cte_image( std::shared_ptr<params> );
   void     setup( long, long );
   virtual ~cte_image() {};
@@ -74,8 +77,6 @@ public:
   void   create_exponential_factor( void );
 
 protected:
-  std::shared_ptr<params>              parameters;
-
   long                                 image_width;
   long                                 image_height;
   long                                 width;

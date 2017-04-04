@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-26
+   changed by: Oliver Cordes 2017-04-04
 
 
    $Id$
@@ -91,6 +91,12 @@ cte_image::cte_image( std::shared_ptr<params> p )
 }
 
 
+cte_image::cte_image( void )
+{
+  parameters = std::shared_ptr<params>( new params() );
+}
+
+
 void cte_image::setup( long w, long h )
 {
   // initialize variables
@@ -115,14 +121,6 @@ void cte_image::setup( long w, long h )
   rotate = parameters->rotate;
   direction = parameters->direction;
 
-
-
-  // print model information
-
-  output( 1, "Model has %i trap species:\n", parameters->n_species );
-  output( 1, " Nr  density  lifetime\n" );
-  for (int i=0;i<parameters->n_species;i++)
-    output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
 
 
   // sets the image parameters according to the rotation paramater
@@ -528,6 +526,13 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
   output( 10, "start_x=%i end_x=%i\n", start_x, end_x );
   output( 10, "start_y=%i end_y=%i\n", start_y, end_y );
 
+
+  // print model information
+
+  output( 1, "Model has %i trap species:\n", parameters->n_species );
+  output( 1, " Nr  density  lifetime\n" );
+  for (int i=0;i<parameters->n_species;i++)
+    output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
 
   // info about the image and algorithm
   sparse_pixels = get_sparse_pixels( image, traps_total );

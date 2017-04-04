@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-13
+   changed by: Oliver Cordes 2017-04-04
 
 
    $Id$
@@ -64,6 +64,12 @@
 // endof macros
 
 
+
+
+cte_image_neo::cte_image_neo( void )
+                            : cte_image( )
+{
+}
 
 
 cte_image_neo::cte_image_neo( std::shared_ptr<params> p )
