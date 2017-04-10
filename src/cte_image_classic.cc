@@ -22,7 +22,7 @@ w
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-06
+   changed by: Oliver Cordes 2017-04-10
 
 
    $Id$
@@ -81,7 +81,8 @@ void cte_image_classic::print_traps( void )
 
   std::string s;
 
-  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, n_levels_traps );
+  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
+              parameters->n_species, n_levels_traps );
   for (j=0;j<n_levels_traps;++j)
   {
     int c;
@@ -90,18 +91,18 @@ void cte_image_classic::print_traps( void )
     s = "";
     c = 0;
     d = 0.0;
-    for (i=0;i<n_species;++i)
+    for (i=0;i<parameters->n_species;++i)
 	  {
 	    if ( j > 0 )
 	    {
-	      if ( fabs( traps[(j*n_species)+i] - traps[((j-1)*n_species)+i] ) < 1e-14 )
+	      if ( fabs( traps[(j*parameters->n_species)+i] - traps[((j-1)*parameters->n_species)+i] ) < 1e-14 )
 		      c++;
 	    }
 	    std::stringstream str;
-	    str << std::fixed << std::setprecision( debug_precision ) << traps[(j*n_species)+i] << " ";
+	    str << std::fixed << std::setprecision( debug_precision ) << traps[(j*parameters->n_species)+i] << " ";
 	    s += str.str();
 	    //s += std::to_string( t[(j*n_species)+i] ) + " ";
-	    d +=  traps[(j*n_species)+i];
+	    d +=  traps[(j*parameters->n_species)+i];
 	  }
 
     std::stringstream str;
@@ -118,14 +119,14 @@ void cte_image_classic::print_traps( void )
 void   cte_image_classic::clock_charge_setup( void )
 {
   output( 1, "setup\n");
-  output( 1, "Using n_levels=%i\n", n_levels );
+  output( 1, "Using n_levels=%i\n", parameters->n_levels );
 
   // setup variables
-  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) n_levels );
-  n_electrons_per_trap_total = traps_total / n_levels;
+  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) parameters->n_levels );
+  n_electrons_per_trap_total = traps_total / parameters->n_levels;
 
   output( 10, "Create trap structure ...\n" );
-  traps = std::valarray<double>( 0.0, n_species * n_levels );
+  traps = std::valarray<double>( 0.0, parameters->n_species * parameters->n_levels );
 
   n_electrons_per_trap_express = n_electrons_per_trap;
   n_electrons_per_trap_express_ov = n_electrons_per_trap;
@@ -136,7 +137,7 @@ void   cte_image_classic::clock_charge_setup( void )
 void   cte_image_classic::clock_charge_clear( void )
 {
   // clean the traps array
-  for (int i=0;i<n_levels*n_species;++i)
+  for (int i=0;i<parameters->n_levels*parameters->n_species;++i)
     traps[i] = 0.0;
   n_levels_traps = 0;
   stat_count = 0;
@@ -163,6 +164,8 @@ double cte_image_classic::clock_charge_pixel_release( void )
 
   double sum = 0.0;
   double release, sum2;
+
+  int    n_species = parameters->n_species;
 
   int    i,j;
 
@@ -212,6 +215,8 @@ double cte_image_classic::clock_charge_pixel_total_capture( double el_height, in
 
   int    i,j;
 
+  int    n_species = parameters->n_species;
+
   // prepare the work
 
   // express correction using i_pixel instead of express_factor_pixel
@@ -219,7 +224,7 @@ double cte_image_classic::clock_charge_pixel_total_capture( double el_height, in
    n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
    // calculate the height in ( affected levels )
-   dheight = n_levels * el_height;
+   dheight = parameters->n_levels * el_height;
 
    // cheight is the last full filled trap level
    cheight = ceil( dheight ) - 1;
@@ -278,6 +283,8 @@ void   cte_image_classic::clock_charge_pixel_capture_ov( double d )
   int    i, j, pos;
   double c;
 
+  int    n_species = parameters->n_species;
+
   // less electrons than required for capturing process
   for (i=0;i<cheight;++i)
     for (j=0;j<n_species;++j)
@@ -307,6 +314,8 @@ void   cte_image_classic::clock_charge_pixel_capture_full( void )
 
   // more electrons than required for capturing process
   // -> fill all traps to the max
+
+  int    n_species = parameters->n_species;
 
   for (i=0;i<cheight;++i)
     for (j=0;j<n_species;j++)
@@ -340,7 +349,7 @@ double cte_image_classic::clock_charge_trap_info( void )
 {
   double total = 0.0;
 
-  for (int i=0;i<n_levels_traps*n_species;++i)
+  for (int i=0;i<n_levels_traps*parameters->n_species;++i)
     total += traps[i];
 
   return total;

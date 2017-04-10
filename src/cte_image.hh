@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-04
+   changed by: Oliver Cordes 2017-04-10
 
    $Id$
 
@@ -82,13 +82,9 @@ protected:
   long                                 width;
   long                                 height;
 
-  bool                                 rotate;
-  bool                                 direction;
   std::image_slice                     is;
 
   // CTE local parameters
-  int                                  n_species;
-  int                                  n_levels;
   double                               well_depth;
   double                               well_notch_depth;
   double                               well_fill_power;

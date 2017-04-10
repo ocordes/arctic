@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-04
+   changed by: Oliver Cordes 2017-04-10
 
 
    $Id$
@@ -90,13 +90,14 @@ void cte_image_neo::print_trapl( void )
 
   std::string s;
 
-  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, nr_trapl );
+  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
+          parameters->n_species, nr_trapl );
   l = 0;
   //for (j=0;j<nr_trapl;j++)
   for (j=nr_trapl-1;j>=0;j--)
     {
       s = "";
-      for (i=0;i<n_species;i++)
+      for (i=0;i<parameters->n_species;i++)
 	{
 	  std::stringstream str;
 	  str << std::fixed << std::setprecision( debug_precision ) << trapl[j][i] << " ";
@@ -138,14 +139,14 @@ void cte_image_neo::clock_charge_setup( void  )
     output( 1, " Using Dark_mode optimization!\n" );
 
 
-  output( 1, "Using n_levels=%i\n", n_levels );
+  output( 1, "Using n_levels=%i\n", parameters->n_levels );
 
 
 
   // setup variables
 
-  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) n_levels );
-  n_electrons_per_trap_total = traps_total / n_levels;
+  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) parameters->n_levels );
+  n_electrons_per_trap_total = traps_total / parameters->n_levels;
   output( 10, "Create trap structure ...\n" );
 
   // the maximun entries in the trap level arraay should be 2x the amount of
@@ -155,7 +156,7 @@ void cte_image_neo::clock_charge_setup( void  )
   int max_trap_levels = height * 2;
 
   // trap level information implementations
-  trapl = std::valarray<std::valarray<double>> ( std::valarray<double>(0.0, n_species), max_trap_levels );
+  trapl = std::valarray<std::valarray<double>> ( std::valarray<double>(0.0, parameters->n_species), max_trap_levels );
   trapl_fill = std::valarray<int> ( 0, max_trap_levels );
   nr_trapl = 0;
 
@@ -214,6 +215,8 @@ double cte_image_neo::clock_charge_pixel_release( void )
   static double sum = 0.0;
   static double sum2, release;
 
+  int    n_species = parameters->n_species;
+
   // Release any trapped electrons, using the appropriate decay half-life
 
   // release a number of electrons in the traps
@@ -244,6 +247,8 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, int i_
 
    int    i, j, h, h2;
 
+   int    n_species = parameters->n_species;
+
    // prepare the work
 
    // Modifications of low signal behaviour
@@ -255,7 +260,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, int i_
    n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
    // calculate the height in ( affected levels )
-   dheight = n_levels * el_height;
+   dheight = parameters->n_levels * el_height;
 
    // cheight is the last full filled trap level
    cheight = ceil( dheight ) - 1;
@@ -336,7 +341,7 @@ void cte_image_neo::clock_charge_pixel_capture_ov_modify( int j, double d )
 {
   int i;
 
-  for (i=0;i<n_species;++i)
+  for (i=0;i<parameters->n_species;++i)
   {
     if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
       new_trapl[new_nr_trapl][i] = trapl[j][i]
@@ -492,48 +497,48 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
 {
   int          j, h, skip;
 
+  int    n_species  = parameters->n_species;
+
+  // cheight full levels
+  // cheight+1 partly filled levels
+  //
+  // trapl_fill gives the number of filled levels
 
 
-         // cheight full levels
-         // cheight+1 partly filled levels
-         //
-         // trapl_fill gives the number of filled levels
+  // prepare the stack for refilling
+
+  // remove the levels which will be completely absorbed
+  // with the new filling
+  skip = 0;
+  h = 0;
+  while ( nr_trapl != 0 )
+  {
+    h += trapl_fill[nr_trapl-1];
+    if ( h > dheight )
+      break;
+    else
+      skip = h;
+    --nr_trapl;
+  }
+
+  // skip now containes the number of previous filled levels which
+  // will completely absorbed with the new filling, the
+  // corresponding levels are removed from the stack
 
 
-         // prepare the stack for refilling
+  #ifdef __debug
+  output( 10, "h,nr_trapl,d: %i %i %.15f\n", h, nr_trapl, dheight );
+  #endif
 
-         // remove the levels which will be completely absorbed
-         // with the new filling
-         skip = 0;
-         h = 0;
-         while ( nr_trapl != 0 )
-           {
-             h += trapl_fill[nr_trapl-1];
-             if ( h > dheight )
-               break;
-             else
-               skip = h;
-             --nr_trapl;
-           }
+  if ( std::abs(skip - dheight) < 1e-14 )
+  {
+    // best solution ... but only reached, if dheight is n_levels,
+    // which means a bright star or strong cosmic passed ...
 
-         // skip now containes the number of previous filled levels which
-         // will completely absorbed with the new filling, the
-         // corresponding levels are removed from the stack
-
-
-         #ifdef __debug
-         output( 10, "h,nr_trapl,d: %i %i %.15f\n", h, nr_trapl, dheight );
-         #endif
-
-         if ( std::abs(skip - dheight) < 1e-14 )
-           {
-              // best solution ... but only reached, if dheight is n_levels,
-              // which means a bright star or strong cosmic passed ...
-
-              // but not correct implemented ...
-              #ifdef __debug
-              output( 10, "skip=%i dheight=%f\n", skip, dheight );
-              #endif
+    // but not correct implemented ...
+    #ifdef __debug
+    output( 10, "skip=%i dheight=%f\n", skip, dheight );
+    #endif
 
               trapl[nr_trapl] = n_electrons_per_trap_express_ov;
               trapl_fill[nr_trapl] = 1;

@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-04
+   changed by: Oliver Cordes 2017-04-10
 
 
    $Id$
@@ -101,8 +101,7 @@ void cte_image::setup( long w, long h )
 {
   // initialize variables
 
-  n_species        = parameters->trap_density.size();
-  n_levels         = parameters->n_levels;
+  
   well_depth       = parameters->well_depth;
   well_notch_depth = parameters->well_notch_depth;
   well_fill_power  = parameters->well_fill_power;
@@ -118,8 +117,6 @@ void cte_image::setup( long w, long h )
   end_y            = parameters->end_y;
 
 
-  rotate = parameters->rotate;
-  direction = parameters->direction;
 
 
 
@@ -128,7 +125,7 @@ void cte_image::setup( long w, long h )
   image_width = w;
   image_height = h;
 
-  if ( rotate == image_readout_y )
+  if ( parameters->rotate == image_readout_y )
   {
     width  = w;
     height = h;
@@ -160,8 +157,8 @@ void cte_image::setup( long w, long h )
   is = std::image_slice( image_width,
                          image_height,
                          0,
-                         rotate,
-                         direction );
+                         parameters->rotate,
+                         parameters->direction );
 
 }
 
@@ -246,11 +243,11 @@ void cte_image::create_express_multiplier( std::valarray<int> & emp,
 void cte_image::create_exponential_factor( void )
 {
   output( 10, "Create exponential factor ...\n" );
-  exponential_factor = std::valarray<double> ( 0.0, n_species*n_levels );
+  exponential_factor = std::valarray<double> ( 0.0, parameters->n_species*parameters->n_levels );
 
-  for (int i=0;i<n_levels;++i)
-    for (int j=0;j<n_species;++j)
-      exponential_factor[(i*n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
+  for (int i=0;i<parameters->n_levels;++i)
+    for (int j=0;j<parameters->n_species;++j)
+      exponential_factor[(i*parameters->n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
   output( 10, "Done.\n" );
 }
 

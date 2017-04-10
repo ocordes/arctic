@@ -22,7 +22,7 @@ w
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-07
+   changed by: Oliver Cordes 2017-04-10
 
 
    $Id$
@@ -84,30 +84,31 @@ void cte_image_watermark::print_wml( void )
 
   std::string s;
 
-  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n", n_species, nr_wml );
+  output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
+          parameters->n_species, nr_wml );
   l = 0.0;
   //for (j=0;j<nr_trapl;j++)
   for (j=nr_wml-1;j>=0;j--)
-    {
-      s = "";
-      for (i=0;i<n_species;i++)
-	{
-	  std::stringstream str;
-	  str << std::fixed << std::setprecision( debug_precision ) << wml[j][i] << " ";
-	  s += str.str();
-	  //s += std::to_string( trapl[j][i] ) + " ";
-	}
+  {
+    s = "";
+    for (i=0;i<parameters->n_species;i++)
+	  {
+	     std::stringstream str;
+	     str << std::fixed << std::setprecision( debug_precision ) << wml[j][i] << " ";
+	     s += str.str();
+	     //s += std::to_string( trapl[j][i] ) + " ";
+	  }
 
-      std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << wml[j].sum() ;
-      s += "= " + str.str();
-      //s += "= " + std::to_string( trapl[j].sum()  );
+    std::stringstream str;
+    str << std::fixed << std::setprecision( debug_precision ) << wml[j].sum() ;
+    s += "= " + str.str();
+    //s += "= " + std::to_string( trapl[j].sum()  );
 
-      //output( 10, "%05i: %s\n", j, s.c_str() );
-      output( 10, "%011.5f: %s  (x %f)\n", l * (double) parameters->n_levels, s.c_str(), wml_fill[j] );
+    //output( 10, "%05i: %s\n", j, s.c_str() );
+    output( 10, "%011.5f: %s  (x %f)\n", l * (double) parameters->n_levels, s.c_str(), wml_fill[j] );
 
-      l += wml_fill[j];
-    }
+    l += wml_fill[j];
+  }
 }
 
 
@@ -130,37 +131,36 @@ void   cte_image_watermark::clock_charge_setup( void )
   if ( dark_mode )
     output( 1, " Using Dark_mode optimization!\n" );
 
-    output( 10, "Create trap structure ...\n" );
+  output( 10, "Create trap structure ...\n" );
 
-    // the maximun entries in the trap level arraay should be 2x the amount of
-    // pixels in the working column, because in the worst case 2 new entries
-    // will be created per pixel!
+  // the maximun entries in the trap level arraay should be 2x the amount of
+  // pixels in the working column, because in the worst case 2 new entries
+  // will be created per pixel!
 
-    int max_wm_levels = height * 2;
+  int max_wm_levels = height * 2;
 
-    trap_density = parameters->trap_density;
-    trap_density_total          = trap_density.sum();
+  trap_density = parameters->trap_density;
+  trap_density_total          = trap_density.sum();
 
-    // trap level information implementations
-    wml = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), max_wm_levels );
-    wml_fill = std::valarray<double> ( 0.0, max_wm_levels );
-    nr_wml = 0;
+  // trap level information implementations
+  wml = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, parameters->n_species), max_wm_levels );
+  wml_fill = std::valarray<double> ( 0.0, max_wm_levels );
+  nr_wml = 0;
 
-    // helper array for the d < 0.0 mode
-    new_wml = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), max_wm_levels );
-    new_wml_fill = std::valarray<double> ( 0.0, max_wm_levels );
-    new_nr_wml = 0;
+  // helper array for the d < 0.0 mode
+  new_wml = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, parameters->n_species), max_wm_levels );
+  new_wml_fill = std::valarray<double> ( 0.0, max_wm_levels );
+  new_nr_wml = 0;
 
-    // helper array for trap saving
-    saved_wml = std::valarray<std::valarray<double>> ( std::valarray<double>(0.0, n_species), max_wm_levels );
-    saved_wml_fill = std::valarray<double> ( 0.0, max_wm_levels );
-    saved_nr_wml = 0;
+  // helper array for trap saving
+  saved_wml = std::valarray<std::valarray<double>> ( std::valarray<double>(0.0, parameters->n_species), max_wm_levels );
+  saved_wml_fill = std::valarray<double> ( 0.0, max_wm_levels );
+  saved_nr_wml = 0;
 
-    trap_density_express = trap_density;
-    trap_density_express_total = trap_density_total;
+  trap_density_express = trap_density;
+  trap_density_express_total = trap_density_total;
 
-    output( 10, "Done.\n" );
-
+  output( 10, "Done.\n" );
 }
 
 
@@ -199,6 +199,8 @@ double cte_image_watermark::clock_charge_pixel_release( void )
   double sum = 0.0;
   double sum2, release;
   int    i,j;
+
+  int    n_species  = parameters->n_species;
 
 
   // trapped electrons relased exponentially
