@@ -101,11 +101,6 @@ void cte_image::setup( long w, long h )
 {
   // initialize variables
 
-  
-  well_depth       = parameters->well_depth;
-  well_notch_depth = parameters->well_notch_depth;
-  well_fill_power  = parameters->well_fill_power;
-  well_range       = well_depth - well_notch_depth;
   express          = parameters->express;
   readout_offset   = parameters->readout_offset;
 
@@ -327,6 +322,12 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
   bool traps_saved = false;
 
   int  i_express, i_pixel, i_pixelp1;
+
+
+  double well_depth       = parameters->well_depth;
+  double well_notch_depth = parameters->well_notch_depth;
+  double well_fill_power  = parameters->well_fill_power;
+  double well_range       = well_depth - well_notch_depth;
 
 
   // p_express_multiplier is a column pointer of the express array

@@ -85,10 +85,6 @@ protected:
   std::image_slice                     is;
 
   // CTE local parameters
-  double                               well_depth;
-  double                               well_notch_depth;
-  double                               well_fill_power;
-  double                               well_range;
   int                                  express;
   int                                  readout_offset;
   double                               traps_total;
