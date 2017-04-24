@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-22
+   changed by: Oliver Cordes 2017-04-24
 
 
    $Id$
@@ -123,11 +123,6 @@ void cte_image::setup( long w, long h )
   express_multiplier = std::valarray<int> ( 0, parameters->express *  (height+1 ) );
   create_express_multiplier( express_multiplier,  height );
 
-  // create the exponentia factors
-  create_exponential_factor();
-
-
-
 
   // image slicer definitions
   is = std::image_slice( image_width,
@@ -135,7 +130,6 @@ void cte_image::setup( long w, long h )
                          0,
                          parameters->rotate,
                          parameters->direction );
-
 }
 
 
@@ -517,8 +511,11 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
 
-  // initialize variables
+    // create the exponentia factors
+  create_exponential_factor();
 
+
+  // initialize variables
   traps_total      = parameters->trap_density.sum();
 
   start_x          = parameters->start_x;
