@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-10
+   changed by: Oliver Cordes 2017-04-22
 
 
    $Id$
@@ -99,22 +99,6 @@ cte_image::cte_image( void )
 
 void cte_image::setup( long w, long h )
 {
-  // initialize variables
-
-  express          = parameters->express;
-  readout_offset   = parameters->readout_offset;
-
-  traps_total      = parameters->trap_density.sum();
-
-  start_x          = parameters->start_x;
-  end_x            = parameters->end_x;
-  start_y          = parameters->start_y;
-  end_y            = parameters->end_y;
-
-
-
-
-
   // sets the image parameters according to the rotation paramater
 
   image_width = w;
@@ -136,7 +120,7 @@ void cte_image::setup( long w, long h )
   // general setups and inits
 
   // new code with variable express
-  express_multiplier = std::valarray<int> ( 0, express *  (height+1 ) );
+  express_multiplier = std::valarray<int> ( 0, parameters->express *  (height+1 ) );
   create_express_multiplier( express_multiplier,  height );
 
   // create the exponentia factors
@@ -205,14 +189,14 @@ void cte_image::create_express_multiplier( std::valarray<int> & emp,
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
   {
     int i_sum = 0;
-    for (int i_express=0;i_express<express;i_express++)
+    for (int i_express=0;i_express<parameters->express;i_express++)
     {
       int pos;
       int d;
       int d2;
 
-      d = ( i_pixel + 1 + readout_offset);
-      d2= ((h+1+readout_offset)*(i_express+1))/express;
+      d = ( i_pixel + 1 + parameters->readout_offset);
+      d2= ((h+1+parameters->readout_offset)*(i_express+1))/parameters->express;
       if ( d > d2 )
         d = d2;
 
@@ -250,7 +234,6 @@ void cte_image::create_exponential_factor( void )
 void cte_image::clock_charge_setup( void )
 {
   // nothing to do in the base class
-  output( 10, "Hallo Berta\n" );
 }
 
 
@@ -333,7 +316,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
   // p_express_multiplier is a column pointer of the express array
   int p_express_multiplier = 0;
 
-  for (i_express=0;i_express<express;++i_express)
+  for (i_express=0;i_express<parameters->express;++i_express)
     {
       // traps are empty
       clock_charge_clear();
@@ -540,6 +523,15 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
+
+  // initialize variables
+
+  traps_total      = parameters->trap_density.sum();
+
+  start_x          = parameters->start_x;
+  end_x            = parameters->end_x;
+  start_y          = parameters->start_y;
+  end_y            = parameters->end_y;
 
 
   // initialize the time measurement

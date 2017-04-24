@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-10
+   changed by: Oliver Cordes 2017-04-24
 
    $Id$
 
@@ -85,8 +85,6 @@ protected:
   std::image_slice                     is;
 
   // CTE local parameters
-  int                                  express;
-  int                                  readout_offset;
   double                               traps_total;
   std::valarray<int>                   express_multiplier;
   std::valarray<double>                exponential_factor;
