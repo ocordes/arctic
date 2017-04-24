@@ -127,9 +127,6 @@ void cte_image::setup( long w, long h )
   create_exponential_factor();
 
 
-  // run the algorithm specific setups
-  clock_charge_setup();
-
 
 
   // image slicer definitions
@@ -504,10 +501,6 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
   double  cpu_diff_time;
 
 
-  output( 10, "start_x=%i end_x=%i\n", start_x, end_x );
-  output( 10, "start_y=%i end_y=%i\n", start_y, end_y );
-
-
   // print model information
 
   output( 1, "Model has %i trap species:\n", parameters->n_species );
@@ -532,6 +525,19 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   end_x            = parameters->end_x;
   start_y          = parameters->start_y;
   end_y            = parameters->end_y;
+
+  // check and liit the range variable
+  minmax_limit_long( start_x, 0, width );
+  minmax_limit_long( end_x, 0, width );
+  minmax_limit_long( start_y, 0, height );
+  minmax_limit_long( end_y, 0, height );
+
+  output( 10, "start_x=%i end_x=%i\n", start_x, end_x );
+  output( 10, "start_y=%i end_y=%i\n", start_y, end_y );
+
+
+  // run the algorithm specific setups
+  clock_charge_setup();
 
 
   // initialize the time measurement
@@ -602,13 +608,6 @@ void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im )
   std::valarray<double> image( (*im) );
 
   std::valarray<double> trail( 0.0, image.size() );
-
-
-  // check and liit the range variable
-  minmax_limit_long( start_x, 0, width );
-  minmax_limit_long( end_x, 0, width );
-  minmax_limit_long( start_y, 0, height );
-  minmax_limit_long( end_y, 0, height );
 
 
   if ( parameters->unclock )
