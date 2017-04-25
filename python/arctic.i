@@ -1,7 +1,7 @@
 %module arctic
 
 // written by: Oliver Cordes 2017-03-23
-// changed by: Oliver Cordes 2017-04-24
+// changed by: Oliver Cordes 2017-04-25
 
 %{
 #define SWIG_FILE_WITH_INIT
@@ -29,9 +29,13 @@ import_array();
 %}
 
 
-%rename (clock_charge) clock_charge2;
+%rename (clock_charge) clock_chargeX;
 
 // cte_image class
+
+%apply ( int DIM1, int DIM2, double* INPLACE_ARRAY2 ) { ( size_t dim1_in, size_t dim2_in, double *vec_in ) }
+%apply ( int DIM1, int DIM2, double* INPLACE_ARRAY2 ) { ( size_t dim1_in, size_t dim2_in, double *vec_in ),
+                                                        ( size_t dim1_out, size_t dim2_out, double *vec_out )}
 
 class cte_image {
 public:
@@ -44,39 +48,39 @@ public:
   void   clock_charge( std::shared_ptr<std::valarray<double> > );
 };
 
-%apply (int DIM1, int DIM2, double* INPLACE_ARRAY2 ) {( size_t dim1, size_t dim2, double *vec )}
 %extend cte_image {
-  void clock_charge2( size_t dim1_inplace, size_t dim2_inplace, double *vec_inplace )
+  void clock_chargeX( size_t dim1_in, size_t dim2_in, double *vec_in )
   {
-    std::cout << "Requested size is " << dim1_inplace << "x" << dim2_inplace << std::endl;
+    std::cout << "Requested size is " << dim1_in << "x" << dim2_in << std::endl;
 
-    std::shared_ptr<std::valarray<double>> v = std::shared_ptr<std::valarray<double>>( new std::valarray<double>(vec_inplace, dim1_inplace*dim2_inplace ) );
+    std::shared_ptr<std::valarray<double>> v = std::shared_ptr<std::valarray<double>>( new std::valarray<double>(vec_in, dim1_in*dim2_in) );
 
     $self->cte_image::clock_charge( v );
 
-    memcpy( vec_inplace, &((*v)[0]), sizeof( double ) * v->size() );
+    memcpy( vec_in, &((*v)[0]), sizeof( double ) * v->size() );
   }
-}
 
-%clear ( size_t dim1, size_t dim2, double *vec );
 
-%apply (int DIM1, int DIM2, double* INPLACE_ARRAY2 ) {(size_t dim1_in, size_t dim2_int, double *vec_in),
-                                                      (size_t dim1_out, size_t dim2_out, double *vec_out)}
-
-%extend cte_image {
-  void clock_charge3( size_t dim1_in, size_t dim2_in, double *vec_in,
+  void clock_charge2( size_t dim1_in, size_t dim2_in, double *vec_in,
                       size_t dim1_out, size_t dim2_out, double *vec_out )
-
   {
-    std::shared_ptr<std::valarray<double >> v = std::shared_ptr<std::valarray<double>>( new std::valarray<double>(vec_in, dim1_in*dim2_in ) );
+    size_t size;
+
+    size = dim1_in * dim2_in;
+
+    std::shared_ptr<std::valarray<double >> v = std::shared_ptr<std::valarray<double>>( new std::valarray<double>(vec_in, size ) );
 
     $self->cte_image::clock_charge( v );
 
-    memcpy( vec_out, &((*v)[0]), sizeof( double ) * v->size() );
+    size = dim1_out * dim2_out;
+    if ( size > v->size() )
+      size = v->size();
+    memcpy( vec_out, &((*v)[0]), sizeof( double ) * size );
   }
 }
 
-%ignore clock_charge2;
+
+%ignore clock_chargeX;
 
 class cte_image_neo : public cte_image {
   public:
@@ -84,6 +88,9 @@ class cte_image_neo : public cte_image {
     cte_image_neo( std::shared_ptr<params> );
 
 };
+
+%apply (int DIM1, double* IN_ARRAY1) {(size_t dim1, double* vec1), (size_t dim2, double* vec2 )}
+%apply (int DIM1, double* ARGOUT_ARRAY1 ) { ( size_t dim1, double *vec )}
 
 class params {
 public:
@@ -132,8 +139,7 @@ public:
     void set_args(  int *argc, char **argv[] );
   };
 
-%apply (int DIM1, double* IN_ARRAY1) {(size_t dim1, double* vec1), (size_t dim2, double* vec2 )}
-%apply (int DIM1, double* ARGOUT_ARRAY1 ) { ( size_t dim1, double *vec )}
+
 %extend params {
     void set_traps( size_t dim1, double *vec1, size_t dim2, double *vec2 )
     {
@@ -166,9 +172,6 @@ public:
    }
 
 }
-
-%clear (size_t dim1, double* vec1), (size_t dim2, double* vec2);
-%clear (size_t dim1, double *vec);
 
 class params_fits : public params {
   public:
@@ -212,5 +215,3 @@ void my_test_function(size_t len_, int* vec_) {
     memcpy( vec_, &v[0], sizeof( int ) * v.size() );
 }
 %}
-
-void my_test_function(size_t len_, int* vec_);

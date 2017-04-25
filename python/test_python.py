@@ -34,9 +34,10 @@ c.setup( data.shape[0], data.shape[1] )
 
 adata = data.astype( np.float64 )
 
-c.clock_charge( adata )
+bdata = adata.copy()
+c.clock_charge2( adata, bdata )
 
 
-hdu = fits.PrimaryHDU( adata , header )
+hdu = fits.PrimaryHDU( bdata , header )
 fname = 'testA.fits'
 hdu.writeto( fname, clobber=True)

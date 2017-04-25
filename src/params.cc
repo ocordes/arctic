@@ -114,53 +114,57 @@ void params::load_config( std::string filename )
 
   std::CString  s;
 
-  f.open( filename );
+  //f.exceptions ( std::ifstream::failbit | std::ifstream::badbit );
+  f.exceptions ( std::ifstream::failbit );
+  try {
+    f.open( filename );
 
-  if ( f.is_open() )
+    while (!f.eof())
     {
-      while ( getline(f, s) )
-	      {
-          int error;
+      getline(f, s);
 
-	        // ignore empty lines and comments
-	        if ( ( s == "" ) || ( s[0] == '#' ) ) {
-	           continue;
-	        }
+      int error;
 
-	        // clean spaces
-	        s = s.clean_white();
+	    // ignore empty lines and comments
+	    if ( ( s == "" ) || ( s[0] == '#' ) )
+	      continue;
 
-          // add line into condfig_entry array for saving information in FITS header
-          config_entries.push_back( s );
 
-	        //std::cout << s << std::endl;
+	    // clean spaces
+	    s = s.clean_white();
 
-	        std::CString key = s.strtok( true, "=#" );
-	        std::CString val = s.strtok( false, "=#" );
+      // add line into condfig_entry array for saving information in FITS header
+      config_entries.push_back( s );
 
-	        // convert key into upper cases
-	        key = key.toupper();
+	    //std::cout << s << std::endl;
 
-	        //std::cout << "key=" << key << " val=" << val << std::endl;
+	    std::CString key = s.strtok( true, "=#" );
+	    std::CString val = s.strtok( false, "=#" );
 
-          error = PARSE_ERROR;
-	        parse_args( key, val, error );
-          switch (error) {
-            case PARSE_OK:
-              break;
-            case PARSE_UNKNOWN:
-              std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
-              break;
-            case PARSE_ERROR:
-              std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
-              break;
-          }
-        }
-	  f.close();
+	    // convert key into upper cases
+	    key = key.toupper();
+
+	    // std::cout << "key=" << key << " val=" << val << std::endl;
+
+      error = PARSE_ERROR;
+	    parse_args( key, val, error );
+      switch (error)
+      {
+        case PARSE_OK:
+          break;
+        case PARSE_UNKNOWN:
+          std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
+          break;
+        case PARSE_ERROR:
+          std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
+          break;
+      }
     }
-  else
-    std::cout << "Can't open config file '" << filename << "'! Config file will be ignored!" << std::endl;
-
+    f.close();
+  }
+  catch (const std::ifstream::failure& e) {
+    std::cout << "Error '" << e.what() << "' during opening/reading config file '" << filename << "'! Config file will be ignored!" << std::endl;
+  }
 
   output( 1, "Done.\n" );
 }
