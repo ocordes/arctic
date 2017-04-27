@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-24
+   changed by: Oliver Cordes 2017-04-27
 
 
    $Id$
@@ -240,7 +240,7 @@ double cte_image::clock_charge_pixel_release( void )
 }
 
 
-double cte_image::clock_charge_pixel_total_capture( double,  int )
+double cte_image::clock_charge_pixel_total_capture( double,  double  )
 {
   return 0.0;
 }
@@ -295,19 +295,21 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
   int last_express_factor_pixel;
   bool traps_saved = false;
 
-  int  i_express, i_pixel, i_pixelp1;
+  int  i_express, i_pixel;
+  double  i_pixelp1;
 
 
   double well_depth       = parameters->well_depth;
   double well_notch_depth = parameters->well_notch_depth;
   double well_fill_power  = parameters->well_fill_power;
   double well_range       = well_depth - well_notch_depth;
+  int    express          = parameters->express;
 
 
   // p_express_multiplier is a column pointer of the express array
   int p_express_multiplier = 0;
 
-  for (i_express=0;i_express<parameters->express;++i_express)
+  for (i_express=0;i_express<express;++i_express)
     {
       // traps are empty
       clock_charge_clear();
@@ -516,6 +518,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
 
   // initialize variables
+  n_species        = parameters->n_species;
   traps_total      = parameters->trap_density.sum();
 
   start_x          = parameters->start_x;

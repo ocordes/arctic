@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-24
+   changed by: Oliver Cordes 2017-04-27
 
    $Id$
 
@@ -55,7 +55,7 @@ public:
   virtual void clock_charge_save_traps( void );
   virtual void clock_charge_restore_traps( void );
   virtual double clock_charge_pixel_release( void );
-  virtual double clock_charge_pixel_total_capture( double, int );
+  virtual double clock_charge_pixel_total_capture( double, double );
   virtual void clock_charge_pixel_capture_ov( double );
   virtual void clock_charge_pixel_capture_full( void );
   virtual void   clock_charge_pixel_cleanup( void );
@@ -85,6 +85,7 @@ protected:
   std::image_slice                     is;
 
   // CTE local parameters
+  int                                  n_species;
   double                               traps_total;
   std::valarray<int>                   express_multiplier;
   std::valarray<double>                exponential_factor;

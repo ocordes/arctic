@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-03-26
+   changed by: Oliver Cordes 2017-04-27
 
    $Id$
 
@@ -53,6 +53,7 @@ params_fits::params_fits() : params()
 
 void params_fits::parse_args_image( std::string & key, std::string & val, int & error )
 {
+  // output( 1, "key = %s, val = %s\n", key.c_str(), val.c_str() );
   if ( key == "XRANGE" )
   {
     str2minmax_long( val, start_x, end_x );
