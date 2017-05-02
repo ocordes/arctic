@@ -22,7 +22,7 @@
 /* cte_image_watermark.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-07
+   changed by: Oliver Cordes 2017-04-27
 
    $Id$
 
@@ -50,13 +50,13 @@ public:
   virtual void   clock_charge_save_traps( void );
   virtual void   clock_charge_restore_traps( void );
   virtual double clock_charge_pixel_release( void );
-  virtual double clock_charge_pixel_total_capture( double, int );
+  virtual double clock_charge_pixel_total_capture( double, double );
   virtual void   clock_charge_pixel_capture_ov( double );
   virtual void   clock_charge_pixel_capture_full( void );
   virtual void   clock_charge_pixel_cleanup( void );
   virtual double clock_charge_trap_info( void );
 private:
-  void   print_wml( void ); 
+  void   print_wml( void );
 protected:
   // extern declarated variables
   bool                                 check_empty_traps;

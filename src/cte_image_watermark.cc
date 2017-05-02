@@ -22,7 +22,7 @@ w
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-10
+   changed by: Oliver Cordes 2017-04-27
 
 
    $Id$
@@ -221,7 +221,7 @@ double cte_image_watermark::clock_charge_pixel_release( void )
 }
 
 
-double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, int i_pixelp1 )
+double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, double i_pixelp1 )
 {
   double total_capture = 0.0;
 
@@ -229,7 +229,7 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   double h, h2;
 
   // express correction using i_pixel instead of express_factor_pixel
-  trap_density_express = trap_density * (double) i_pixelp1;
+  trap_density_express = trap_density * i_pixelp1;
   trap_density_express_total = trap_density_total * i_pixelp1;
 
   cloud_height = el_height;

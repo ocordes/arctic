@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-25
+   changed by: Oliver Cordes 2017-04-27
 
    $Id$
 

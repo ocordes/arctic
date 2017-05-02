@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-10
+   changed by: Oliver Cordes 2017-04-27
 
 
    $Id$
@@ -75,11 +75,6 @@ cte_image_neo::cte_image_neo( void )
 cte_image_neo::cte_image_neo( std::shared_ptr<params> p )
                             : cte_image( p  )
 {
-  check_empty_traps = parameters->check_empty_traps;
-  empty_trap_limit = parameters->empty_trap_limit;
-  empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
-
-  dark_mode        = parameters->dark_mode;
 }
 
 
@@ -144,6 +139,12 @@ void cte_image_neo::clock_charge_setup( void  )
 
 
   // setup variables
+
+  check_empty_traps = parameters->check_empty_traps;
+  empty_trap_limit = parameters->empty_trap_limit;
+  empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
+
+  dark_mode        = parameters->dark_mode;
 
   n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) parameters->n_levels );
   n_electrons_per_trap_total = traps_total / parameters->n_levels;
@@ -240,14 +241,12 @@ double cte_image_neo::clock_charge_pixel_release( void )
 }
 
 // prepare the electron caputer by calculating the total_capture
-double cte_image_neo::clock_charge_pixel_total_capture( double el_height, int i_pixelp1 )
+double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double i_pixelp1 )
 {
    double total_capture = 0.0;
    double c;
 
    int    i, j, h, h2;
-
-   int    n_species = parameters->n_species;
 
    // prepare the work
 
@@ -256,7 +255,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, int i_
    //n_electrons_per_trap_express_total = n_electrons_per_trap_total * express_factor_pixel;
 
    // express correction using i_pixel instead of express_factor_pixel
-   n_electrons_per_trap_express = n_electrons_per_trap * (double) i_pixelp1;
+   n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
    n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
    // calculate the height in ( affected levels )
@@ -341,7 +340,7 @@ void cte_image_neo::clock_charge_pixel_capture_ov_modify( int j, double d )
 {
   int i;
 
-  for (i=0;i<parameters->n_species;++i)
+  for (i=0;i<n_species;++i)
   {
     if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
       new_trapl[new_nr_trapl][i] = trapl[j][i]
@@ -461,6 +460,7 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
     }
 
     trapl_fill[j] -= ceil( dheight );
+
     if ( trapl_fill[j] == 0 ) --j;      // fix BUG which was also in the 1st implementation
 
     dheight = 0.0;
@@ -497,7 +497,6 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
 {
   int          j, h, skip;
 
-  int    n_species  = parameters->n_species;
 
   // cheight full levels
   // cheight+1 partly filled levels
@@ -632,44 +631,44 @@ void cte_image_neo::clock_charge_pixel_cleanup( void )
 {
   int i, j;
 
-        // cleanup the array
-        // - removing/merge duplicated levels ...
-        // maybe it is better to stop the scanning after the first valid level?
-        if ( dark_mode  == 1 )
-          {
-             j = 0;
-             for (i=1;i<nr_trapl;++i)
-               {
-                  #ifdef __debug
-                  output( 10, "i,j: %i %i\n", i, j );
-                  output( 10, "trapl[i,j] : %f %f\n", trapl[i].sum(), trapl[j].sum() );
-                  output( 10, "diff       : %f\n", std::abs(  trapl[i].sum() - trapl[j].sum() ) );
-                  #endif
+  // cleanup the array
+  // - removing/merge duplicated levels ...
+  // maybe it is better to stop the scanning after the first valid level?
+  if ( dark_mode  == 1 )
+  {
+    j = 0;
+    for (i=1;i<nr_trapl;++i)
+    {
+      #ifdef __debug
+      output( 10, "i,j: %i %i\n", i, j );
+      output( 10, "trapl[i,j] : %f %f\n", trapl[i].sum(), trapl[j].sum() );
+      output( 10, "diff       : %f\n", std::abs(  trapl[i].sum() - trapl[j].sum() ) );
+      #endif
 
-                  if ( std::abs( trapl[i].sum() - trapl[j].sum() ) < empty_trap_limit  )
-                    {
-                       int cc = trapl_fill[j] + trapl_fill[i];
-                       trapl[j] *= trapl_fill[j];
-                       trapl[j] += trapl[i] * (double) trapl_fill[i];
-                       trapl[j] /= cc;
-                       trapl_fill[j] += trapl_fill[i];
-                    }
-                  else
-                    {
-                       ++j;
-                       if ( i != j )
-                         {
-                            trapl[j] = trapl[i];
-                            trapl_fill[j] = trapl_fill[i];
-                         }
-                    }
-               }
-             nr_trapl = j + 1;
-         }
+      if ( std::abs( trapl[i].sum() - trapl[j].sum() ) < empty_trap_limit  )
+      {
+        int cc = trapl_fill[j] + trapl_fill[i];
+        trapl[j] *= trapl_fill[j];
+        trapl[j] += trapl[i] * (double) trapl_fill[i];
+        trapl[j] /= cc;
+        trapl_fill[j] += trapl_fill[i];
+      }
+      else
+      {
+        ++j;
+        if ( i != j )
+        {
+          trapl[j] = trapl[i];
+          trapl_fill[j] = trapl_fill[i];
+        }
+      }
+    }
+    nr_trapl = j + 1;
+  }
 
-        #ifdef __debug
-        print_trapl();
-        #endif
+  #ifdef __debug
+  print_trapl();
+  #endif
 }
 
 

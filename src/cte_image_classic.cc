@@ -22,7 +22,7 @@ w
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-10
+   changed by: Oliver Cordes 2017-04-27
 
 
    $Id$
@@ -206,7 +206,7 @@ double cte_image_classic::clock_charge_pixel_release( void )
 }
 
 // prepare the electron caputre by calculating the total_capture
-double cte_image_classic::clock_charge_pixel_total_capture( double el_height, int i_pixelp1 )
+double cte_image_classic::clock_charge_pixel_total_capture( double el_height, double i_pixelp1 )
 {
   double trap_sum, total_capture;
   double  c;
@@ -220,7 +220,7 @@ double cte_image_classic::clock_charge_pixel_total_capture( double el_height, in
   // prepare the work
 
   // express correction using i_pixel instead of express_factor_pixel
-   n_electrons_per_trap_express = n_electrons_per_trap * (double) i_pixelp1;
+   n_electrons_per_trap_express = n_electrons_per_trap * i_pixelp1;
    n_electrons_per_trap_express_total = n_electrons_per_trap_total * i_pixelp1;
 
    // calculate the height in ( affected levels )
