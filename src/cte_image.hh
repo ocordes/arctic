@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-03
 
    $Id$
 
@@ -72,8 +72,7 @@ public:
   double get_sum_double_array( double *array, int width, int height );
 
 
-  void   create_express_multiplier( std::valarray<int> & express_multiplier,
-                                    int h );
+  void   create_express_multiplier( std::valarray<int> & express_multiplier );
   void   create_exponential_factor( void );
 
 protected:

@@ -145,6 +145,13 @@ void params_fits::parse_args_algorithm_basics( std::string & key, std::string & 
     error = PARSE_OK;
   }
 
+  if ( key == "INJECTION" )
+  {
+    charge_injection = true;
+    output( 10, "params: charge_injection=%i\n", charge_injection );
+    error = PARSE_OK;
+  }
+
   if ( key == "CLOCK" )
   {
     unclock = false;

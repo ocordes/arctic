@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-03
 
 
    $Id$
@@ -121,7 +121,7 @@ void cte_image::setup( long w, long h )
 
   // new code with variable express
   express_multiplier = std::valarray<int> ( 0, parameters->express *  (height+1 ) );
-  create_express_multiplier( express_multiplier,  height );
+  create_express_multiplier( express_multiplier );
 
 
   // image slicer definitions
@@ -173,10 +173,12 @@ void cte_image::limit_to_max( std::valarray<double> & v, double limit )
 }
 
 
-void cte_image::create_express_multiplier( std::valarray<int> & emp,
-                                           int h )
+void cte_image::create_express_multiplier( std::valarray<int> & emp )
 {
+  int ix;
+
   output( 10, "Create express_multiplier...\n" );
+  output( 1, "h=%i w=%i\n", height, width );
   for (int i_pixel=0;i_pixel<height+1;++i_pixel)
   {
     int i_sum = 0;
@@ -186,8 +188,12 @@ void cte_image::create_express_multiplier( std::valarray<int> & emp,
       int d;
       int d2;
 
-      d = ( i_pixel + 1 + parameters->readout_offset);
-      d2= ((h+1+parameters->readout_offset)*(i_express+1))/parameters->express;
+      if ( parameters->charge_injection )
+        ix = height - 1;
+      else
+        ix = i_pixel;
+      d = ( ix + 1 + parameters->readout_offset);
+      d2= ((height+1+parameters->readout_offset)*(i_express+1))/parameters->express;
       if ( d > d2 )
         d = d2;
 
@@ -201,7 +207,9 @@ void cte_image::create_express_multiplier( std::valarray<int> & emp,
     #ifdef __debug
     for (int i=0; i<height;i++)
     {
-      for (int j=0;j<express;++j)
+      std::cout << i << " : ";
+
+      for (int j=0;j<parameters->express;++j)
          std::cout << emp[j*(height+1)+i] << " ";
       std::cout << std::endl;
     }

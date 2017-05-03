@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-03
 
    $Id$
 
@@ -63,6 +63,7 @@ params::params()
   check_empty_traps     = true;
   empty_trap_limit      = 1e-11;
   empty_trap_limit_neo2 = 1e-6;
+  charge_injection      = false;
   n_iterations          = 1;
   express               = 1;
   n_levels              = 10000;

@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-25
+   changed by: Oliver Cordes 2017-05-03
 
    $Id$
 
@@ -78,6 +78,7 @@ public:
   double                   empty_trap_limit;
   double                   empty_trap_limit_neo2;
   bool                     check_empty_traps;
+  bool                     charge_injection;
   unsigned int             n_iterations;
   int                      express;
   int                      n_levels;
