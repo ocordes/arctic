@@ -164,7 +164,8 @@ void params::load_config( std::string filename )
     f.close();
   }
   catch (const std::ifstream::failure& e) {
-    std::cout << "Error '" << e.what() << "' during opening/reading config file '" << filename << "'! Config file will be ignored!" << std::endl;
+    std::cout << "Error '" << e.what() << "' during opening/reading config file '"
+              << filename << "'! Config file will be ignored!" << std::endl;
   }
 
   output( 1, "Done.\n" );

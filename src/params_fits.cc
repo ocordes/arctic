@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-03
 
    $Id$
 
@@ -166,13 +166,6 @@ void params_fits::parse_args_algorithm_basics( std::string & key, std::string & 
     error = PARSE_OK;
   }
 
-  if ( key == "DARK_MODE" )
-  {
-    dark_mode = tobool( val, true );
-    output( 10, "params: dark_mode=%i\n", dark_mode );
-    error = PARSE_OK;
-  }
-
   if ( key == "CUT_UPPER_LIMIT" )
   {
     cut_upper_limit = tobool( val, true );
@@ -185,13 +178,6 @@ void params_fits::parse_args_algorithm_basics( std::string & key, std::string & 
     upper_limit = atof( val.c_str() );
     cut_upper_limit = true;
     output( 10, "params: upper_limit=%f\n", upper_limit );
-    error = PARSE_OK;
-  }
-
-  if ( key == "NEO2_SPLIT_LIMIT" )
-  {
-    neo2_split_limit = atof( val.c_str() );
-    output( 10, "params: neo2_split_limit=%f\n", neo2_split_limit );
     error = PARSE_OK;
   }
 }
@@ -240,6 +226,20 @@ void  params_fits::parse_args_algorithm( std::string & key, std::string & val, i
 
     error = PARSE_OK;
     return;
+  }
+
+  if ( key == "DARK_MODE" )
+  {
+    dark_mode = tobool( val, true );
+    output( 10, "params: dark_mode=%i\n", dark_mode );
+    error = PARSE_OK;
+  }
+
+  if ( key == "NEO2_SPLIT_LIMIT" )
+  {
+    neo2_split_limit = atof( val.c_str() );
+    output( 10, "params: neo2_split_limit=%f\n", neo2_split_limit );
+    error = PARSE_OK;
   }
 }
 
