@@ -34,7 +34,8 @@ function runVera++
   rm -f $sonar_cxx_vera_reportFile
   export VERA_ROOT=/usr/local/lib/vera++
 
-  find src -regex ".*\.cc\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
+  #find src -regex ".*\.cc\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
+  find src  -type f | vera++ -s -c $sonar_cxx_vera_reportFile
 } # runVera++
 
 
@@ -45,6 +46,6 @@ function runRats
 
 # main
 
-#runCppcheck
+runCppcheck
 runVera++
-#runRats
+runRats
