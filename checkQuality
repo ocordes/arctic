@@ -1,16 +1,16 @@
-#!/bin/bash
+#!/usr/local/bin/bash
 #########################################################################################
 # Linux Shell script for running SonarQube analyzer, Jan. 2016
 # Steps:
 #  1. set common values  (C++ and python)
 #  2. run tools for C++ code analysis
 #  3. run tools for python code analysis
-#  4. write the sonar-project.properties file and run sonar-runner 
+#  4. write the sonar-project.properties file and run sonar-runner
 #
-# SVN repository location : $URL: http://euclid.esac.esa.int/svn/EC/SGS/ST/4-2-09-TOOLS/CODEEN/CWGs/Quality/QualCheck/tags/1.4.1/checkQuality.sh $:  
-# Revision of last commit : $Rev: 15428 $:  
-# Author of last commit   : $Author: dbagot $:  
-# Date of last commit     : $Date: 2016-10-03 15:50:12 +0200 (Mon, 03 Oct 2016) $:  
+# SVN repository location : $URL: http://euclid.esac.esa.int/svn/EC/SGS/ST/4-2-09-TOOLS/CODEEN/CWGs/Quality/QualCheck/tags/1.4.1/checkQuality.sh $:
+# Revision of last commit : $Rev: 15428 $:
+# Author of last commit   : $Author: dbagot $:
+# Date of last commit     : $Date: 2016-10-03 15:50:12 +0200 (Mon, 03 Oct 2016) $:
 #########################################################################################
 
 
@@ -54,7 +54,7 @@ sonar="yes"                              # activate sonar by default (with defau
 # ----------------------------------------------------------------------------------------
 
 # Sonar http local adress
-sonarQubeURL_LODEEN="http://localhost:9000/sonar" 
+sonarQubeURL_LODEEN="http://localhost:9000/sonar"
 sonarQubeURL_CODEEN="https://apceuclidapp.in2p3.fr/sonar"
 # default= LODEEN (SonarQube filled in getSonarQubeInfos
 declare -g -A SonarQube
@@ -104,17 +104,17 @@ sonar_python_xunit_reportFile=""
 
 
 # keys: tools as gcc,..Values=version of the tool. Filled in get_toolVersion
-declare -g -A toolVersion 
+declare -g -A toolVersion
 # keys: info of the project: name,... Filled in get_project
 declare -g -A project
 # keys: elements lib ("USE" in CMaleLists.txt). Values=lib version. Filled in get_project
 declare -g -A projectCodePaths
 # keys: name src include python tests_python  Filled in get_projectCodePaths
 declare -g -A projectUSE
-# list of elements include/import paths.Keys: "c++" and "python". Filled in get_elementsLib 
+# list of elements include/import paths.Keys: "c++" and "python". Filled in get_elementsLib
 declare -g -A elementsLib
 # list of system include/import paths.Keys: "c++" and "python". Filled in get_systemLib
-declare -g -A systemLib 
+declare -g -A systemLib
 # list of all necessary tools and var to execute complete analysis
 declare -g -A requiredEnv
 # list of all the binary C++ and python founded (keys : o2g and cov)
@@ -127,7 +127,7 @@ declare -g -A pythonTestName
 declare -g -A pythonTestPath
 declare -g -A pythonTestArgs
 declare -g -A pythonTestType
-      
+
 # list of all the executables added in options C++ and python founded (key : incremental integer)
 declare -g -A cppUserTestsWithOptions
 declare -g -A pyUserTestsWithOptions
@@ -148,23 +148,23 @@ declare -g -A projectQualityGatebyKey
 
 #########################################################
 # display usage
-# In Globals: scriptName languages staticTools 
+# In Globals: scriptName languages staticTools
 #             dynamicTools sonar $targetMake logLevel
 #########################################################
 function usage
 {
 echo "
-$scriptName	
+$scriptName
 		[-l|--log-level=<none|info|debug>]
 		[-L|--languages=<languages>]
  		[-s|--static-tools=<tools>]
  		[-d|--dynamic-tools=<tools>]
- 		[-sonar=<no>|<yes>|<quality gate>] 
+ 		[-sonar=<no>|<yes>|<quality gate>]
 		[-m|--make=<none|configure|all|clean|purge|test|install>]
 		[-bincpp|--binary-cpp=<C++ executable with options>]
 		[-binpy|--binary-py=<Python program with options>]
 		[-p|--projects [codeen]
-		[-r|--report=[project key] [diff] [codeen] 
+		[-r|--report=[project key] [diff] [codeen]
 		[-e|--envt]
 		[-u] [-h]
 		[-v] --version
@@ -173,12 +173,12 @@ $scriptName
 
 default mode:
 $scriptName --languages \"$languages\" --static-tools \"$staticTools\" --dynamic-tools \"$dynamicTools\" -sonar $sonar
-         --make $targetMake --log-level $logLevel" 
+         --make $targetMake --log-level $logLevel"
 } # usage
 
 ##############################################################
 # display help
-# In Globals: scriptName SonarQube languages staticTools 
+# In Globals: scriptName SonarQube languages staticTools
 #             dynamicTools sonar $targetMake logLevel
 ##############################################################
 function help
@@ -194,9 +194,9 @@ SYNOPSIS
    $scriptName is a command-line tool that tries to detect bugs that your C/C++ compiler or Python interpreter doesn't see.
 
    It launches several quality rools (such as cppcheck or pylint), gather their results into XML files and run finally the local sonar-runner executable
-    
+
    Results from this local analysis is displayed in your local web browser, on $sonarQubeURL_LODEEN
-   
+
 
 "
 
@@ -215,7 +215,7 @@ OPTIONS
 	[-s|--static-tools=<names of quality tools>]
 		select tools to be launched for the static analysis. Default list is \"$staticTools\"
 		static analysis: means that the selected source code will be analyzed without any expected generation aor execution
-		Note for gcc: \"$scriptName\" reads the \"make\" output text file \"$sonar_gcc_reportFile\" under \"build.\$BINARY_TAG\"   
+		Note for gcc: \"$scriptName\" reads the \"make\" output text file \"$sonar_gcc_reportFile\" under \"build.\$BINARY_TAG\"
 		examples:
 		'> $scriptName --static-tools \"$staticTools\"' : static analysis only (no dynamic analysis) (\"$languages\")
 		'> $scriptName -s \"cppcheck vera++\"' : static  analysis for C++ code only with cppcheck and vera++ tools
@@ -225,16 +225,16 @@ OPTIONS
 		dynamic analysis: means that a generation (see -m|--make option) and unit tests execution are mandatory
 		the structural coverage of the source code by unit tests will be thereafter measured and a memory analysis (for C++ code) done
 		examples:
-		'> $scriptName --dynamic-tools \"$dynamicTools\"' : dynamic analysis only 
+		'> $scriptName --dynamic-tools \"$dynamicTools\"' : dynamic analysis only
 		'> $scriptName -d coverage' : dynamic  analysis with coverage.py only
 est
-	[-sonar=<yes>|<no>|<quality gate>] 
+	[-sonar=<yes>|<no>|<quality gate>]
 		yes: Results from this local analysis is displayed in your local web browser, on $sonarQubeURL_LODEEN
 		     Quality gate is set in the sonar server configuration
 		no: sonar is not launched
 		    quality gate: same as '-sonar yes'but specifying the quality gate (eg PROTOTYPE, DEVELOPMENT, PRODUCTION)
 		The list of the available quality gate on your local sonar is displayed in '${SonarQube[URL]}/quality_gates'
-	
+
 		examples:
 		'> $scriptName -sonar no' : deactivate the default option (so no sonar performance)
 		'> $scriptName -sonar PROTOTYPE' : run sonar with quality gate set to 'PROTOTYPE'
@@ -245,12 +245,12 @@ est
 		examples:
 		'> $scriptName --make all' : do a \"make all\" before running all the tools
 		'> $scriptName - m \"purge all\"' : clean the (generation) environment and do a generation
-		
+
 	[-bincpp|--binary-cpp=<C++ executable with options>]
 	[-binpy|--binary-python=<Python program with options>]
 	    run a executable (with options) in the PATH or generated under \"./build/\$BINARY_TAG\" relative folder (e.g. \"./build.$BINARY_TAG_o2g\")
 	    examples:
-		'> $scriptName -L \"python\" -binpy \"scripts/pyfirststep --workdir=/home/user --simvisproduct=Output.xml --skyposition=output.txt\"' 
+		'> $scriptName -L \"python\" -binpy \"scripts/pyfirststep --workdir=/home/user --simvisproduct=Output.xml --skyposition=output.txt\"'
 		'> $scriptName -L \"c++\" -s \"\" -d \"gcovr\" -bincpp \"py.test ./ThisModule/tests/python\"
 
 
@@ -280,7 +280,7 @@ est
 
 	[-u] [-h]
 		usage and (this) help
-		
+
 	[-v] --version
 	       version (SVN revision) of $scriptName
 
@@ -288,24 +288,24 @@ est
 	       examples:
                '> $scriptName GridContainer MathUtils'
                '> $scriptName GridContainer -s \"gcc cppcheck\" -sonar no'
- 
+
 
 COPYRIGHT
 
-    
-   Copyright (C) 2012-2020 Euclid Science Ground Segment    
-    
-   This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General  
-   Public License as published by the Free Software Foundation; either version 3.0 of the License, or (at your option)  
-   any later version.  
-    
-   This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied  
-   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more  
-   details.  
-    
-   You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to  
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA  
-       
+
+   Copyright (C) 2012-2020 Euclid Science Ground Segment
+
+   This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General
+   Public License as published by the Free Software Foundation; either version 3.0 of the License, or (at your option)
+   any later version.
+
+   This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+   details.
+
+   You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+
 "
 } # help
 
@@ -315,12 +315,12 @@ COPYRIGHT
 # In Globals: logLevel logboog
 # Arguments: message
 #######################################
-function info 
+function info
 {
 
   if [ "$logLevel" == "info" -o "$logLevel" == "debug" ] ; then
     #echo "[$scriptName] : $@"| tee -a $logbook
-    echo -e "\e[92m$@\e[0m" | tee -a $logbook 
+    echo -e "\e[92m$@\e[0m" | tee -a $logbook
     #echo "$@" | tee -a $logbook
   fi
 
@@ -330,7 +330,7 @@ function info
 # In Globals: logLevel logbook
 # Arguments: title + message
 #######################################
-function debug 
+function debug
 {
   local title=$1
   shift
@@ -346,11 +346,11 @@ function debug
 # In Globals: scriptName logLevel logbook
 # Arguments: title + message
 #######################################
-function error 
+function error
 {
   local title=$1
   shift
-  #echo "[ERROR $scriptName line $title]: $@" | tee -a $logbook 
+  #echo "[ERROR $scriptName line $title]: $@" | tee -a $logbook
   echo -e "\e[91m[ERROR $scriptName line $title]: $@\e[0m" | tee -a $logbook
   exit 1
 }
@@ -360,7 +360,7 @@ function error
 # In Globals: scriptName logLevel logbook
 # Arguments: title + message
 #######################################
-function warn 
+function warn
 {
     local title=$1
     shift
@@ -369,22 +369,22 @@ function warn
 }
 
 #######################################
-# display addscript lines 
+# display addscript lines
 # In Globals: runToolsScript
 # Arguments: addscript line
 #######################################
-function addscript 
+function addscript
 {
     #echo "[WARN $scriptName line $title]: $@" | tee -a $logbook
     echo -e "$@" >> $runToolsScript
 }
 
 #######################################
-# existsAndNotEmpty 
+# existsAndNotEmpty
 # Arguments: directory or file
 # return TRUE (0) if file/directory exists and is not empty else returns FALSE (1)
 #######################################
-function existsAndNotEmpty  
+function existsAndNotEmpty
 {
   local item=$1
   debug ${!F}_${!L} "----------------> BEGIN: existsAndNotEmpty $item"
@@ -421,7 +421,7 @@ function initLogbook
 
 
   if [[ "$withTmpOption" == "tmp" ]] ; then
-    # shell run with only "display" commands (no persistent logbook) 
+    # shell run with only "display" commands (no persistent logbook)
     reportsDir=$reportsDirTMP
     logbook=${reportsDir}/${scriptName}_report.txt
     mkdir ${reportsDir} 2>/dev/null
@@ -462,7 +462,7 @@ function initLogbook
 
 #######################################
 # select modules
-# In Globals: 
+# In Globals:
 # Arguments: list of modules or nothing
 #######################################
 function selectModules
@@ -481,21 +481,21 @@ function selectModules
   do
     debug ${!F}_${!L} "module=${module}."
     [[ "$module" == "." ]] && break
-    # supress / and ./ 
-    myModOK=$(echo $module | sed "s,\.\/,,g" | sed "s,\/,,g" ) 
+    # supress / and ./
+    myModOK=$(echo $module | sed "s,\.\/,,g" | sed "s,\/,,g" )
     [[ ! -d $myModOK ]] && error $LINENO "module \"$myModOK\" does not exist"
     myModules="$myModules $myModOK"
   done
 
   debug ${!F}_${!L} "Selection of modules = $myModules."
   if [[ "$myModules" ]] ; then
-    for key in modules src include tests_src python tests_python ; do 
+    for key in modules src include tests_src python tests_python ; do
 
       values=""
       for dir in ${projectCodePaths[$key]} ; do
         for module in $myModules ; do
           term=""
-          if [[ "$key" == "modules" ]] ; then 
+          if [[ "$key" == "modules" ]] ; then
             term=$(echo $dir | grep "^${module}$" )
           else
             term=$(echo $dir | grep  "^${module}\/")
@@ -524,7 +524,7 @@ function exitScript
 # display this script version
 # In Globals: scriptFullName
 ##################################################################
-function printVersion 
+function printVersion
 {
   version=$( grep "^# SVN repository location" $scriptFullName | egrep -o '(tags|branches)/[^/]+|trunk' | egrep -o '[^/]+$')
   revision=$( grep "^# Revision of last commit" $scriptFullName | awk '{print $8}')
@@ -537,7 +537,7 @@ function printVersion
 # In  Globals: sonarQubeURL projectKeybyId
 # Out Globals: sonarQube projectQualityGatebyKeyQG projectQualityGatebyKey
 ###################################################################################################
-function getSonarQubeQualityGates 
+function getSonarQubeQualityGates
 {
   debug ${!F}_${!L} "----------------> BEGIN: getSonarQubeQualityGates"
   local tmpFile="/tmp/getSonarQubeQualityGates$$.txt"
@@ -548,7 +548,7 @@ function getSonarQubeQualityGates
   runCurl "${SonarQube[URL]}/api/qualitygates/list" $tmpFile
   cat $tmpFile |  jq -jr '.qualitygates[] | "\(.id) \(.name)\n"' > $tmpFile2 2>/dev/null
   # output: "8 DEVELOPMENT\n9 PRODUCTION\n7 PROTOTYPE\n"
-  while read line  
+  while read line
   do
     QGid=$(echo $line | awk '{print $1}')
     QGname=$(echo $line | awk '{for (i=2; i<=NF; i++) printf $i " "; }')
@@ -571,7 +571,7 @@ function getSonarQubeQualityGates
       runCurl "${SonarQube[URL]}/api/qualitygates/search?gateId=$key&selected=all" $tmpFile
       cat $tmpFile | jq -r '.results[] | "\(.id) \(.selected) "' > $tmpFile2 2>/dev/null
       # "11529 false \n10920 true \n7118 false"
-      while read line  
+      while read line
       do
         selected=$(echo $line | awk '{print $2}')
         id=$(echo $line | awk '{print $1}')
@@ -592,7 +592,7 @@ function getSonarQubeQualityGates
 # In  Globals: SonarQube
 # Out Globals: projectNamebyId, projectKeybyId, projectKeysbyName, projectIdbyKey
 ###################################################################################################
-function getSonarQubeProjects 
+function getSonarQubeProjects
 {
   debug ${!F}_${!L} "----------------> BEGIN: getSonarQubeProjects"
   local tmpFile="/tmp/getSonarQubeProjects$$.txt"
@@ -603,8 +603,8 @@ function getSonarQubeProjects
 
   # output: "CT_DEVWS2-1.0 11610 CT_DEVWS2\nCT_Elements:2.2 5698 CT_Elements\n..."
 
-  while read line  
-  do  
+  while read line
+  do
       name=$(echo $line | awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}')
       key=$(echo $line | awk '{print $1}')
       id=$(echo $line | awk '{print $2}')
@@ -628,7 +628,7 @@ function getSonarQubeProjects
       debug ${!F}_${!L} "projectKeysbyName[$name]=${projectKeysbyName[$name]}."
   done
   debug ${!F}_${!L} "----------------> END: getSonarQubeProjects"
-  
+
 } #getSonarQubeProjects
 
 ###################################################################################################
@@ -637,7 +637,7 @@ function getSonarQubeProjects
 # Argument: url ($1) output from curl ($2)
 # example: runCurl "$URL/api/profiles/list?format=json" "/tmp/file.txt"
 ###################################################################################################
-function runCurl 
+function runCurl
 {
   local myUrl=$1
   local myOut=$2
@@ -667,12 +667,12 @@ function runCurl
 # Argument: projet key ($1) output filename ($2)
 # In  Globals: SonarQube,projectQualityGatebyKey toolVersion
 ###################################################################################################
-function saveReportProject 
+function saveReportProject
 {
   local projectKey=$1
   local outFile=$2
   debug ${!F}_${!L} "----------------> BEGIN: saveReportProject $projectKey $outFile"
-  
+
   local projectId=${projectIdbyKey[${projectKey}]}
   local projectName=${projectNamebyId[$projectId]}
   local lineSep="# $lineSep"
@@ -723,7 +723,7 @@ function saveReportProject
 
   echo $lineSep >> $outFile
   echo "# Tests" >> $outFile
-  runCurl "$URL/api/resources?resource=${projectKey}&metrics=coverage,line_coverage,branch_coverage,tests,test_execution_time,test_errors,test_failures,test_success_density" $tmpFile 
+  runCurl "$URL/api/resources?resource=${projectKey}&metrics=coverage,line_coverage,branch_coverage,tests,test_execution_time,test_errors,test_failures,test_success_density" $tmpFile
   cat $tmpFile |  jq -r '.[].msr[] | "\(.key) : \(.val)"' >> $outFile 2>/dev/null
 
    echo $lineSep >> $outFile
@@ -747,7 +747,7 @@ function saveReportProject
 
   local severities="MINOR,MAJOR,CRITICAL,BLOCKER"
   runCurl "$URL/api/resources?resource=${projectKey}&metrics=minor_violations" $tmpFile
-   
+
   local nb_minor=$(cat $tmpFile |  jq -r '.[].msr[] | "\(.val)"' 2>/dev/null)
   if [ "${nb_minor}" -ge "100" ] ; then
     severities="MAJOR,CRITICAL,BLOCKER"
@@ -775,7 +775,7 @@ function saveReportProject
 # test the internet connection and exit if no connection
 # Argument: none
 ###################################################################################################
-function exitIfNoInternet 
+function exitIfNoInternet
 {
   debug ${!F}_${!L} "----------------> BEGIN: exitIfNoInternet"
   #wget -q --spider http://google.com
@@ -825,11 +825,11 @@ function getSonarQubeInfos
 
 ###################################################################################################
 # printSonarQubeProjects
-# Argument: option: $1="codeen" 
+# Argument: option: $1="codeen"
 # IN Global: SonarQube_CODEEN
 # Out Global: sonarQubeURL
 ###################################################################################################
-function printSonarQubeProjects  
+function printSonarQubeProjects
 {
   local option=$1
   debug ${!F}_${!L} "----------------> BEGIN: printSonarQubeProjects option=$option"
@@ -853,11 +853,11 @@ function printSonarQubeProjects
 
 ###################################################################################################
 # produceSonarQubeReport
-# Argument: optional project key ($1) and option: $2=="codeen" 
+# Argument: optional project key ($1) and option: $2=="codeen"
 # IN Global: sonarQubeURL_CODEEN,reportsDir ${project[name]} ${project[sonarVersion]}
-# Out Global: sonarQube sonarQube_reportFile 
+# Out Global: sonarQube sonarQube_reportFile
 ###################################################################################################
-function produceSonarQubeReport  
+function produceSonarQubeReport
 {
   local projectKey=$1
   local option=$2
@@ -896,16 +896,16 @@ function produceSonarQubeReport
 
 ###################################################################################################
 # displaySonarQubeReport
-# Argument: optional project key ($1) and option: $2=="codeen" 
+# Argument: optional project key ($1) and option: $2=="codeen"
 # IN Global: sonarQubeURL_CODEEN,reportsDir
-# Out Global: sonarQube sonarQube_reportFile 
+# Out Global: sonarQube sonarQube_reportFile
 ###################################################################################################
-function displaySonarQubeReport  
+function displaySonarQubeReport
 {
   local projectKey=$1
   local option=$2
   debug ${!F}_${!L} "----------------> BEGIN: displaySonarQubeReport projectKey=$projectKey,option=$option"
-  
+
   local display="cat"
 
    initLogbook append
@@ -937,25 +937,25 @@ function displaySonarQubeReport
 # # Argument: project key ($1)
 # In Global: sonarQube_reportFile
 ###################################################################################################
-function displaySonarQubeSummary  
+function displaySonarQubeSummary
 {
   local projectKey=$1
   debug ${!F}_${!L} "----------------> BEGIN: displaySonarQubeSummary projectKey=$projectKey"
   local tmpFile="/tmp/displaySonarQubeSummary$$.txt"
   local reg='^[0-9]+$' # regular expression for an expected integer
   local sleepInSeconds
-  
-  
+
+
   sleep 2 # wait 2 seconds in any cases
   info "SonarQube dashboard is available on ${SonarQube[URL]}/dashboard/?id=${sonar_projectKey}&did=1"
-  
+
   runCurl "${SonarQube[URL]}/api/resources?resource=${projectKey}&metrics=lines" $tmpFile
   debug ${!F}_${!L} "runCurl \"${SonarQube[URL]}/api/resources?resource=${projectKey}&metrics=lines\" $tmpFile"
-  
+
   #local lines=$(cat $tmpFile | jq -r '.[].msr[] | "\(.key) : \(.val)"' 2>/dev/null)
   local lines=$(cat $tmpFile | jq -r '.[].msr[] | "\(.val)"' 2>/dev/null)
   debug ${!F}_${!L}  "lines =${lines}."
-  
+
   if [ -z $lines ] ; then
     debug ${!F}_${!L} "Variable lines is empty: no summary report produced"
     produceSonarQubeReport ${projectKey}
@@ -968,12 +968,12 @@ function displaySonarQubeSummary
     debug ${!F}_${!L} "Wait for $sleepInSeconds seconds..."
     sleep $sleepInSeconds
     produceSonarQubeReport ${projectKey}
-     
+
     info "SonarQube analysis summary:"
     grep "^lines :\|^tests :\|^line_coverage :\|.*_violations" $sonarQube_reportFile
-    info "More in \"$sonarQube_reportFile\""     
+    info "More in \"$sonarQube_reportFile\""
   fi
-  
+
   debug ${!F}_${!L} "----------------> END: displaySonarQubeSummary"
 } # displaySonarQubeSummary
 
@@ -984,7 +984,7 @@ function displaySonarQubeSummary
 #             project projectCodePaths projectUSE BINARY_TAG_cov
 #             cppBinTests pythonBinTests
 ##################################################################
-function printEnvironment 
+function printEnvironment
 {
   local tools=$1
   debug ${!F}_${!L} "----------------> BEGIN: printEnvironment : tools=$tools"
@@ -992,17 +992,17 @@ function printEnvironment
   local analysis
   local tool
   local enVar
-  
+
   get_toolVersion  # available tools
 
-  for analysis in static dynamic ; do 
+  for analysis in static dynamic ; do
     info $lineSep
     info "Mandatory tools for a complete $analysis analysis:"
     for tool in ${requiredEnv[$analysis]}; do
    	  info "  $tool = " ${toolVersion[${tool}]}
     done
-  done  
-  
+  done
+
   info $lineSep
   info "Mandatory environment variable:"
   for enVar in ${requiredEnv[Var]} ; do
@@ -1012,8 +1012,8 @@ function printEnvironment
   # check local project (under current directory) if required
   if [[ "$tools" != "tools" ]]
   then
- 
-    get_project          # project general information (and elements libraries used) 
+
+    get_project          # project general information (and elements libraries used)
     get_projectCodePaths # list of modules in the current directory
 
     info $lineSep
@@ -1023,8 +1023,8 @@ function printEnvironment
     done
     for myInfo in ${!projectUSE[@]}; do
    	info "  project uses $myInfo version" ${projectUSE[${myInfo}]}
-    done 
-    info "Module(s) found : " ${projectCodePaths[modules]}  
+    done
+    info "Module(s) found : " ${projectCodePaths[modules]}
 
     info $lineSep
     info "Project paths:"
@@ -1034,15 +1034,15 @@ function printEnvironment
     info "  Python source  paths: " ${projectCodePaths[python]}
     info "         tests   paths: " ${projectCodePaths[tests_python]}
     info $lineSep
-  
+
     if [[ -d build.${BINARY_TAG_o2g}/bin ]] ; then
       get_cppTests o2g  # list of the c++ unit tests found under BINARY_TAG_cov
-      get_pythonBinTests o2g  # list of the python unit tests found under BINARY_TAG_cov 
-  
+      get_pythonBinTests o2g  # list of the python unit tests found under BINARY_TAG_cov
+
       info "Project tests (under .build/$BINARY_TAG_o2g):"
       #for myTest in ${cppTests[o2g]} ; do  info "  C++ under o2g : $myTest" ; done
       for myTest in ${cppTestName[@]} ; do  info "  C++ tests: $myTest" ; done
-      for myTest in ${pythonTestName[@]} ; do  info "Python tests: $myTest" ; done   
+      for myTest in ${pythonTestName[@]} ; do  info "Python tests: $myTest" ; done
       info $lineSep
     fi   # -d build.${BINARY_TAG_o2g}/bin
 
@@ -1057,7 +1057,7 @@ function printEnvironment
 
 ############################################################################
 # get versions from the used tools by this script
-# In Globals: BINARY_TAG EUCLIDPROJECTPATH 
+# In Globals: BINARY_TAG EUCLIDPROJECTPATH
 # Out Globals : requiredEnv toolVersion enVars
 ############################################################################
 function get_toolVersion
@@ -1068,7 +1068,7 @@ function get_toolVersion
   requiredEnv[static]="cppcheck verapp pylint sonarRunner"
   requiredEnv[dynamic]="gcc boost ctest xsltproc gcovr valgrind python pylint coverage pytest sonarRunner"
   requiredEnv[other]="$scriptName rats"
-  
+
   enVars="BINARY_TAG EUCLIDPROJECTPATH CMAKE_PROJECT_PATH PYTHONPATH VERA_ROOT"
 
   # initialize version to "" (empty)
@@ -1078,7 +1078,15 @@ function get_toolVersion
   for myTool in $mandatoryTools ${requiredEnv[other]} ; do toolVersion[$myTool]="" ; done
 
   toolVersion[gcc]=$(gcc --version | grep gcc | awk '{print $3}')
+  if [ -f /usr/include/boost/version.hpp ]; then
   toolVersion[boost]=$(grep "#define BOOST_LIB_VERSION" /usr/include/boost/version.hpp | awk '{print $3}' | sed 's/\"//g')
+  else
+    if [ -f /usr/local//include/boost/version.hpp ]; then
+      toolVersion[boost]=$(grep "#define BOOST_LIB_VERSION" /usr/local/include/boost/version.hpp | awk '{print $3}' | sed 's/\"//g')
+    else
+      toolVersion[boost]=123456
+    fi
+  fi
   toolVersion[ctest]=$(ctest --version | awk '{print $3}')
   toolVersion[xsltproc]=$(xsltproc --version | head -1)
   toolVersion[python]=$(python --version 2>&1  | awk '{print $2}')
@@ -1095,14 +1103,14 @@ function get_toolVersion
   # other tools (optional)
   toolVersion[rats]=$(rats --help | head -1 | awk '{print $2}' | sed 's/v//')
   toolVersion[$scriptName]=$( $scriptFullName --version | awk '{print $3}')
-    
-  for analysis in static dynamic other ; do 
+
+  for analysis in static dynamic other ; do
   	for tool in ${requiredEnv[$analysis]}; do
-      # [[ ${toolVersion[${myTool}]} == "not found" ]] && warn $LINENO "$myTool not found" 
+      # [[ ${toolVersion[${myTool}]} == "not found" ]] && warn $LINENO "$myTool not found"
    	  debug ${!F}_${!L}  "  $tool = " ${toolVersion[${tool}]}
     done
-  done 
-  
+  done
+
   debug ${!F}_${!L} "----------------> END:get_toolVersion"
 } # get_toolVersion
 
@@ -1116,7 +1124,7 @@ function get_toolVersion
 #      ex: $@ = "GridContainer/GridContainer MathUtils/MathUtils"
 #      return: "-IGridContainer -IMathUtils"
 ###################################################################################################
-function addInclOption 
+function addInclOption
 {
   local option=$1
 	shift
@@ -1132,8 +1140,8 @@ function addInclOption
             dirIncl="$dirIncl -I$dir"
 	fi
 	done
-  echo "$dirIncl" 
-} # addInclOption 
+  echo "$dirIncl"
+} # addInclOption
 
 ###################################################################################################
 # select directories if they exist
@@ -1151,12 +1159,12 @@ function get_directoriesOK
 		else
  			warn $LINENO "cannot access $dir: expected folder ignored"
 		fi
-	done 
+	done
 } # get_directoriesOK
 
 ###################################################################################################
 # select system (i.e. not the project nor elements) includes
-# In Globals: PYTHONPATH toolVersion["gcc"]  
+# In Globals: PYTHONPATH toolVersion["gcc"]
 # Out Globals: systemLib (keys for both arrays: "include" and "python")
 # each variable containing list of validated directories separated with space
 # ex: elementsLib["python"] = "path1/python path2/python"
@@ -1168,11 +1176,11 @@ function get_systemLib
 	systemLib[python]=$(echo $PYTHONPATH | sed 's/:/ /g' | sed 's/;/ /g')
 
 	debug ${!F}_${!L} "systemLib[include] = " ${systemLib[include]}
-	debug ${!F}_${!L} "systemLib[python] = " ${systemLib[python]}	
+	debug ${!F}_${!L} "systemLib[python] = " ${systemLib[python]}
 }
 ###################################################################################################
 # select elemnts (i.e. not the project) includes and imports
-# In Globals: EUCLIDPROJECTPATH BINARY_TAG CMAKE_PROJECT_PATH projectUSE  
+# In Globals: EUCLIDPROJECTPATH BINARY_TAG CMAKE_PROJECT_PATH projectUSE
 # Out Globals: elementsLib (keys for both arrays: "include" and "python")
 #              BINARY_TAG (set to x86_64-slc7-gcc48-o2g if no exist) BINARY_TAG_o2g BINARY_TAG_cov
 # each variable containing list of validated directories separated with space
@@ -1185,8 +1193,8 @@ function get_elementsLib
   local lib
   local dirCmake
 
-  # TBC: select BINARY_TAG_o2g [yes] or BINARY_TAG_cov below ? 
-   
+  # TBC: select BINARY_TAG_o2g [yes] or BINARY_TAG_cov below ?
+
   # elements librairies C++ include and import paths
   for typeLib in include python ; do
     local found=""
@@ -1199,7 +1207,7 @@ function get_elementsLib
       # is lib under the parent directory or under /opt/euclid ?
       # example of $CMAKE_PROJECT_PATH ="/home/user/Work/Projects:/opt/euclid:"
       # break below avoid to get several include directory for the same lib
-  		
+
       for dirCmake in $(echo $CMAKE_PROJECT_PATH | sed 's/:/ /g' ) ; do
  	#debug ${!F}_${!L} "dirCmake=$dirCmake"
    	local dir="$dirCmake/$lib/$version/InstallArea/$BINARY_TAG_o2g/$typeLib"
@@ -1207,7 +1215,7 @@ function get_elementsLib
    	  found="$found $dir"
   	  break
   	fi
-  	# TBC: no version in Work directory ? 
+  	# TBC: no version in Work directory ?
       	dir="$dirCmake/$lib/InstallArea/$BINARY_TAG_o2g/$typeLib"
       	if [ -d $dir ] ; then
   	  found="$found $dir"
@@ -1216,7 +1224,7 @@ function get_elementsLib
       done # loop $CMAKE_PROJECT_PATH
     done # loop elements libs
     elementsLib[$typeLib]=$found
-  done # loop "include" "python" 
+  done # loop "include" "python"
 
   for typeLib in ${!elementsLib[@]}; do
     debug ${!F}_${!L} "$typeLib elements library paths = " ${elementsLib[${typeLib}]}
@@ -1226,19 +1234,19 @@ function get_elementsLib
   # retrieve the EuclidDMTools path
   for lib in ${elementsLib[python]}; do
     if [[ $(echo $lib | grep "EuclidDMTools") ]] ; then
-      libEuclidDMTools=$lib			
-    fi    
+      libEuclidDMTools=$lib
+    fi
   done
-  if [[ ! -z "$libEuclidDMTools" ]] ; then 
+  if [[ ! -z "$libEuclidDMTools" ]] ; then
     local elementsLibInBefore=${elementsLib[python]}
-    # add all the sub-folders necessary to get a complete PYTHONPATH 
+    # add all the sub-folders necessary to get a complete PYTHONPATH
     local DmB="$libEuclidDMTools/EuclidDmBindings"
     local DmBsubs="$DmB $DmB/sys $DmB/dpd $DmB/pro $DmB/bas $DmB/ins $DmB/interfaces $DmB/raw"
     get_directoriesOK $DmBsubs
     elementsLib[python]="$elementsLibInBefore $directoriesOK"
     debug ${!F}_${!L} "lib python with EuclidDmBindings sub-folders = " ${elementsLib[python]}
   fi
-  
+
   debug ${!F}_${!L} "----------------> END:get_elementsLib"
 } #getIncludeSystem
 
@@ -1246,7 +1254,7 @@ function get_elementsLib
 # get information relative to this project
 # Out Globals: project projectUSE ${toolVersion[svn]}
 #################################################################################################################
-function get_project 
+function get_project
 {
   debug ${!F}_${!L} "----------------> BEGIN:get_project"
 
@@ -1272,7 +1280,7 @@ function get_project
   local elementsLibs=$(echo $lineElements | sed -n -e 's/^.*\(USE \)\(.*\))$/\2/p')
   # example  used= "Elements 3.5 EuclidDMTools 1.0 myLib 2.1"
 
-  if [[ ! -z $elementsLibs ]] ; then 
+  if [[ ! -z $elementsLibs ]] ; then
     set $elementsLibs
     while [ "$1" != "" ]; do
       #debug ${!F}_${!L} "lib = " $1
@@ -1304,7 +1312,7 @@ function get_project
   for myInfo in ${!projectUSE[@]}; do
    	debug ${!F}_${!L} "project uses $myInfo version" ${projectUSE[${myInfo}]}
   done
-  
+
   debug ${!F}_${!L} "----------------> END:get_project"
 } # get_project
 
@@ -1321,19 +1329,19 @@ function get_projectCodePaths
   debug ${!F}_${!L} "----------------> BEGIN:get_projectCodePaths"
 
   local CMakeLists="CMakeLists.txt"
-  local myModules=$(ls -d */ | sed 's:/::' | grep -v ^InstallArea$ | grep -v ^build\\. | grep -v ^cmake$ | grep -v ^Testing$ | grep -v ^$reportsDir$ |  tr "\n" " ")   
+  local myModules=$(ls -d */ | sed 's:/::' | grep -v ^InstallArea$ | grep -v ^build\\. | grep -v ^cmake$ | grep -v ^Testing$ | grep -v ^$reportsDir$ |  tr "\n" " ")
   local module
   local myDir
   #local key
-  
-  for key in modules src include tests_src python tests_python ; do projectCodePaths[$key]="" ; done 
+
+  for key in modules src include tests_src python tests_python ; do projectCodePaths[$key]="" ; done
   for module in $myModules ; do
    debug ${!F}_${!L} $module
    if [ ! -f $module/$CMakeLists  ]; then
     debug ${!F}_${!L} "cannot access $module/$CMakeLists: No such file"
     debug ${!F}_${!L} "    $module was expected to be a module of elements containing $CMakeLists..."
     debug ${!F}_${!L} "    $module is ignored and will not be analyzed by quality tools"
-   else	  
+   else
     declare -A pairs=( [modules]=$module [src]=$module/src [include]=$module/$module [tests_src]=$module/tests/src [python]=$module/python [tests_python]=$module/tests/python )
     for key in ${!pairs[@]} ; do
       myDir=${pairs[$key]}
@@ -1342,13 +1350,13 @@ function get_projectCodePaths
    	    debug ${!F}_${!L} "cannot access $myDir: expected sub-folder does not exist (ignored)"
         # store the directory if not empty
       elif existsAndNotEmpty $myDir ; then
-	    projectCodePaths[$key]="${projectCodePaths[${key}]} $myDir"		  
+	    projectCodePaths[$key]="${projectCodePaths[${key}]} $myDir"
       fi
      done # for key
-   fi    
+   fi
   done # module
 
-  for key in modules src include tests_src python tests_python ; do 
+  for key in modules src include tests_src python tests_python ; do
     debug ${!F}_${!L} "projectCodePaths[$key]=" ${projectCodePaths[${key}]}
   done
 
@@ -1375,7 +1383,7 @@ function doGeneration
 
     [ "$targetMake" == "none" ] && targetMakeTmp="purge clean all"
     info "make $targetMakeTmp # (BINARY_TAG=${BINARY_TAG_o2g})"
-    ( 
+    (
         addscript "( export BINARY_TAG=${BINARY_TAG_o2g}"
 	      export BINARY_TAG=${BINARY_TAG_o2g}
         debug ${!F}_${!L} "make $targetMakeTmp 2> $sonar_gcc_reportFile"
@@ -1400,7 +1408,7 @@ function doGeneration
     [ "$targetMake" == "none" ] && targetMakeTmp="purge clean all"
     info "make $targetMakeTmp # (BINARY_TAG=${BINARY_TAG_cov})"
     # TODO: 2>(tee $sonar_gcc_reportFile >&2)
-    ( 
+    (
         addscript "( export BINARY_TAG=${BINARY_TAG_cov}"
 	    export BINARY_TAG=${BINARY_TAG_cov}
         debug ${!F}_${!L} "make $targetMakeTmp 2> $sonar_gcc_reportFile"
@@ -1419,15 +1427,15 @@ function doGeneration
     fi
     mv -f $sonar_gcc_reportFile build.${BINARY_TAG_cov} 2>/dev/null
   fi
-  
-  if ! existsAndNotEmpty "build.${BINARY_TAG_o2g}/$sonar_gcc_reportFile" ; then 
+
+  if ! existsAndNotEmpty "build.${BINARY_TAG_o2g}/$sonar_gcc_reportFile" ; then
     debug ${!F}_${!L} "Warnings gcc file \"$sonar_gcc_reportFile\" does not exist or is empty under ${BINARY_TAG_o2g}"
-  fi  
+  fi
   if ! existsAndNotEmpty "build.${BINARY_TAG_cov}/$sonar_gcc_reportFile" ; then
      debug ${!F}_${!L} "Warnings gcc file \"$sonar_gcc_reportFile\" does not exist or is empty under ${BINARY_TAG_cov}"
   fi
   debug ${!F}_${!L} "----------------> END: doGeneration"
- 
+
 } # doGeneration
 
 ###########################################################################################
@@ -1447,9 +1455,9 @@ function runCppcheck
   # note: $includeDirSys could be added (but slows the execution of cppcheck)
   # inclSys=$(addInclOption shiftIncl ${systemLib[include]} )
   local dir
-  
+
   debug ${!F}_${!L} "elementsLib[include]=${elementsLib[include]} projectCodePaths[include]=${projectCodePaths[include]}"
-  
+
   # TBC: keep include path with a number of ".h" files under a MAX of 50
   # this reduce a lot the duration of cppcheck
   local MAX=50
@@ -1465,16 +1473,16 @@ function runCppcheck
   local inclElt=$(addInclOption none $inclEltMAXok)
   local inclProj=$(addInclOption shiftIncl ${projectCodePaths[include]})
   debug ${!F}_${!L} "-I option of cppcheck : inclElt=$inclElt"
-  
+
   if [ "$logLevel" == "debug" ] ; then out="" ; else out="-q" ; fi
 
   debug ${!F}_${!L} "cppcheck --xml --std=c++11  --enable=all --suppress=missingIncludeSystem $inclProj ${projectCodePaths[src]} $out"
   addscript "cppcheck --xml --std=c++11  --enable=all --suppress=missingIncludeSystem $inclProj ${projectCodePaths[src]}"
-  
+
   #cppcheck --xml --std=c++11  --enable=all --suppress=missingIncludeSystem  $inclElt $inclProj ${projectCodePaths[src]} $out 2> $sonar_cxx_cppcheck_reportFile
   # no more $inclElt  (as /opt/euclid/Elements/3.6/InstallArea/x86_64-co7-gcc48-o2g/include) : some warning messages are not found...
   cppcheck --xml --std=c++11  --enable=all --suppress=missingIncludeSystem  $inclProj ${projectCodePaths[src]} $out 2> $sonar_cxx_cppcheck_reportFile
-	
+
   if [ -s $sonar_cxx_cppcheck_reportFile ] ; then
     cppcheck_errors=$(grep "\<error" $sonar_cxx_cppcheck_reportFile | wc -l)
     debug ${!F}_${!L} "cppcheck: remarks or issues detected: $cppcheck_errors"
@@ -1500,7 +1508,7 @@ function runVera
   [[ "${toolVersion[verapp]}" == "" ]] && error $LINENO "vera++ not found"
   [[ ! -d ${VERA_ROOT} ]] && error $LINENO "directory VERA_ROOT=$VERA_ROOT not found"
 
-  # see version 1.3.1 of checkQuality to run vera++ previous version 
+  # see version 1.3.1 of checkQuality to run vera++ previous version
   debug ${!F}_${!L} "find ${projectCodePaths[src]} ${projectCodePaths[include]} -regex \".*\.cpp\|.*\.h\" | vera++ -s -c $sonar_cxx_vera_reportFile"
   addscript "find ${projectCodePaths[src]} ${projectCodePaths[include]} -regex \".*\.cpp\|.*\.h\" | vera++ -s -c $sonar_cxx_vera_reportFile"
   find ${projectCodePaths[src]} ${projectCodePaths[include]} -regex ".*\.cpp\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
@@ -1516,7 +1524,7 @@ function runVera
 ###########################################################################################
 # run rats in the current directory
 # In Globals: ${toolVersion[rats]} ${projectCodePaths[src]}
-#             logLevel sonar_cxx_rats_reportFile 
+#             logLevel sonar_cxx_rats_reportFile
 # Out Globals: rats_done rats_errors
 ###########################################################################################
 function runRats
@@ -1543,8 +1551,8 @@ function runRats
 ###########################################################################################
 # search for C++ test binaries in order to launch them (using gcovr or valgrind)
 # Arguments: "o2g" or "cov" (search under  BINARY_TAG_o2g or BINARY_TAG_cov)
-# In Globals: ${toolVersion[ctest]}  BINARY_TAG_o2g and BINARY_TAG_cov 
-# Out Globals: cppBinTests[o2g|cov] = found c++ binary tests (separated by spaces), 
+# In Globals: ${toolVersion[ctest]}  BINARY_TAG_o2g and BINARY_TAG_cov
+# Out Globals: cppBinTests[o2g|cov] = found c++ binary tests (separated by spaces),
 #              under build.${BINARY_TAG_o2g|cov}/bin
 ###########################################################################################
 function get_cppTests
@@ -1555,23 +1563,23 @@ function get_cppTests
   local myBinTest
   local myDir
   local myBin
-  local binary 
-  local outFile 
- 
-  # clear tables 
+  local binary
+  local outFile
+
+  # clear tables
   unset cppTestName[@]
   unset cppTestType[@]
   unset cppTestPath[@]
-  unset cppTestArgs[@] 
-  
+  unset cppTestArgs[@]
+
   noTest=0
   [[ "${toolVersion[ctest]}" == "" ]] && error $LINENO "ctest not found"
   local buildDir=build.${BINARY_TAG_o2g}
   [[ $target == "cov" ]] &&  buildDir=build.${BINARY_TAG_cov}
-  [[ ! -d ${buildDir}/bin ]] && error $LINENO "Directory with expected binaries \"$buildDir/bin\" not found" 
-  
+  [[ ! -d ${buildDir}/bin ]] && error $LINENO "Directory with expected binaries \"$buildDir/bin\" not found"
+
   # record unit tests if no user test asked in arguments
-  if [ ${#cppUserTestsWithOptions[@]} == 0 ] ; then  
+  if [ ${#cppUserTestsWithOptions[@]} == 0 ] ; then
 
     # find all the c++ unit tests
     local ctestTests=`( cd $buildDir ; ctest -N | grep "\#" | grep -v Py | awk '{print $3}'| awk -NF "." '{print $NF}' |  tr "\n" " " )`
@@ -1584,12 +1592,12 @@ function get_cppTests
       myBinTest=""
       for aBinTest in $binTests ; do
         myBinTest=$(echo $aBinTest| grep $myCtest)
-        [[ "$myBinTest" != "" ]] && break 
+        [[ "$myBinTest" != "" ]] && break
       done
 
 	  debug  ${!F}_${!L} "myTest= $myCtest  et myBinTest = $myBinTest"
 
-      if [ "$myBinTest" != "" ] ; then 
+      if [ "$myBinTest" != "" ] ; then
         #debug ${!F}_${!L} "test $myCtest identified by ctest found under $buildDir/bin (binary test is $myBinTest)"
         let "noTest++"
         cppTestName[$noTest]=$myBinTest
@@ -1600,14 +1608,14 @@ function get_cppTests
         debug ${!F}_${!L} "test $myCtest identified by ctest not found under $buildDir/bin"
       fi
     done
-    
+
   else # if [ ${#cppUserTestsWithOptions[@]} != 0 ]
-  
+
   # tests given by the user (arguments -bincpp)
   ##############################################
-  
+
   for aBinTest in  "${cppUserTestsWithOptions[@]}" ; do
-    
+
       binary=$(echo $aBinTest | awk '{ print $1 }')
       arguments=$(echo $aBinTest | awk '{for (i=2; i<=NF; i++) print $i}')
       debug ${!F}_${!L} "binary=$binary and arguments=$arguments"
@@ -1635,7 +1643,7 @@ function get_cppTests
   done
   fi
   # if [ ${#cppUserTestsWithOptions[@]} != 0 ]
-  
+
   debug ${!F}_${!L} "${#cppTestPath[@]} binary tests selected under $buildDir/bin:"
   for i in "${!cppTestName[@]}" ; do
     debug ${!F}_${!L} "noTest=$i"
@@ -1643,9 +1651,9 @@ function get_cppTests
     debug ${!F}_${!L} "Test binary path = ${cppTestPath[$i]}"
     debug ${!F}_${!L} "Test binary arguments = ${cppTestArgs[$i]}"
   done
-  
 
-  
+
+
   debug ${!F}_${!L} "----------------> END: get_cppTests"
 } #get_cppTests
 
@@ -1674,8 +1682,8 @@ function runCppCoverage
           info "Detailled information on c++ coverage in file://$(pwd)/$cppCoverage_reportHTMLFile"
         else
           warn $LINENO "Detailled information on c++ coverage in $cppCoverage_reportHTMLFile not found or empty"
-        fi    
-      fi # if [ "$logLevel" == "debug" 
+        fi
+      fi # if [ "$logLevel" == "debug"
     fi # if [ ! -s "$sonar_cxx_coverage_reportFile"
 } # runCppCoverage
 
@@ -1712,48 +1720,48 @@ function runCppUnitestsAndCoverage
   # Step 2: select all the unit tests to be run
   # do not forget ro add "sonar.cxx.xunit.xsltURL=boosttest-1.x-to-junit-1.0.xsl" in sonar-project.properties
   get_cppTests cov
-  # ${cppTests[i]} = binary tests found under build.${BINARY_TAG_cov}/bin 
-  
+  # ${cppTests[i]} = binary tests found under build.${BINARY_TAG_cov}/bin
 
-  
+
+
   # run binaries and do coverage only if (Unit or User) C++ tests founded...
   if [ "${#cppTestPath[@]}" -gt "0" ]  ; then
-  
-    # Step 3: run  tests 
+
+    # Step 3: run  tests
 
     info "running binaries under build.${BINARY_TAG_cov} directory"
     for noTest in "${!cppTestName[@]}" ; do
       debug ${!F}_${!L} "noTest=$noTest"
-      
+
       myType=${cppTestType[$noTest]}
       myBin=${cppTestName[$noTest]}
       myPath=${cppTestPath[$noTest]}
       myArgs=${cppTestArgs[$noTest]}
-    
+
       debug ${!F}_${!L} " Test binary name = $myBin"
       debug ${!F}_${!L} " Test binary path = $myPath"
       debug ${!F}_${!L} " Test binary arguments = $myArgs"
-      
+
       if [[ $myType == "Unit test" ]] ; then
         outFile="${reportsDirCpp}/${xunitReport}_${myBin}.xml"
         myArgsTool="$myArgs --log_format=XML --log_sink=$outFile --log_level=all --report_level=no 1>/dev/null 2>&1"
       elif [[ $myType == "User test" ]] ; then
         outFile="${reportsDirCpp}/${userCppRunReport}_${myBin}.txt"
-        myArgsTool="$myArgs >$outFile 2>&1" 
+        myArgsTool="$myArgs >$outFile 2>&1"
       fi
 
-      command="./build.${BINARY_TAG_cov}/run ${myPath}${myBin} $myArgsTool"      
+      command="./build.${BINARY_TAG_cov}/run ${myPath}${myBin} $myArgsTool"
       debug ${!F}_${!L} $command
       addscript $command
       eval $command
- 
+
       if [[ ! $? ]] ; then
 	   warn $LINENO "error code returned : $? : test output ignored"
 	   # outFile="${reportsDirCpp}/${userTestReport}_${aBinTest}.txt"
        [[ -f $outFile ]] && rm $outFile
-      fi 
+      fi
     done
-    
+
     #if [ "$(ls ${reportsDirCpp} | grep -E '^xunitests-report' | wc -l)" -ge 1 ] ; then
     if [ "$(ls ${reportsDirCpp} | grep -E ^${xunitReport} | wc -l)" -ge 1 ] ; then
 	  xunit_done="ok"
@@ -1772,19 +1780,19 @@ debug ${!F}_${!L} "----------------> END: runCppUnitestsAndCoverage"
 
 ###########################################################################################
 # run all the C++ or/and Python tests using ctest
-# In Globals: ${toolVersion[ctest]} ${toolVersion[xsltproc]} reportsDir BINARY_TAG_cov 
+# In Globals: ${toolVersion[ctest]} ${toolVersion[xsltproc]} reportsDir BINARY_TAG_cov
 # Out Globals: xunit_done
 ###########################################################################################
 function runAllUnitestsAndCoverage
 {
 
   error $LINENO "AllUnitestsAndCoverage should not be used : see old code in checkQuality v1.3"
-	
+
 } # runAllUnitestsAndCoverage
 
 ###########################################################################################
-# run all the C++ (boost) tests built and analyze memory with valgrind 
-# In Globals: valgrindVersion 
+# run all the C++ (boost) tests built and analyze memory with valgrind
+# In Globals: valgrindVersion
 #             BINARY_TAG_o2g LINENO sonar_cxx_valgrind_reportFile
 # Out Globals:valgrind_done
 ###########################################################################################
@@ -1799,38 +1807,38 @@ function runValgrind
   local myPath
   local myArgs
 
-  [[ ${toolVersion[valgrind]} == "" ]] && error $LINENO "valgrind not found" 
+  [[ ${toolVersion[valgrind]} == "" ]] && error $LINENO "valgrind not found"
   get_cppTests o2g
-  # ${cppTests[i]} = binary tests found under build.${BINARY_TAG_o2g}/bin 
+  # ${cppTests[i]} = binary tests found under build.${BINARY_TAG_o2g}/bin
 
   # run valgrind if tests runned
 
-  
+
   # run binaries and do coverage only if C++ tests founded...
   if [ "${#cppTestPath[@]}" -gt "0" ] ; then
-  
+
     info "running valgrind on binaries under build.${BINARY_TAG_o2g} directory"
-    
+
       for noTest in "${!cppTestName[@]}" ; do
       debug ${!F}_${!L} "noTest=$noTest"
-      
+
       myType=${cppTestType[$noTest]}
       myBin=${cppTestName[$noTest]}
       myPath=${cppTestPath[$noTest]}
       myArgs=${cppTestArgs[$noTest]}
-    
+
       debug ${!F}_${!L} " Test binary name = $myBin"
       debug ${!F}_${!L} " Test binary path = $myPath"
       debug ${!F}_${!L} " Test binary arguments = $myArgs"
-      
-  
+
+
 	  outFile="${reportsDirCpp}/${valgrindReport}_${myBin}.xml"
-      command="./build.${BINARY_TAG_o2g}/run valgrind --xml=yes --xml-file=$outFile  --leak-check=full ${myPath}${myBin} $myArgs 1>/dev/null 2>&1"      
+      command="./build.${BINARY_TAG_o2g}/run valgrind --xml=yes --xml-file=$outFile  --leak-check=full ${myPath}${myBin} $myArgs 1>/dev/null 2>&1"
 
       debug ${!F}_${!L} $command
       addscript $command
       eval $command
-      
+
 	  if [[ ! $? ]] ; then
 	    warn $LINENO "error code returned : $? : test output ignored"
 	    [[ -f $outFile ]] && rm $outFile
@@ -1847,21 +1855,21 @@ function runValgrind
     else
 	    warn $LINENO "valgrind output file ${reportsDirCpp}/${valgrindReport}*.xml not found or empty"
     fi
-	  
+
   fi #  "${#cppTests}" -gt "0"
   debug ${!F}_${!L} "----------------> END: runValgrind"
 } # runValgrind
 
 ###########################################################################################
-# search for python unit tests 
+# search for python unit tests
 # Arguments: "o2g" or "cov" (search under  BINARY_TAG_o2g or BINARY_TAG_cov)
 # In Globals: ctestVersion BINARY_TAG_o2g and BINARY_TAG_cov pyUserTestsWithOptions
-# Out Globals: pythonBinTests[i] = found python tests, 
+# Out Globals: pythonBinTests[i] = found python tests,
 #              under build.${BINARY_TAG_o2g|cov}/bin
 ###########################################################################################
 function get_pythonBinTests
 {
-  local target=$1 #o2g or cov 
+  local target=$1 #o2g or cov
   debug ${!F}_${!L} "----------------> BEGIN: get_pythonBinTests target=$target"
   noTest=0
   local binary
@@ -1869,26 +1877,26 @@ function get_pythonBinTests
   local myBin
   local myDir
   local myTestFiles
-  
-    # clear tables 
+
+    # clear tables
   unset pythonTestName[@]
   unset pythonTestType[@]
   unset pythonTestPath[@]
-  unset pythonTestArgs[@] 
+  unset pythonTestArgs[@]
 
 
   # record unit tests if no user test asked in arguments
-  if [ ${#pyUserTestsWithOptions[@]} == 0 ] ; then  
+  if [ ${#pyUserTestsWithOptions[@]} == 0 ] ; then
 
   # find all the python unit tests under <module>/tests/python folders
-  # Do not longer use `$buildDir/run py.test --collectonly ... etc...(see checkQuality v1.4) 
- 
+  # Do not longer use `$buildDir/run py.test --collectonly ... etc...(see checkQuality v1.4)
+
   debug ${!F}_${!L} "projectCodePaths[tests_python]=" ${projectCodePaths[tests_python]}
-  
+
   local myTestFiles=$(find ${projectCodePaths[tests_python]} -name "*.py" 2>/dev/null |  tr "\n" " ")
   #local myTestFiles=$(find ${projectCodePaths[tests_python]} -name "*.py")
   debug ${!F}_${!L} "Python unit tests found  = $myTestFiles"
-  
+
   for aBinTest in $myTestFiles ; do
       debug ${!F}_${!L} "noTest=$noTest and aBinTest=$aBinTest"
 
@@ -1897,17 +1905,17 @@ function get_pythonBinTests
       pythonTestType[$noTest]="Unit test"
       pythonTestPath[$noTest]=$(dirname $aBinTest)
       pythonTestArgs[$noTest]=""
-      
+
   done
-  
-  else # if [ ${#pythonUserTestsWithOptions[@]} == 0 ] 
+
+  else # if [ ${#pythonUserTestsWithOptions[@]} == 0 ]
 
   local buildDir=build.${BINARY_TAG_o2g}
   [[ $target == "cov" ]] &&  buildDir=build.${BINARY_TAG_cov}
-  [[ ! -d ${buildDir} ]] && error $LINENO "Directory with expected user test files \"$buildDir\" not found" 
+  [[ ! -d ${buildDir} ]] && error $LINENO "Directory with expected user test files \"$buildDir\" not found"
 
   for aBinTest in "${pyUserTestsWithOptions[@]}" ; do
-  
+
       binary=$(echo $aBinTest | awk '{ print $1 }')
       arguments=$(echo $aBinTest | awk '{for (i=2; i<=NF; i++) print $i}')
       debug ${!F}_${!L} "binary=$binary and arguments=$arguments"
@@ -1926,14 +1934,14 @@ function get_pythonBinTests
           continue
         fi
       fi
-      
+
       let "noTest++"
       pythonTestName[$noTest]=$binary
       pythonTestType[$noTest]="User test"
       pythonTestPath[$noTest]=$pathBinary
       pythonTestArgs[$noTest]=$arguments
   done
-  fi # if [ ${#pythonUserTestsWithOptions[@]} == 0 ] 
+  fi # if [ ${#pythonUserTestsWithOptions[@]} == 0 ]
 
   debug ${!F}_${!L} "${#pythonTestName[@]} python tests under $buildDir :"
   for i in "${!pythonTestName[@]}" ; do
@@ -1941,8 +1949,8 @@ function get_pythonBinTests
     debug ${!F}_${!L} "Test binary name = ${pythonTestName[$i]}"
     debug ${!F}_${!L} "Test binary path = ${pythonTestPath[$i]}"
     debug ${!F}_${!L} "Test binary arguments = ${pythonTestArgs[$i]}"
-  done 
-  debug ${!F}_${!L} "----------------> END: get_pythonBinTests" 
+  done
+  debug ${!F}_${!L} "----------------> END: get_pythonBinTests"
 } #get_pythonBinTests
 
 ###########################################################################################
@@ -1957,8 +1965,8 @@ function runPythonUnitestsAndCoverage
   #info "Dynamic analysis with coverage.py"
   #info "Launching python executables under \"./build.${BINARY_TAG_cov}\" directory"
 
-  [[ ${toolVersion[coverage]} == "" ]] && error $LINENO "coverage not found" 
-  [[ ${toolVersion[pytest]} == "" ]] && error $LINENO "py.test not found" 
+  [[ ${toolVersion[coverage]} == "" ]] && error $LINENO "coverage not found"
+  [[ ${toolVersion[pytest]} == "" ]] && error $LINENO "py.test not found"
 
 
   py_xunit_done=""
@@ -1974,23 +1982,23 @@ function runPythonUnitestsAndCoverage
     debug ${!F}_${!L} "delete last coverage data files (.coverage) : coverage erase"
     addscript "coverage erase"
     coverage erase
-  
-    # Step 2: run  tests 
+
+    # Step 2: run  tests
     info "running python unit tests under \"./build.${BINARY_TAG_cov}\" directory"
 
     for noTest in "${!pythonTestName[@]}" ; do
       debug ${!F}_${!L} "noTest=$noTest"
-      
+
       myType=${pythonTestType[$noTest]}
       myBin=${pythonTestName[$noTest]}
       myPath=${pythonTestPath[$noTest]}
       myArgs=${pythonTestArgs[$noTest]}
-    
+
       debug ${!F}_${!L} " Test binary name = $myBin"
       debug ${!F}_${!L} " Test binary path = $myPath"
       debug ${!F}_${!L} " Test binary arguments = $myArgs"
       debug ${!F}_${!L} " Test binary type = $myType"
-      
+
       if [[ $myType == "Unit test" ]] ; then
 
         outFile="${reportsDirPy}/${py_xunitReport}_${myBin}.xml"
@@ -1999,7 +2007,7 @@ function runPythonUnitestsAndCoverage
 
       elif [[ $myType == "User test" ]] ; then
         outFile="${reportsDirPy}/${userPyRunReport}_${myBin}.txt"
-        command="./build.${BINARY_TAG_cov}/run coverage run ${myPath}/${myBin} $myArgs >$outFile 2>&1"     
+        command="./build.${BINARY_TAG_cov}/run coverage run ${myPath}/${myBin} $myArgs >$outFile 2>&1"
 
         # example of call: ./build.x86_64-co7-gcc48-o2g/run pyfirststep --workdir=/home/user/workshop_workdir --simvisproduct=SimVisOutput.xml --skyposition=firststep_output.txt
         # see http://euclid.roe.ac.uk/projects/codeen-users/wiki/DevWS15_advanced_tutorial_python
@@ -2010,7 +2018,7 @@ function runPythonUnitestsAndCoverage
       debug ${!F}_${!L} $command
       addscript $command
       eval $command
- 
+
       if [[ ! $? ]] ; then
 	 warn $LINENO "error code returned : $? : test output ignored"
          [[ -f $outFile ]] && rm $outFile
@@ -2023,7 +2031,7 @@ function runPythonUnitestsAndCoverage
       else
           warn ${!F}_${!L} "python coverage data in .coverage not found"
       fi
- 
+
     done # for noTest in "${!pythonTestName[@]}" ;
 
     # gather previous coverage data in a single .coverage file
@@ -2033,7 +2041,7 @@ function runPythonUnitestsAndCoverage
     coverage combine
     [[ ! -f .coverage ]] && warn ${!F}_${!L} "Final python coverage data in .coverage not found"
 
-    
+
     if [ "$(ls ${reportsDirPy} | grep -E ^${py_xunitReport} | wc -l)" -ge 1 ] ; then
 	  py_xunit_done="ok"
     else
@@ -2061,15 +2069,15 @@ function runPythonUnitestsAndCoverage
                 info "Detailled information on python coverage in file://$(pwd)/$pythonCoverage_reportHTMLDir/index.html"
              else
                 warn $LINENO "Detailled information on python coverage in $pythonCoverage_reportHTMLDir/index.html not found or empty"
-             fi 
-          fi # if [ "$logLevel" == "debug" 
+             fi
+          fi # if [ "$logLevel" == "debug"
     fi # if [ ! -s "$sonar_python_coverage_reportFile" ]
 
     # Step 4: run the c++ coverage if C++ source code exist and language in option asked
     if [[ $(echo $languages | grep "c++") ]] && [[ "${projectCodePaths[src]}" != "" ]] ; then
        runCppCoverage
     fi
- 
+
   fi # "${#pythonTestName}" -gt "0"
 
 debug ${!F}_${!L} "END unPythonUnitestsAndCoverage"
@@ -2098,7 +2106,7 @@ while [ "$1" != "" ]; do
     -l | --log-level )      shift
 			    logLevel=$1
                             ;;
-    -e | --envt )           initLogbook tmp 
+    -e | --envt )           initLogbook tmp
                             printEnvironment $2
                             exitScript
                             ;;
@@ -2119,16 +2127,16 @@ while [ "$1" != "" ]; do
                             ;;
     -bincpp | --binary-cpp ) shift
                             binaryWithOptions=$1
-                            let nocppUserTestsWithOptions++ 
+                            let nocppUserTestsWithOptions++
                             cppUserTestsWithOptions[$nocppUserTestsWithOptions]=$binaryWithOptions
                             ;;
     -binpy | --binary-python ) shift
                             binaryWithOptions=$1
-                            let nopyUserTestsWithOptions++ 
+                            let nopyUserTestsWithOptions++
                             pyUserTestsWithOptions[$nopyUserTestsWithOptions]=$binaryWithOptions
                             ;;
-    -p | --projects )       initLogbook tmp 
-                            printSonarQubeProjects $2           
+    -p | --projects )       initLogbook tmp
+                            printSonarQubeProjects $2
                             exitScript
                             ;;
     -r | --report )         displaySonarQubeReport $2 $3
@@ -2182,8 +2190,8 @@ info "Workind directory: " $(pwd)
 info "getting tools and project information"
 # get tools and project information
 get_toolVersion  # available tools
-get_systemLib     # system includes C++ and import Python 
-get_project       # project general information (and elements libraries used) 
+get_systemLib     # system includes C++ and import Python
+get_project       # project general information (and elements libraries used)
 get_elementsLib   # elements includes C++ and import Python
 get_projectCodePaths # list of modules in the current directory
 
@@ -2226,14 +2234,14 @@ if [[ $(echo $languages | grep "c++") ]] && [[ "${projectCodePaths[src]}" != "" 
 
   debug ${!F}_${!L}  "2. run tools for C++ code analysis"
 
-  [[ $(echo $staticTools  | grep "cppcheck") ]] && runCppcheck 
+  [[ $(echo $staticTools  | grep "cppcheck") ]] && runCppcheck
   [[ $(echo $staticTools  | grep "vera++")   ]] && runVera
   [[ $(echo $staticTools  | grep "rats")     ]] && runRats
   [[ $(echo $dynamicTools | grep "gcovr")    ]] && runCppUnitestsAndCoverage
 
   # Important note: Dynamic Python analysis done below (with ctest)
   [[ $(echo $dynamicTools | grep "ctest")    ]] && runAllUnitestsAndCoverage
-  [[ $(echo $dynamicTools | grep "valgrind") ]] && runValgrind 
+  [[ $(echo $dynamicTools | grep "valgrind") ]] && runValgrind
 
 fi # end doCppAnalysis
 
@@ -2248,7 +2256,7 @@ if [[ $(echo $languages | grep "python") ]] && [[ "${projectCodePaths[python]}" 
 
   debug ${!F}_${!L}  "3. run tools for Python code analysis"
 
-  if [[ $(echo $staticTools | grep "pylint") ]] ; then 
+  if [[ $(echo $staticTools | grep "pylint") ]] ; then
 	  # TO: run pylint locally
 	  # pylint --rcfile=/home/user/Desktop/pylintrc-v0.3 $sonar_sources_py
 	  # pylint $sonar_sources_py
@@ -2258,7 +2266,7 @@ if [[ $(echo $languages | grep "python") ]] && [[ "${projectCodePaths[python]}" 
   # run coverage only if requested ( python coverage yet done if $dynamicTools contains ctest)
   if [[ $(echo $dynamicTools | grep "coverage") ]] ; then
 	  runPythonUnitestsAndCoverage
-  fi 
+  fi
 
 
 fi # python
@@ -2266,7 +2274,7 @@ fi # python
 
 #########################################################################################
 #
-# 4. write the sonar-project.properties file and run sonar-runner 
+# 4. write the sonar-project.properties file and run sonar-runner
 #
 #########################################################################################
 
@@ -2276,14 +2284,14 @@ fi # python
   # C++ plugin: https://github.com/wenns/sonar-cxx/wiki/Supported-configuration-properties
   # Python plugin: http://docs.codehaus.org/display/SONAR/Python+Plugin
   # pytest with coverage https://pypi.python.org/pypi/pytest-cov
-  
+
   sonar_sources=""
   sonar_tests=""
-  if [[ $(echo $languages | grep "python") ]] ; then 
+  if [[ $(echo $languages | grep "python") ]] ; then
     sonar_sources="${projectCodePaths[python]}"
-    sonar_tests="${projectCodePaths[tests_python]}" 
+    sonar_tests="${projectCodePaths[tests_python]}"
   fi
-  if [[ $(echo $languages | grep "c++") ]]    ; then 
+  if [[ $(echo $languages | grep "c++") ]]    ; then
     sonar_sources="$sonar_sources ${projectCodePaths[include]} ${projectCodePaths[src]}"
     sonar_tests="$sonar_tests ${projectCodePaths[tests_src]}"
   fi
@@ -2304,14 +2312,14 @@ fi # python
   debug ${!F}_${!L} "sonar_sources=$sonar_sources"
   debug ${!F}_${!L} "sonar_tests=$sonar_tests"
 
-  if existsAndNotEmpty "build.${BINARY_TAG_o2g}/$sonar_gcc_reportFile" ; then 
+  if existsAndNotEmpty "build.${BINARY_TAG_o2g}/$sonar_gcc_reportFile" ; then
     sonar_gcc_reportFile="build.${BINARY_TAG_o2g}/$sonar_gcc_reportFile"
   elif existsAndNotEmpty "build.${BINARY_TAG_cov}/$sonar_gcc_reportFile" ; then
     sonar_gcc_reportFile="build.${BINARY_TAG_cov}/$sonar_gcc_reportFile"
   else
     sonar_gcc_reportFile=""
   fi
-  
+
   # TBC: for C++: add modules top folders ? [yes: add $projectModules but not the current top folder "."]
   dir="${systemLib[include]} ${elementsLib[include]} ${projectCodePaths[modules]}"
   sonar_cxx_includeDirectories=$(echo $dir| sed 's/[[:blank:]]\+/,/g')
@@ -2381,7 +2389,7 @@ if [ "$sonar" != "no" ] ; then
   info "running sonar-runner"
   # launch sonar-runner
   # add -X for debug (sonar-runner -X)
-  if [ "$logLevel" == "debug" ] ; then 
+  if [ "$logLevel" == "debug" ] ; then
 	sonar-runner -X | tee ${reportsDir}/sonar-runner-report.txt
   else
 	sonar-runner > ${reportsDir}/sonar-runner-report.txt 2>&1
@@ -2400,4 +2408,3 @@ debug ${!F}_${!L} $(ls ${reportsDir})
 
 info "analysis finished on " $(date +"%x %r %Z")
 info $lineSep
-

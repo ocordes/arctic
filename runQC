@@ -1,0 +1,50 @@
+#!/bin/bash
+
+
+# runQC
+#
+# runs some quality control tests for sonar
+
+DEBUG=1
+
+sonar_cxx_cppcheck_reportFile="sonar/sonar_cxx_cppcheck_report.xml"
+sonar_cxx_vera_reportFile="sonar/sonar_cxx_vera_report.xml"
+sonar_cxx_rats_reportFile="sonar/sonar_cxx_rats_report.xml"
+
+function runCppcheck
+{
+  if [ "$DBUG" == "0" ]; then
+    out="-q"
+  else
+    out=""
+  fi
+  #INCLUDES="-I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1 \
+  #           -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include \
+  #         -I /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers/machine/ \
+  #           -I /usr/include -I /usr/local/include -I /Users/ocordes/git/arctic/build"
+  INCLUDES="-I /usr/include -I /usr/include/c++/4.2.1 -I /usr/local/include -I /Users/ocordes/git/arctic/build"
+  INCLUDES="-I /usr/local/include -I /Users/ocordes/git/arctic/build"
+  cppcheck --force --xml --std=c++11  --enable=all --suppress=missingInclude src/ $out $INCLUDES 2> $sonar_cxx_cppcheck_reportFile
+
+} # runCppcheck
+
+
+function runVera++
+{
+  rm -f $sonar_cxx_vera_reportFile
+  export VERA_ROOT=/usr/local/lib/vera++
+
+  find src -regex ".*\.cc\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
+} # runVera++
+
+
+function runRats
+{
+  rats -w 3 --xml src > $sonar_cxx_rats_reportFile
+} # runrats
+
+# main
+
+#runCppcheck
+runVera++
+#runRats
