@@ -77,7 +77,6 @@ void help_check( int argc, char *argv[] )
 }
 
 
-
 int main( int argc, char *argv[])
 {
   std::cout << argv[0] << " Version " << VERSION << " build " << BUILD;
@@ -102,44 +101,44 @@ int main( int argc, char *argv[])
 
   try {
     std::cout << "Working in ";
-    switch( working_mode )
+    switch ( working_mode )
     {
       case WORKING_MODE_FITS:
         std::cout << "FITS mode!" << std::endl;
-	      im = new fits_image( argc, argv );
-	      break;
+        im = new fits_image( argc, argv );
+        break;
       case WORKING_MODE_ACS:
-	      std::cout << "ACS mode!" << std::endl;
-	      im = new acs_image( argc, argv );
-	      break;
+        std::cout << "ACS mode!" << std::endl;
+        im = new acs_image( argc, argv );
+        break;
       case WORKING_MODE_EUCLID:
-	      std::cout << "Euclid mode!" << std::endl;
-	      im = new euclid_image( argc, argv );
-	      break;
+        std::cout << "Euclid mode!" << std::endl;
+        im = new euclid_image( argc, argv );
+        break;
       default:
-	      std::cout << "Standard FITS mode!" << std::endl;
-	      im = new fits_image( argc, argv );
-	      break;
+        std::cout << "Standard FITS mode!" << std::endl;
+        im = new fits_image( argc, argv );
+        break;
     }
   }
   catch ( char const *s )
-    {
-      std::cerr << s << " Program aborted!" <<  std::endl;
-      exit( 1 );
-    }
+  {
+    std::cerr << s << " Program aborted!" <<  std::endl;
+    exit( 1 );
+  }
 
-  
+
   if ( im->read_file() != 0 )
-    {
-      std::cerr << "Program aborted!" <<  std::endl;
-      exit( 1 );
-    }
+  {
+    std::cerr << "Program aborted!" <<  std::endl;
+    exit( 1 );
+  }
 
   if ( im->clock_charge() == 0 )
-    {
-      // save file only of the CTE correction was run sccessfully
-      im->write_file();
-    }
+  {
+    // save file only of the CTE correction was run sccessfully
+    im->write_file();
+  }
 
 
   // free image
