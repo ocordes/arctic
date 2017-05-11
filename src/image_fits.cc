@@ -19,10 +19,10 @@
 
 */
 
-/* image.cc
+/* image_fits.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-05-11
 
    $Id$
 
@@ -58,15 +58,12 @@ fits_image::fits_image( int argc, char *argv[] ) : image( argc, argv )
   // initialize with command line parameters
   parameters->set_args( &argc, &argv);
 
-  // default allocate image_data object
-  image_data = std::shared_ptr<std::valarray<double>>( new std::valarray<double> );
-
 
   if ( argc < 2 )
-    {
-      output( 1, "Program needs <INPUTFILE> <OUTPUTFILE>! Abort\n" );
-      throw "Not enough arguments!";
-    }
+  {
+    output( 1, "Program needs <INPUTFILE> <OUTPUTFILE>! Abort\n" );
+    throw "Not enough arguments!";
+  }
 
   // copy filename parameters
   infilename = argv[1];

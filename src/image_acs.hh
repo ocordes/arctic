@@ -22,7 +22,7 @@
 /* image_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-05-11
 
    $Id$
 
@@ -50,11 +50,6 @@ public:
   virtual ~acs_image();
   virtual int clock_charge_prepare( void );
 private:
-  bool                                   sci_mode_dark;
-
-  // special variables/reminders
-  bool                                   electrons_per_sec;
-
   double  date2double( std::string & s );
 };
 

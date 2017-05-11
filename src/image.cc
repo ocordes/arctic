@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-03-13
+   changed by: Oliver Cordes 2017-05-11
 
    $Id$
 
@@ -63,24 +63,31 @@ std::string get_working_path()
 }
 
 
-
 image::image( int argc, char *argv[] )
 {
-  prgname      = "";
+  prgname = "";
   for (int i=0;i<argc;++i)
+  {
     if ( prgname == "" )
-       prgname = std::string( argv[i] );
+    {
+      prgname = std::string( argv[i] );
+    }
     else
-       prgname = prgname + " " + std::string( argv[i] );
+    {
+      prgname = prgname + " " + std::string( argv[i] );
+    }
+  }
 
-  infilename   = "";
-  outfilename  = "";
-  image_width  = 0;
-  image_height = 0;
+  infilename        = "";
+  outfilename       = "";
+  image_width       = 0;
+  image_height      = 0;
+  sci_mode_dark     = false;
+  electrons_per_sec = false;
+  exptime           = 0.0;
 
-  FITS_image   = NULL;
-  image_data   = NULL;
-
+  FITS_image        = NULL;
+  image_data        = std::valarray<double>();
 }
 
 
@@ -106,16 +113,17 @@ void image::fits_info( void )
 }
 
 
-
 int image::read_file( void )
 {
   output( 1, "Reading file %s\n", infilename.c_str() );
 
   if ( debug_level > 1 )
+  {
     FITS::setVerboseMode(true);
+  }
 
   try {
-    FITS_image = std::unique_ptr<FITS> ( new FITS( infilename , Read, true) );
+    FITS_image = std::unique_ptr<FITS> ( new FITS( infilename, Read, true) );
 
     // write some information about the image
     fits_info();
@@ -135,7 +143,7 @@ int image::read_file( void )
 
 
     // read the image data
-    FITS_image->pHDU().read( (*image_data) );
+    FITS_image->pHDU().read( image_data );
 
     // read image properties
     image_width = FITS_image->pHDU().axis(0);
@@ -166,19 +174,23 @@ void image::update_header_serial( PHDU & hdu )
 
   hdu.addKey( "CTE_SNTR", parameters->trap_density.size(), "Number of charge trap species" );
   for (unsigned int i=0;i<parameters->trap_density.size();i++)
-    {
-      key  = "CTE_TS" + std::to_string( i+1 ) + "D";
-      comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
-      hdu.addKey( key, parameters->trap_density[i], comm );
-      key  = "CTE_TS" + std::to_string( i+1 ) + "T";
-      comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
-      hdu.addKey( key, parameters->trap_lifetime[i], comm );
-    }
+  {
+    key  = "CTE_TS" + std::to_string( i+1 ) + "D";
+    comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
+    hdu.addKey( key, parameters->trap_density[i], comm );
+    key  = "CTE_TS" + std::to_string( i+1 ) + "T";
+    comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
+    hdu.addKey( key, parameters->trap_lifetime[i], comm );
+  }
   hdu.addKey( "CTE_SNLE", parameters->n_levels, "N_levels parameter in ClockCharge code" );
   if ( parameters->direction )
+  {
     hdu.addKey( "CTE_SDIR",  "REVERSE", "READOUT direction" );
+  }
   else
+  {
     hdu.addKey( "CTE_SDIR",  "FORWARD", "READOUT direction" );
+  }
 }
 
 
@@ -328,7 +340,7 @@ void image::write_file( void )
 
   long  fpixel(1);  // ???? what the heck is this useful ...
 
-  hdu.write( fpixel, nelements, (*image_data) );
+  hdu.write( fpixel, nelements, image_data );
 
   output( 1, "Done.\n" );
 }
@@ -378,4 +390,64 @@ int image::clock_charge( void )
   delete cte;
 
   return 0;
+}
+
+
+int image::correct_units( void )
+{
+  // check the image UNITS
+
+  std::string bunit = readkey<std::string>( FITS_image->pHDU(), "BUNIT" );
+
+  for (unsigned int i=0;i<bunit.length();i++)
+  {
+    bunit[i] = toupper( bunit[i] );
+  }
+
+  if ( bunit == "ELECTRONS" )
+  {
+    // everything is OK
+    return 0;
+  }
+
+  if ( bunit == "ELECTRONS/S" )
+	{
+	  // needs to convert
+	  electrons_per_sec = true;
+
+	  // get the exposure time
+
+	  exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
+
+	  if ( std::isnan( exptime ) )
+	  {
+	    output( 1, "Warning: EXPTIME doesn't exist! Assume exptime=1s!\n" );
+	    exptime = 1.0;
+	  }
+
+	  if ( sci_mode_dark )
+	  {
+	    double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
+
+	    if ( std::isnan( mexptime ) )
+		  {
+		    output( 1, "Warning: MEANEXP doesn't exist, leaving exptime untouched!\n" );
+		  }
+	    else
+      {
+        exptime = mexptime;
+      }
+	  }
+
+	  // recreate electrons from electrons/s
+	  image_data *= exptime;
+
+    return 0;
+	}
+
+	// wrong in general
+
+	std::cout << "Image UNITS are not in ELECTRONS or ELECTRONS/S! Program aborted!" << std::endl;
+
+	return 1;
 }

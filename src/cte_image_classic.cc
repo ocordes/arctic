@@ -22,7 +22,7 @@ w
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-11
 
 
    $Id$
@@ -56,13 +56,7 @@ w
 // use to activate the comparison code
 //#define compariaon
 
-
-
-// define some macros for the neo code
-
 // endof macros
-
-
 
 
 cte_image_classic::cte_image_classic( std::shared_ptr<params> p )
@@ -73,8 +67,7 @@ cte_image_classic::cte_image_classic( std::shared_ptr<params> p )
   empty_trap_limit = parameters->empty_trap_limit;
 }
 
-
-
+#ifdef __debug
 void cte_image_classic::print_traps( void )
 {
   int i, j;
@@ -92,28 +85,32 @@ void cte_image_classic::print_traps( void )
     c = 0;
     d = 0.0;
     for (i=0;i<parameters->n_species;++i)
-	  {
-	    if ( j > 0 )
-	    {
-	      if ( fabs( traps[(j*parameters->n_species)+i] - traps[((j-1)*parameters->n_species)+i] ) < 1e-14 )
-		      c++;
-	    }
-	    std::stringstream str;
-	    str << std::fixed << std::setprecision( debug_precision ) << traps[(j*parameters->n_species)+i] << " ";
-	    s += str.str();
-	    //s += std::to_string( t[(j*n_species)+i] ) + " ";
-	    d +=  traps[(j*parameters->n_species)+i];
-	  }
+    {
+      if ( j > 0 )
+      {
+        if ( fabs( traps[(j*parameters->n_species)+i] - traps[((j-1)*parameters->n_species)+i] ) < 1e-14 )
+        {
+          c++;
+        }
+      }
+      std::stringstream str;
+      str << std::fixed << std::setprecision( debug_precision ) << traps[(j*parameters->n_species)+i] << " ";
+      s += str.str();
+      //s += std::to_string( t[(j*n_species)+i] ) + " ";
+      d +=  traps[(j*parameters->n_species)+i];
+    }
 
     std::stringstream str;
     str << std::fixed << std::setprecision( debug_precision ) << d;
     s += "= " + str.str();
     //      s += "= " + std::to_string( d );
     if ( c < 3 )
+    {
 	    output( 10, "%05i: %s\n", j, s.c_str() );
+    }
   }
 }
-
+#endif
 
 
 void   cte_image_classic::clock_charge_setup( void )

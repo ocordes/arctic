@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-03
+   changed by: Oliver Cordes 2017-05-11
 
 
    $Id$
@@ -56,32 +56,20 @@ w
 //#define compariaon
 
 
-
-void minmax_limit_array2( std::valarray<long> & xrange, long min, long max )
+template <typename T> void minmax_limit( T & val, T min, T max )
 {
-  if (  xrange.size() >= 2 )
+  if ( val < min )
   {
-    if ( xrange[0] < min ) xrange[0] = min;
-    if ( xrange[1] > max ) xrange[1] = max;
+    val = min;
+  }
+  else
+  {
+    if ( val > max )
+    {
+      val = max;
+    }
   }
 }
-
-void minmax_limit_double( double & val, double min, double max )
-{
-  if ( val < min )
-    val = min;
-  else if ( val > max )
-    val = max;
-}
-
-void minmax_limit_long( long & val, long min, long max )
-{
-  if ( val < min )
-    val = min;
-  else if ( val > max )
-    val = max;
-}
-
 
 
 cte_image::cte_image( std::shared_ptr<params> p )
@@ -158,8 +146,12 @@ long cte_image::get_sparse_pixels( std::valarray<double> & v, double limit )
   long nr = 0;
 
   for (unsigned long i=0;i<v.size();++i)
+  {
     if ( ( v[i] > 0.0 ) && ( v[i] < limit ) )
+    {
       nr++;
+    }
+  }
 
   return nr;
 }
@@ -168,8 +160,12 @@ long cte_image::get_sparse_pixels( std::valarray<double> & v, double limit )
 void cte_image::limit_to_max( std::valarray<double> & v, double limit )
 {
   for (unsigned long i=0;i<v.size();i++)
+  {
     if ( v[i] > limit )
+    {
       v[i] = limit;
+    }
+  }
 }
 
 
@@ -189,13 +185,19 @@ void cte_image::create_express_multiplier( std::valarray<int> & emp )
       int d2;
 
       if ( parameters->charge_injection )
+      {
         ix = height - 1;
+      }
       else
+      {
         ix = i_pixel;
+      }
       d = ( ix + 1 + parameters->readout_offset);
       d2= ((height+1+parameters->readout_offset)*(i_express+1))/parameters->express;
       if ( d > d2 )
+      {
         d = d2;
+      }
 
       d -= i_sum;
       i_sum += d;
@@ -210,7 +212,9 @@ void cte_image::create_express_multiplier( std::valarray<int> & emp )
       std::cout << i << " : ";
 
       for (int j=0;j<parameters->express;++j)
-         std::cout << emp[j*(height+1)+i] << " ";
+      {
+        std::cout << emp[j*(height+1)+i] << " ";
+      }
       std::cout << std::endl;
     }
     #endif
@@ -224,8 +228,12 @@ void cte_image::create_exponential_factor( void )
   exponential_factor = std::valarray<double> ( 0.0, parameters->n_species*parameters->n_levels );
 
   for (int i=0;i<parameters->n_levels;++i)
+  {
     for (int j=0;j<parameters->n_species;++j)
+    {
       exponential_factor[(i*parameters->n_species)+j] = 1 - exp( -1.0 / parameters->trap_lifetime[j] );
+    }
+  }
   output( 10, "Done.\n" );
 }
 
@@ -341,7 +349,6 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
           last_express_factor_pixel = express_factor_pixel;
 
 
-
           // inner pixel loop
 
           // check if we need to calculate a new trail for that pixel
@@ -390,10 +397,10 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
               im = image[ (*is) ];
 
               // shape pixel value
-              minmax_limit_double( im, 0.0, well_depth );
+              minmax_limit<double>( im, 0.0, well_depth );
 
               #ifdef __debug
-              output( 10, "debug : %i\n" , i_pixel );
+              output( 10, "debug : %i\n", i_pixel );
               output( 10, "--------------------------------\n" );
               output( 10, "freec       : %f\n", im );
               output( 10, "................................\n" );
@@ -412,8 +419,8 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
 
               if ( freec > well_notch_depth )
                 {
-                  el_height = pow(((freec - well_notch_depth ) / well_range ),well_fill_power);
-                  minmax_limit_double( el_height , 0.0, 1.0 );
+                  el_height = pow(((freec - well_notch_depth ) / well_range ), well_fill_power);
+                  minmax_limit<double>( el_height, 0.0, 1.0 );
 
                   // calculate the total_capture
                   total_capture = clock_charge_pixel_total_capture( el_height, i_pixelp1 );
@@ -423,7 +430,9 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
 
                   // limit the total_capture
                   if ( total_capture < 1e-14 )
+                  {
                     total_capture = 1e-14;
+                  }
 
                   //  d gives a hint of how much electrons are available
                   // for the capturing process
@@ -510,13 +519,15 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
   output( 1, "Model has %i trap species:\n", parameters->n_species );
   output( 1, " Nr  density  lifetime\n" );
   for (int i=0;i<parameters->n_species;i++)
+  {
     output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
+  }
 
   // info about the image and algorithm
   sparse_pixels = get_sparse_pixels( image, traps_total );
 
-  output( 1, "There are %i pixels containing more traps than charge.\n\
-The order in which these traps should be filled is ambiguous.\n", sparse_pixels );
+  output( 1, "There are %i pixels containing more traps than charge.", sparse_pixels );
+  output( 1, "The order in which these traps should be filled is ambiguous.\n" );
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
 
@@ -535,10 +546,10 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
   end_y            = parameters->end_y;
 
   // check and liit the range variable
-  minmax_limit_long( start_x, 0, width );
-  minmax_limit_long( end_x, 0, width );
-  minmax_limit_long( start_y, 0, height );
-  minmax_limit_long( end_y, 0, height );
+  minmax_limit<long>( start_x, 0, width );
+  minmax_limit<long>( end_x, 0, width );
+  minmax_limit<long>( start_y, 0, height );
+  minmax_limit<long>( end_y, 0, height );
 
   output( 10, "start_x=%i end_x=%i\n", start_x, end_x );
   output( 10, "start_y=%i end_y=%i\n", start_y, end_y );
@@ -568,7 +579,7 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
           gettimeofday( &temp_time, NULL );
           getrusage( RUSAGE_SELF, &cpu_temp_time);
           diff_time = get_difftime( start_time, temp_time );
-	        cpu_diff_time = get_difftime( cpu_start_time.ru_utime, cpu_temp_time.ru_utime );
+          cpu_diff_time = get_difftime( cpu_start_time.ru_utime, cpu_temp_time.ru_utime );
           eta_time = ( diff_time / ( (i_column+1) - start_x ) ) * ( end_x - start_x );
 
           output( 1, "Clocking column #%i/%i in %fs, or %fs/column. ETA %.1fs.\n",
@@ -579,11 +590,8 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 
         }
 
-      //output( 1, "stat_count=%i\n", stat_count );
-
-
-	    traps_total = clock_charge_trap_info();
-	    output( 11, "%5i trap fill end: %f\n", i_column, traps_total );
+      traps_total = clock_charge_trap_info();
+      output( 11, "%5i trap fill end: %f\n", i_column, traps_total );
 
     } /* end of i_column loop */
 
@@ -604,72 +612,66 @@ The order in which these traps should be filled is ambiguous.\n", sparse_pixels 
 }
 
 
-
-
-void cte_image::clock_charge( std::shared_ptr<std::valarray<double>> im )
+void cte_image::clock_charge( std::valarray<double> & im )
 {
   output( 11, "cte_image::clock_charge\n" );
 
-
-
   // make a local copy of the image data
-  std::valarray<double> image( (*im) );
+  std::valarray<double> image( im );
 
   std::valarray<double> trail( 0.0, image.size() );
 
 
   if ( parameters->unclock )
+  {
+    // unclocking mode
+    for (unsigned int iteration=0;iteration<parameters->n_iterations;iteration++)
     {
-      // unclocking mode
-      for (unsigned int iteration=0;iteration<parameters->n_iterations;iteration++)
-	       {
-	          output( 1, "Iteration %i/%i\n", iteration+1, parameters->n_iterations );
+      output( 1, "Iteration %i/%i\n", iteration+1, parameters->n_iterations );
 
-	          //if ( have_negative_values( model, naxes[0], naxes[1] ) == 1 )
-            //  output( 1, "Image contains negative pixels!\n" );
+      //if ( have_negative_values( model, naxes[0], naxes[1] ) == 1 )
+      //  output( 1, "Image contains negative pixels!\n" );
 
-            //model_readout = copy_image( (char*)model, naxes[0], naxes[1], DOUBLE_IMG );
+      //model_readout = copy_image( (char*)model, naxes[0], naxes[1], DOUBLE_IMG );
 
-	          // image holds now the original image + trail
+      // image holds now the original image + trail
 
-	          trail = image;
+      trail = image;
 
-            clock_charge_image( trail );
+      clock_charge_image( trail );
 
+      // do some statistics after work
+      output( 1, "Minmax(old image): %f %f\n", image.min(), image.max() );
 
-	          // do some statistics after work
-            output( 1, "Minmax(old image): %f %f\n", image.min(), image.max() );
+      // sub the trail
+      image -= trail;
+      image += im;
 
-            // sub the trail
-	          image -= trail;
-	          image += (*im);
+      //for (unsigned int i=0;i<image.size();i++)
+      //  trail[i] = 0.0;
 
-	          //for (unsigned int i=0;i<image.size();i++)
-	          //  trail[i] = 0.0;
+      // limit_to_max
+      if ( parameters->cut_upper_limit == true )
+      {
+        limit_to_max( image, parameters->upper_limit );
+      }
 
-	          // limit_to_max
-            //limit_to_max( image, (65536.-3) );
-
-	          if ( parameters->cut_upper_limit == true )
-	             limit_to_max( image, parameters->upper_limit );
-
-            output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
-
-	         }
-    }
-  else
-    {
-      // clocking mode
-
-      // no iteration is necessary , the calculated CTI is correct
-
-      // do something
-      clock_charge_image( image );
-
-      output( 1, "Minmax(old image): %f %f\n", (*im).min(), (*im).max() );
       output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
     }
+  }
+  else
+  {
+    // clocking mode
+
+    // no iteration is necessary , the calculated CTI is correct
+
+    // do something
+    clock_charge_image( image );
+
+    output( 1, "Minmax(old image): %f %f\n", (im.min)(), (im.max)() );
+    output( 1, "Minmax(new image): %f %f\n", (image.min)(), (image.max)() );
+  }
 
   // copy the data back into the original image
-  (*im) = image;
+  im = image;
 }

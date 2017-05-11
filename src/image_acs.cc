@@ -22,7 +22,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-05-11
 
    $Id$
 
@@ -60,18 +60,11 @@ acs_image::acs_image( int argc, char *argv[] ) : image( argc, argv )
   // initialize with command line parameters
   parameters->set_args( &argc, &argv);
 
-  // default allocate image_data object
-  image_data = std::shared_ptr<std::valarray<double>>( new std::valarray<double> );
-
-  // debug
-  //for (int i =1;i<argc;i++)
-  //  std::cout << i << " " << argv[i] << std::endl;
-
   if ( argc < 2 )
-    {
-      output( 1, "Program needs <INPUTFILE> <OUTPUTFILE>! Abort\n" );
-      throw "Not enough arguments!";
-    }
+  {
+    output( 1, "Program needs <INPUTFILE> <OUTPUTFILE>! Abort\n" );
+    throw "Not enough arguments!";
+  }
 
   // copy filename parameters
   infilename = argv[1];
@@ -103,70 +96,25 @@ int acs_image::clock_charge_prepare( void )
   double date = readkey<double>( FITS_image->pHDU(), "DATE" );
 
   if ( std::isnan( date ) )
-    {
-      std::string sdate = readkey<std::string>( FITS_image->pHDU(), "DATE" );
-      date = date2double( sdate );
-    }
+  {
+    std::string sdate = readkey<std::string>( FITS_image->pHDU(), "DATE" );
+    date = date2double( sdate );
+  }
   else
-    {
-      output( 1, "Image aquired after %f days since launch\n", date );
+  {
+    output( 1, "Image aquired after %f days since launch\n", date );
 
-      date += +2452334.5; /* convert to JD */
-    }
+    date += +2452334.5; /* convert to JD */
+  }
 
 
-  // check the image UNITS
+  int erg = correct_units();
 
-  std::string bunit = readkey<std::string>( FITS_image->pHDU(), "BUNIT" );
-
-  for (unsigned int i=0;i<bunit.length();i++) bunit[i] = toupper( bunit[i] );
-
-  if ( bunit == "ELECTRONS" )
-    {
-      // everything is OK
-    }
-  else
-    {
-      if ( bunit == "ELECTRONS/S" )
-	{
-	  // needs to convert
-	  electrons_per_sec = true;
-
-	  // get the exposure time
-
-	  double exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
-
-	  if ( std::isnan( exptime ) )
-	    {
-	      output( 1, "Warning: EXPTIME doesn't exist! Assume exptime=1s!\n" );
-	      exptime = 1.0;
-	    }
-
-	  if ( sci_mode_dark )
-	    {
-	      double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
-
-	      if ( std::isnan( mexptime ) )
-		{
-		  output( 1, "Warning: MEANEXP doesn't exist, leaving exptime untouched!\n" );
-		}
-	      else
-		exptime = mexptime;
-	    }
-
-	  // recreate electrons from electrons/s
-	  (*image_data) *= exptime;
-
-	}
-      else
-	{
-	  // wrong in general
-
-	  std::cout << "Image UNITS are not in ELECTRONS or ELECTRONS/S! Program aborted!" << std::endl;
-
-	  return 1;
-	}
-    }
+  if ( erg == 1 )
+  {
+    // if something went wrong in unit check, then exit the program!
+    return 1;
+  }
 
   // calculate the trap confiuration
 

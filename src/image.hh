@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-05-11
 
    $Id$
 
@@ -62,6 +62,11 @@ private:
 
 
 protected:
+  int          correct_units( void );
+  bool                                   sci_mode_dark;
+  bool                                   electrons_per_sec;
+  double                                 exptime;
+  
   std::string                            prgname;
   std::shared_ptr<params>                parameters;
   std::string                            infilename;
@@ -69,7 +74,7 @@ protected:
 
   std::unique_ptr<FITS>                  FITS_image;
 
-  std::shared_ptr<std::valarray<double>> image_data;
+  std::valarray<double>                  image_data;
 
   long                                   image_width;
   long                                   image_height;

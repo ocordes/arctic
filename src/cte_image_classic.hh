@@ -22,7 +22,7 @@
 /* cte_image_classic.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-11
 
    $Id$
 
@@ -59,7 +59,9 @@ public:
   virtual double clock_charge_trap_info( void );
 
 private:
+  #ifdef __debug
   void   print_traps( void );
+  #endif
 
 protected:
   // extern declarated variables
