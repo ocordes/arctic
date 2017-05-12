@@ -22,7 +22,7 @@
 /* cte_image_classic.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-12
 
    $Id$
 
@@ -81,7 +81,5 @@ protected:
 
   int                                  cheight;
 };
-
-
 
 #endif

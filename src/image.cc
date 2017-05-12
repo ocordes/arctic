@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-12
 
    $Id$
 
@@ -204,19 +204,23 @@ void image::update_header_parallel( PHDU & hdu )
 
   hdu.addKey( "CTE_PNTR", parameters->trap_density.size(), "Number of charge trap species" );
   for (unsigned int i=0;i<parameters->trap_density.size();i++)
-    {
-      key  = "CTE_TP" + std::to_string( i+1 ) + "D";
-      comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
-      hdu.addKey( key, parameters->trap_density[i], comm );
-      key  = "CTE_TP" + std::to_string( i+1 ) + "T";
-      comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
-      hdu.addKey( key, parameters->trap_lifetime[i], comm );
-    }
+  {
+    key  = "CTE_TP" + std::to_string( i+1 ) + "D";
+    comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
+    hdu.addKey( key, parameters->trap_density[i], comm );
+    key  = "CTE_TP" + std::to_string( i+1 ) + "T";
+    comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
+    hdu.addKey( key, parameters->trap_lifetime[i], comm );
+  }
   hdu.addKey( "CTE_PNLE", parameters->n_levels, "N_levels parameter in ClockCharge code" );
   if ( parameters->direction )
+  {
     hdu.addKey( "CTE_PDIR",  "REVERSE", "READOUT direction" );
+  }
   else
+  {
     hdu.addKey( "CTE_PDIR",  "FORWARD", "READOUT direction" );
+  }
 }
 
 
@@ -239,55 +243,65 @@ void image::update_header( PHDU & hdu)
   std::string comm;
 
   for (unsigned int i=0;i<parameters->trap_density.size();i++)
-    {
-      key  = "CTE_TR" + std::to_string( i+1 ) + "D";
-      comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
-      hdu.addKey( key, parameters->trap_density[i], comm );
-      key  = "CTE_TR" + std::to_string( i+1 ) + "T";
-      comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
-      hdu.addKey( key, parameters->trap_lifetime[i], comm );
-    }
+  {
+    key  = "CTE_TR" + std::to_string( i+1 ) + "D";
+    comm = "Density of " + std::to_string( i+1 ) + ". charge trap species [pixel^-1]";
+    hdu.addKey( key, parameters->trap_density[i], comm );
+    key  = "CTE_TR" + std::to_string( i+1 ) + "T";
+    comm = "Decay halflife of " + std::to_string( i+1 ) + ". charge trap species";
+    hdu.addKey( key, parameters->trap_lifetime[i], comm );
+  }
   hdu.addKey( "CTE_NLEV", parameters->n_levels, "N_levels parameter in ClockCharge code" );
 
   if ( parameters->rotate )
+  {
     hdu.addKey( "CTE_READ",  "SERIAL", "Readout modus" );
+  }
   else
+  {
     hdu.addKey( "CTE_READ",  "PARALLEL", "Readout modus" );
+  }
 
   if ( parameters->direction )
+  {
     hdu.addKey( "CTE_DIR",  "REVERSE", "READOUT direction" );
+  }
   else
+  {
     hdu.addKey( "CTE_DIR",  "FORWARD", "READOUT direction" );
-
+  }
 
   if ( parameters->rotate )
+  {
     update_header_serial( hdu );
+  }
   else
+  {
     update_header_parallel( hdu );
+  }
 
 
-      // write HISTORY strings to FITS file
+  // write HISTORY strings to FITS file
+  hdu.writeHistory( "========================================================================" );
+  hdu.writeHistory( "artic Version "+ std::string( VERSION) );
+  hdu.writeHistory( "RUN: " + std::string( ctime( & systime ) ) );
+  hdu.writeHistory( "CMD: " + prgname );
+  hdu.writeHistory( "CWD: " + get_working_path() );
 
-      hdu.writeHistory( "========================================================================" );
-      hdu.writeHistory( "artic Version "+ std::string( VERSION) );
-      hdu.writeHistory( "RUN: " + std::string( ctime( & systime ) ) );
-      hdu.writeHistory( "CMD: " + prgname );
-      hdu.writeHistory( "CWD: " + get_working_path() );
+  if ( parameters-> config_filename != "" )
+  {
+    hdu.writeHistory( "Config File: " + parameters->config_filename );
 
-      if ( parameters-> config_filename != "" )
-      {
-        hdu.writeHistory( "Config File: " + parameters->config_filename );
+    std::vector<std::string>::iterator iter = parameters->config_entries.begin();
+    std::vector<std::string>::iterator end = parameters->config_entries.end();
+    while ( iter != end )
+    {
+      hdu.writeHistory( " " + (*iter) );
+      ++iter;
+    }
+  }
 
-        std::vector<std::string>::iterator iter = parameters->config_entries.begin();
-        std::vector<std::string>::iterator end = parameters->config_entries.end();
-        while(iter != end)
-        {
-          hdu.writeHistory( " " + (*iter) );
-          ++iter;
-        }
-      }
-
-      hdu.writeHistory( "========================================================================" );
+  hdu.writeHistory( "========================================================================" );
 }
 
 
@@ -358,13 +372,16 @@ int image::clock_charge( void )
 {
   int ret = clock_charge_prepare();
 
-  if ( ret != 0 ) return ret;
+  if ( ret != 0 )
+  {
+    return ret;
+  }
 
 
   // create a CTE obejct with the parameter class
   cte_image *cte;
 
-  switch( parameters->algorithm )
+  switch ( parameters->algorithm )
   {
     case ALGORITHM_CLASSIC:
       cte = new cte_image_classic( parameters );
@@ -411,43 +428,42 @@ int image::correct_units( void )
   }
 
   if ( bunit == "ELECTRONS/S" )
-	{
-	  // needs to convert
-	  electrons_per_sec = true;
+  {
+    // needs to convert
+    electrons_per_sec = true;
 
-	  // get the exposure time
+    // get the exposure time
+    exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
 
-	  exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
+    if ( std::isnan( exptime ) )
+    {
+      output( 1, "Warning: EXPTIME doesn't exist! Assume exptime=1s!\n" );
+      exptime = 1.0;
+    }
 
-	  if ( std::isnan( exptime ) )
-	  {
-	    output( 1, "Warning: EXPTIME doesn't exist! Assume exptime=1s!\n" );
-	    exptime = 1.0;
-	  }
+    if ( sci_mode_dark )
+    {
+      double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
 
-	  if ( sci_mode_dark )
-	  {
-	    double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
-
-	    if ( std::isnan( mexptime ) )
-		  {
-		    output( 1, "Warning: MEANEXP doesn't exist, leaving exptime untouched!\n" );
-		  }
-	    else
+      if ( std::isnan( mexptime ) )
+      {
+        output( 1, "Warning: MEANEXP doesn't exist, leaving exptime untouched!\n" );
+      }
+      else
       {
         exptime = mexptime;
       }
-	  }
+    }
 
-	  // recreate electrons from electrons/s
-	  image_data *= exptime;
+    // recreate electrons from electrons/s
+    image_data *= exptime;
 
     return 0;
-	}
+  }
 
-	// wrong in general
+  // wrong in general
 
-	std::cout << "Image UNITS are not in ELECTRONS or ELECTRONS/S! Program aborted!" << std::endl;
+  std::cout << "Image UNITS are not in ELECTRONS or ELECTRONS/S! Program aborted!" << std::endl;
 
-	return 1;
+  return 1;
 }

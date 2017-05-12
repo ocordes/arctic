@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-12
 
 
    $Id$
@@ -326,166 +326,162 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
   int p_express_multiplier = 0;
 
   for (i_express=0;i_express<express;++i_express)
+  {
+    // traps are empty
+    clock_charge_clear();
+
+    // good question if this is really necessary, because the array is used via nr_trapl as an indication
+    // how much levels are really used, these levels have then also valid entries ...
+    //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
+    //trapl_fill = std::valarray<int> ( 0, n_levels );
+    is.reset( i_column ); // initialize the image slicer
+
+    for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
     {
-      // traps are empty
-      clock_charge_clear();
+      i_pixelp1 = i_pixel + 1;
 
-      // good question if this is really necessary, because the array is used via nr_trapl as an indication
-      // how much levels are really used, these levels have then also valid entries ...
-      //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
-      //trapl_fill = std::valarray<int> ( 0, n_levels );
-      is.reset( i_column ); // initialize the image slicer
+      // the low signal mode produces some error with express > 1
+      // the problem is that in the express loop for express values > 1
+      // the first lines have a multiplier =0 and therefor empty traps
+      // which should have at least a filled situation ...
 
-      for (i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
+      last_express_factor_pixel = express_factor_pixel;
+
+
+      // inner pixel loop
+
+      // check if we need to calculate a new trail for that pixel
+
+      // access the express array only once and use this value twice ;-)
+      //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
+      express_factor_pixel = express_multiplier[p_express_multiplier];
+
+
+      // correcttion factor
+      express_correct = (double) express_factor_pixel / i_pixelp1;
+
+      #ifdef __debug
+      output( 10, "express_correct = %f\n", express_correct );
+      #endif
+
+      // in express >1 mode save states when an exress block ends
+      if ( ( last_express_factor_pixel == express_factor_pixel ) && ( traps_saved == false ) )
+      {
+        traps_saved = true;
+        #ifdef __debug
+        output( 10, "Traps will be saved!\n");
+        output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
+        #endif
+
+        clock_charge_save_traps();
+      }
+
+
+      if ( express_factor_pixel != 0 )
+      {
+        // restore the saved trap states
+        if ( last_express_factor_pixel == 0 )
         {
-
-          i_pixelp1 = i_pixel + 1;
-
-          // the low signal mode produces some error with express > 1
-          // the problem is that in the express loop for express values > 1
-          // the first lines have a multiplier =0 and therefor empty traps
-          // which should have at least a filled situation ...
-
-          last_express_factor_pixel = express_factor_pixel;
-
-
-          // inner pixel loop
-
-          // check if we need to calculate a new trail for that pixel
-
-          // access the express array only once and use this value twice ;-)
-          //express_factor_pixel = express_multiplier[p_express_multiplier + i_pixel];
-          express_factor_pixel = express_multiplier[p_express_multiplier];
-
-
-          // correcttion factor
-          express_correct = (double) express_factor_pixel / i_pixelp1;
-
+          traps_saved = false;
           #ifdef __debug
-          output( 10, "express_correct = %f\n", express_correct );
+          output( 10, "Traps will be restored!\n");
+          output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
           #endif
 
-          // in express >1 mode save states when an exress block ends
-          if ( ( last_express_factor_pixel == express_factor_pixel ) && ( traps_saved == false ) )
-          {
-            traps_saved = true;
-            #ifdef __debug
-            output( 10, "Traps will be saved!\n");
-            output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
-            #endif
+          clock_charge_restore_traps();
+        }
 
-            clock_charge_save_traps();
+
+        // extract pixel
+        im = image[ (*is) ];
+
+        // shape pixel value
+        minmax_limit<double>( im, 0.0, well_depth );
+
+        #ifdef __debug
+        output( 10, "debug : %i\n", i_pixel );
+        output( 10, "--------------------------------\n" );
+        output( 10, "freec       : %f\n", im );
+        output( 10, "................................\n" );
+        #endif
+
+        sum = clock_charge_pixel_release();
+        freec = im + sum * express_correct;
+
+        #ifdef __debug
+        output( 10, "release     : %f\n", sum );
+        output( 10, "express_corr: %f\n", express_correct );
+        output( 10, "freec       : %f\n", freec );
+        #endif
+
+        // Capture any free electrons in the vicinity of empty traps
+
+        if ( freec > well_notch_depth )
+        {
+          el_height = pow(((freec - well_notch_depth ) / well_range ), well_fill_power);
+          minmax_limit<double>( el_height, 0.0, 1.0 );
+
+          // calculate the total_capture
+          total_capture = clock_charge_pixel_total_capture( el_height, i_pixelp1 );
+
+          // correct the total_capture for express
+          total_capture *= express_correct;
+
+          // limit the total_capture
+          if ( total_capture < 1e-14 )
+          {
+            total_capture = 1e-14;
           }
 
+          //  d gives a hint of how much electrons are available
+          // for the capturing process
+          // d > 1  more electrons are available
+          // d < 1  less electrons are available, in
+          //         the end d * total_capture is then used!
+          d = freec / total_capture;
+          if ( d < 1.0 )
+          {
+            #ifdef __debug
+            output( 10, "d < 1.0\n" );
+            #endif
 
-          if ( express_factor_pixel != 0 )
-            {
-              // restore the saved trap states
-              if ( last_express_factor_pixel == 0 )
-              {
-                traps_saved = false;
-                #ifdef __debug
-                output( 10, "Traps will be restored!\n");
-                output( 10, "pixel=%i express=%i\n", i_pixel, i_express );
-                #endif
+            clock_charge_pixel_capture_ov( d );
+          }
+          else
+          {
+            #ifdef __debug
+            output( 10, "d >= 1.0\n" );
+            #endif
 
-                clock_charge_restore_traps();
-              }
+            clock_charge_pixel_capture_full();
+          }
 
+          // remove the captured electrons
+          freec -= total_capture;
 
-              // extract pixel
-              im = image[ (*is) ];
+          // cleanup trap structure
+          clock_charge_pixel_cleanup();
+        }
 
-              // shape pixel value
-              minmax_limit<double>( im, 0.0, well_depth );
+        #ifdef __debug
+        output( 1, "--------------------------------\n" );
 
-              #ifdef __debug
-              output( 10, "debug : %i\n", i_pixel );
-              output( 10, "--------------------------------\n" );
-              output( 10, "freec       : %f\n", im );
-              output( 10, "................................\n" );
-              #endif
+        double trail = ( freec - im );
+        output( 10, "strail: %.10f\n", trail );
+        #endif
 
-              sum = clock_charge_pixel_release();
-              freec = im + sum * express_correct;
+        image[(*is)] += ( freec - im );
+      } // end of p_express_multiplier[i_pixel] != 0
 
-              #ifdef __debug
-              output( 10, "release     : %f\n", sum );
-              output( 10, "express_corr: %f\n", express_correct );
-              output( 10, "freec       : %f\n", freec );
-              #endif
-
-              // Capture any free electrons in the vicinity of empty traps
-
-              if ( freec > well_notch_depth )
-                {
-                  el_height = pow(((freec - well_notch_depth ) / well_range ), well_fill_power);
-                  minmax_limit<double>( el_height, 0.0, 1.0 );
-
-                  // calculate the total_capture
-                  total_capture = clock_charge_pixel_total_capture( el_height, i_pixelp1 );
-
-                  // correct the total_capture for express
-                  total_capture *= express_correct;
-
-                  // limit the total_capture
-                  if ( total_capture < 1e-14 )
-                  {
-                    total_capture = 1e-14;
-                  }
-
-                  //  d gives a hint of how much electrons are available
-                  // for the capturing process
-                  // d > 1  more electrons are available
-                  // d < 1  less electrons are available, in
-                  //         the end d * total_capture is then used!
-                  d = freec / total_capture;
-                  if ( d < 1.0 )
-                  {
-                    #ifdef __debug
-                    output( 10, "d < 1.0\n" );
-                    #endif
-
-                    clock_charge_pixel_capture_ov( d );
-                  }
-                  else
-                  {
-                    #ifdef __debug
-                    output( 10, "d >= 1.0\n" );
-                    #endif
-
-                    clock_charge_pixel_capture_full();
-                  }
-
-                  // remove the captured electrons
-                  freec -= total_capture;
-
-                  // cleanup trap structure
-                  clock_charge_pixel_cleanup();
-                }
-
-              #ifdef __debug
-              output( 1, "--------------------------------\n" );
-              #endif
-
-
-              #ifdef __debug
-              double trail = ( freec - im );
-              output( 10, "strail: %.10f\n", trail );
-              #endif
-
-              image[(*is)] += ( freec - im );;
-
-
-            } /* end of p_express_multiplier[i_pixel] != 0 */
-            // nevertheless that we are doing nothing, change the slicer
-            // next image element
-            ++p_express_multiplier;
-            ++is;
-         } /* i_pixel loop for the trail */
-      //p_express_multiplier += height + 1;
+      // nevertheless that we are doing nothing, change the slicer
+      // next image element
       ++p_express_multiplier;
-    }  /* end of express loop */
+      ++is;
+    } // i_pixel loop for the trail
+
+    //p_express_multiplier += height + 1;
+    ++p_express_multiplier;
+  }  // end of express loop
 }
 
 
@@ -641,7 +637,7 @@ void cte_image::clock_charge( std::valarray<double> & im )
       clock_charge_image( trail );
 
       // do some statistics after work
-      output( 1, "Minmax(old image): %f %f\n", image.min(), image.max() );
+      output( 1, "Minmax(old image): %f %f\n", (image.min)(), (image.max)() );
 
       // sub the trail
       image -= trail;
@@ -656,7 +652,7 @@ void cte_image::clock_charge( std::valarray<double> & im )
         limit_to_max( image, parameters->upper_limit );
       }
 
-      output( 1, "Minmax(new image): %f %f\n", image.min(), image.max() );
+      output( 1, "Minmax(new image): %f %f\n", (image.min)(), (image.max)() );
     }
   }
   else

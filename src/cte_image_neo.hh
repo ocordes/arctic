@@ -22,7 +22,7 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-12
 
    $Id$
 
@@ -59,7 +59,9 @@ public:
   virtual double clock_charge_trap_info( void );
 
 private:
+  #ifdef __debug
   void   print_trapl( void );
+  #endif
   bool   val_array_smaller( std::valarray<double> & v1,
 			    std::valarray<double> & v2 );
   void   clock_charge_pixel_capture_ov_modify( int, double );
@@ -92,7 +94,6 @@ protected:
   unsigned int                         cheight;
   double                               ov;
 };
-
 
 
 #endif

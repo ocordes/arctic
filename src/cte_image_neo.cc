@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-12
 
 
    $Id$
@@ -56,14 +56,11 @@
 //#define compariaon
 
 
-
 // define some macros for the neo code
 
 #define newtrap( new_h, new_val) ( trapl_fill[nr_trapl] = new_h; trapl[nr_trapl] = new_val; ++nr_trapl; )
 
 // endof macros
-
-
 
 
 cte_image_neo::cte_image_neo( void )
@@ -77,51 +74,51 @@ cte_image_neo::cte_image_neo( std::shared_ptr<params> p )
 {
 }
 
-
-
+#ifdef __debug
 void cte_image_neo::print_trapl( void )
 {
-  int i, j, l;
+  int i, j, k;
 
   std::string s;
 
   output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
           parameters->n_species, nr_trapl );
-  l = 0;
+  k = 0;
   //for (j=0;j<nr_trapl;j++)
-  for (j=nr_trapl-1;j>=0;j--)
+  for (j=nr_trapl-1;j>=0;--j)
+  {
+    s = "";
+    for (i=0;i<parameters->n_species;++i)
     {
-      s = "";
-      for (i=0;i<parameters->n_species;i++)
-	{
-	  std::stringstream str;
-	  str << std::fixed << std::setprecision( debug_precision ) << trapl[j][i] << " ";
-	  s += str.str();
-	  //s += std::to_string( trapl[j][i] ) + " ";
-	}
-
       std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << trapl[j].sum() ;
-      s += "= " + str.str();
-      //s += "= " + std::to_string( trapl[j].sum()  );
-
-      //output( 10, "%05i: %s\n", j, s.c_str() );
-      output( 10, "%05i: %s  (x %05i)\n", l, s.c_str(), trapl_fill[j] );
-
-      l += trapl_fill[j];
+      str << std::fixed << std::setprecision( debug_precision ) << trapl[j][i] << " ";
+      s += str.str();
+      //s += std::to_string( trapl[j][i] ) + " ";
     }
+
+    std::stringstream str;
+    str << std::fixed << std::setprecision( debug_precision ) << trapl[j].sum();
+    s += "= " + str.str();
+    //s += "= " + std::to_string( trapl[j].sum()  );
+
+    //output( 10, "%05i: %s\n", j, s.c_str() );
+    output( 10, "%05i: %s  (x %05i)\n", k, s.c_str(), trapl_fill[j] );
+
+    k += trapl_fill[j];
+  }
 }
+#endif
 
 
-
-
-
-bool cte_image_neo::val_array_smaller( std::valarray<double> & v1,
-				  std::valarray<double> & v2 )
+bool cte_image_neo::val_array_smaller( std::valarray<double> & v1, std::valarray<double> & v2 )
 {
-  for( unsigned int i=0; i<v1.size();i++)
+  for ( unsigned int i=0; i<v1.size();++i)
+  {
     if ( v1[i] < v2[i] )
+    {
       return true;
+    }
+  }
   return false;
 }
 
@@ -131,15 +128,14 @@ void cte_image_neo::clock_charge_setup( void  )
   output( 1, "Using Olli's neo algorithm!\n" );
 
   if ( dark_mode )
+  {
     output( 1, " Using Dark_mode optimization!\n" );
+  }
 
 
   output( 1, "Using n_levels=%i\n", parameters->n_levels );
 
-
-
   // setup variables
-
   check_empty_traps = parameters->check_empty_traps;
   empty_trap_limit = parameters->empty_trap_limit;
   empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
@@ -214,7 +210,7 @@ void cte_image_neo::clock_charge_restore_traps( void )
 double cte_image_neo::clock_charge_pixel_release( void )
 {
   static double sum = 0.0;
-  static double sum2, release;
+  static double release;
 
   int    n_species = parameters->n_species;
 
@@ -226,7 +222,7 @@ double cte_image_neo::clock_charge_pixel_release( void )
   sum = 0.0;
   for (int j=0;j<nr_trapl;++j)
   {
-    sum2 = 0.0;
+    double sum2 = 0.0;
     for (int i=0;i<n_species;++i)
     {
       release = trapl[j][i] * exponential_factor[i];
@@ -246,7 +242,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
    double total_capture = 0.0;
    double c;
 
-   int    i, j, h, h2;
+   int    i, j, h;
 
    // prepare the work
 
@@ -279,7 +275,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
    h = 0;
    for (j=nr_trapl-1;j>=0;--j)
    {
-     h2 = h + trapl_fill[j];
+     int h2 = h + trapl_fill[j];
 
      // don't need to check for max. because
      // n_electrons_per_trap_express is always higher or
@@ -302,12 +298,16 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
        {
          c = n_electrons_per_trap_express_ov[i]  - trapl[j][i];
          if ( c > 0.0 )
+         {
            total_capture += c;
+         }
        }
      }
      h = h2;
      if ( h > dheight )
+     {
        break;
+     }
    }
 
    // h has the height of all used levels
@@ -319,7 +319,9 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
    #ifdef __debug
    double traps_total2 = 0.0;
    for (i=0;i<nr_trapl;++i)
-      traps_total2 += trapl[i].sum() * trapl_fill[i];
+   {
+     traps_total2 += trapl[i].sum() * trapl_fill[i];
+   }
    output( 10, "ntrap_total : %.15f\n", traps_total2 );
    output( 10, "n_p_t_e_t   : %.15f\n", n_electrons_per_trap_express_total );
 
@@ -343,10 +345,14 @@ void cte_image_neo::clock_charge_pixel_capture_ov_modify( int j, double d )
   for (i=0;i<n_species;++i)
   {
     if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
+    {
       new_trapl[new_nr_trapl][i] = trapl[j][i]
                               + ( ( n_electrons_per_trap_express_ov[i]  ) - trapl[j][i] ) * d;
+    }
     else
+    {
       new_trapl[new_nr_trapl][i] = trapl[j][i];
+    }
   }
   new_trapl_fill[new_nr_trapl] = 1;
   ++new_nr_trapl;
@@ -357,7 +363,7 @@ void cte_image_neo::clock_charge_pixel_capture_ov_copyback_temp( void )
   int i, j;
 
   // copy the temporary array back
-  for (j=new_nr_trapl-1,i=0;j>=0;--j,++i)
+  for (j=new_nr_trapl-1, i=0;j>=0;--j, ++i)
   {
     trapl[i]      = new_trapl[j];
     trapl_fill[i] = new_trapl_fill[j];
@@ -461,7 +467,10 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
     trapl_fill[j] -= ceil( dheight );
 
-    if ( trapl_fill[j] == 0 ) --j;      // fix BUG which was also in the 1st implementation
+    if ( trapl_fill[j] == 0 )
+    {
+      --j;      // fix BUG which was also in the 1st implementation
+    }
 
     dheight = 0.0;
   }
@@ -514,9 +523,13 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
   {
     h += trapl_fill[nr_trapl-1];
     if ( h > dheight )
+    {
       break;
+    }
     else
+    {
       skip = h;
+    }
     --nr_trapl;
   }
 
@@ -539,91 +552,92 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
     output( 10, "skip=%i dheight=%f\n", skip, dheight );
     #endif
 
-              trapl[nr_trapl] = n_electrons_per_trap_express_ov;
-              trapl_fill[nr_trapl] = 1;
-              ++nr_trapl;
-              trapl_fill[nr_trapl] = cheight;
-              trapl[nr_trapl] = n_electrons_per_trap_express;
-              ++nr_trapl;
-           }
-         else
-           {
-              // normal case
+    trapl[nr_trapl] = n_electrons_per_trap_express_ov;
+    trapl_fill[nr_trapl] = 1;
+    ++nr_trapl;
+    trapl_fill[nr_trapl] = cheight;
+    trapl[nr_trapl] = n_electrons_per_trap_express;
+    ++nr_trapl;
+  }
+  else
+  {
+    // normal case
 
-              // we have removed all levels from the stack which will be
-              // absorbed completely during the new filling
+    // we have removed all levels from the stack which will be
+    // absorbed completely during the new filling
 
-              // skip is the number of levels which are already absorbed!
+    // skip is the number of levels which are already absorbed!
 
-              // we are lucky, the levels are empty because we are at the
-              // start or the new dheight is larger than all previous levels
-              if ( nr_trapl == 0 )
-                {
-                   // an additional trap level
-                   trapl_fill[1] = cheight;
-                   trapl_fill[0] = 1;
-                   trapl[1] = n_electrons_per_trap_express;
-                   trapl[0] = n_electrons_per_trap_express_ov;
-                   nr_trapl = 2;
-                }
-              else
-                {
-                   #ifdef __debug
-                   output( 10, "tr_f[0],ch,skip: %i %i %i\n", trapl_fill[0], cheight, skip );
-                   //print_trapl( trapl, trapl_fill, n_species, nr_trapl );
-                   #endif
-
-                   // cheight full trap levels
-                   // ov is a single level with ov * n_electrons_per_trap fill
-
-                   // skip levels are already absorbed
-
-                   // modify the first levels
-                   // using cheight because this is the number of remaining levels
-                   // from the prior filled trap levels
-
-                   // cheight - skip are the (sub)-levels  which needs to be absorbed
-                   // by the next big entry
-                   trapl_fill[nr_trapl-1] -= cheight - skip;   // absorbes levels
-
-                   // check what to do anyway, if there is a chance to modify the
-                   // big level!
-
-                   if ( val_array_smaller( trapl[nr_trapl-1], n_electrons_per_trap_express_ov ) )
-                   {
-                     if ( trapl_fill[nr_trapl-1] > 1 )
-                     {
-                       // split levels
-                       --trapl_fill[nr_trapl-1];
-                       trapl_fill[nr_trapl] = 1;
-                       trapl[nr_trapl] = trapl[nr_trapl-1];
-                       ++nr_trapl;
-                     }
-
-                     // fill only the species which needs to be filled
-                     for (j=0;j<n_species;++j)
-                       // modify if there are free
-                       if ( trapl[nr_trapl-1][j] < n_electrons_per_trap_express_ov[j] )
-                         trapl[nr_trapl-1][j] =  n_electrons_per_trap_express_ov[j];
-
-                   }
-
-
-                   // fill the leading trap level if necessary
-                   if ( cheight > 0 )
-                     {
-                        trapl_fill[nr_trapl] = cheight;
-                        trapl[nr_trapl] = n_electrons_per_trap_express;
-
-                        ++nr_trapl;
-                     }
-             }
-           }
-
-
+    // we are lucky, the levels are empty because we are at the
+    // start or the new dheight is larger than all previous levels
+    if ( nr_trapl == 0 )
+    {
+      // an additional trap level
+      trapl_fill[1] = cheight;
+      trapl_fill[0] = 1;
+      trapl[1] = n_electrons_per_trap_express;
+      trapl[0] = n_electrons_per_trap_express_ov;
+      nr_trapl = 2;
+    }
+    else
+    {
       #ifdef __debug
-      print_trapl();
+      output( 10, "tr_f[0],ch,skip: %i %i %i\n", trapl_fill[0], cheight, skip );
+      //print_trapl( trapl, trapl_fill, n_species, nr_trapl );
       #endif
+
+      // cheight full trap levels
+      // ov is a single level with ov * n_electrons_per_trap fill
+
+      // skip levels are already absorbed
+
+      // modify the first levels
+      // using cheight because this is the number of remaining levels
+      // from the prior filled trap levels
+
+      // cheight - skip are the (sub)-levels  which needs to be absorbed
+      // by the next big entry
+      trapl_fill[nr_trapl-1] -= cheight - skip;   // absorbes levels
+
+      // check what to do anyway, if there is a chance to modify the
+      // big level!
+
+      if ( val_array_smaller( trapl[nr_trapl-1], n_electrons_per_trap_express_ov ) )
+      {
+        if ( trapl_fill[nr_trapl-1] > 1 )
+        {
+          // split levels
+          --trapl_fill[nr_trapl-1];
+          trapl_fill[nr_trapl] = 1;
+          trapl[nr_trapl] = trapl[nr_trapl-1];
+          ++nr_trapl;
+        }
+
+        // fill only the species which needs to be filled
+        for (j=0;j<n_species;++j)
+        {
+          // modify if there are free
+          if ( trapl[nr_trapl-1][j] < n_electrons_per_trap_express_ov[j] )
+          {
+            trapl[nr_trapl-1][j] =  n_electrons_per_trap_express_ov[j];
+          }
+        }
+      }
+
+      // fill the leading trap level if necessary
+      if ( cheight > 0 )
+      {
+        trapl_fill[nr_trapl] = cheight;
+        trapl[nr_trapl] = n_electrons_per_trap_express;
+
+        ++nr_trapl;
+      }
+    }
+  }
+
+  #ifdef __debug
+  print_trapl();
+  #endif
 }
 
 
@@ -672,14 +686,15 @@ void cte_image_neo::clock_charge_pixel_cleanup( void )
 }
 
 
-
 // gives a total number of how much electrons are located in the traps
 double cte_image_neo::clock_charge_trap_info( void )
 {
   double total = 0.0;
 
   for (unsigned int i=0;i<nr_trapl;++i)
-     total += trapl[i].sum() * trapl_fill[i];
+  {
+    total += trapl[i].sum() * trapl_fill[i];
+  }
 
   return total;
 }
