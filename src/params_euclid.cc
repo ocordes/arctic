@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-02-28
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -37,11 +37,11 @@
 #include "strstr.hh"
 
 
-params_euclid::params_euclid() : params_fits()
+params_euclid::params_euclid() : params_fits(),
+  has_local_n_species( false ),
+  has_local_trap_density( false ),
+  ccd( 0 )
 {
-  has_local_n_species    = false;
-  has_local_trap_density = false;
-
   working_mode = "EUCLID";
 }
 

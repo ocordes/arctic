@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -36,8 +36,6 @@
 #include "params.hh"
 
 #include <CCfits/CCfits>
-
-using namespace CCfits;
 
 
 // Defines the simple abstract image class
@@ -53,12 +51,12 @@ public:
   virtual int  clock_charge_prepare( void );
   int          clock_charge( void );
 
-  template <typename T>  T readkey( PHDU & pHDU, std::string key );
+  template <typename T>  T readkey( CCfits::PHDU & pHDU, std::string key );
 
 private:
-  void         update_header( PHDU & hdu);
-  void         update_header_serial( PHDU & hdu );
-  void         update_header_parallel( PHDU & hdu );
+  void         update_header( CCfits::PHDU & hdu);
+  void         update_header_serial( CCfits::PHDU & hdu );
+  void         update_header_parallel( CCfits::PHDU & hdu );
 
 
 protected:
@@ -66,13 +64,13 @@ protected:
   bool                                   sci_mode_dark;
   bool                                   electrons_per_sec;
   double                                 exptime;
-  
+
   std::string                            prgname;
   std::shared_ptr<params>                parameters;
   std::string                            infilename;
   std::string                            outfilename;
 
-  std::unique_ptr<FITS>                  FITS_image;
+  std::unique_ptr<CCfits::FITS>          FITS_image;
 
   std::valarray<double>                  image_data;
 
@@ -81,14 +79,14 @@ protected:
 };
 
 template <typename T>
-T image::readkey( PHDU & pHDU, std::string key )
+T image::readkey( CCfits::PHDU & pHDU, std::string key )
 {
   T val;
 
   try {
     pHDU.readKey( key, val );
   }
-  catch (FitsException&)
+  catch (CCfits::FitsException&)
     {
       std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
       std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;

@@ -22,7 +22,7 @@
 /* image_slice.hh
 
    written by: Oliver Cordes 2016-05-09
-   changed by: Oliver Cordes 2016-09-27
+   changed by: Oliver Cordes 2017-05-15
 
 */
 
@@ -45,9 +45,6 @@ namespace std
 {
   class image_slice;
 }
-
-
-
 
 
 class std::image_slice {
@@ -77,7 +74,6 @@ public:
 
   image_slice begin();
   image_slice end();
-
 };
 
 #endif

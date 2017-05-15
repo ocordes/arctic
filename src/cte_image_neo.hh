@@ -22,7 +22,7 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-12
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -62,8 +62,7 @@ private:
   #ifdef __debug
   void   print_trapl( void );
   #endif
-  bool   val_array_smaller( std::valarray<double> & v1,
-			    std::valarray<double> & v2 );
+  bool   val_array_smaller( std::valarray<double> &, std::valarray<double> & );
   void   clock_charge_pixel_capture_ov_modify( int, double );
   void   clock_charge_pixel_capture_ov_copyback_temp( void );
 protected:

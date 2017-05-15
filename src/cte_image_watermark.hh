@@ -22,7 +22,7 @@
 /* cte_image_watermark.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -56,7 +56,9 @@ public:
   virtual void   clock_charge_pixel_cleanup( void );
   virtual double clock_charge_trap_info( void );
 private:
+  #ifdef __debug
   void   print_wml( void );
+  #endif
 protected:
   // extern declarated variables
   bool                                 check_empty_traps;
@@ -86,7 +88,6 @@ protected:
 
   double                              cloud_height;
 };
-
 
 
 #endif

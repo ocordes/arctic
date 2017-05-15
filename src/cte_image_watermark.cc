@@ -22,7 +22,7 @@ w
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-04-27
+   changed by: Oliver Cordes 2017-05-15
 
 
    $Id$
@@ -57,13 +57,6 @@ w
 //#define compariaon
 
 
-
-// define some macros for the neo code
-// endof macros
-
-
-
-
 cte_image_watermark::cte_image_watermark( std::shared_ptr<params> p )
                                         : cte_image( p )
 {
@@ -77,39 +70,39 @@ cte_image_watermark::cte_image_watermark( std::shared_ptr<params> p )
 }
 
 
+#ifdef __debug
 void cte_image_watermark::print_wml( void )
 {
   int i, j;
-  double l;
+  double k;
 
   std::string s;
 
   output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
           parameters->n_species, nr_wml );
-  l = 0.0;
-  //for (j=0;j<nr_trapl;j++)
-  for (j=nr_wml-1;j>=0;j--)
+  k = 0.0;
+  for (j=nr_wml-1;j>=0;--j)
   {
     s = "";
     for (i=0;i<parameters->n_species;i++)
-	  {
-	     std::stringstream str;
-	     str << std::fixed << std::setprecision( debug_precision ) << wml[j][i] << " ";
-	     s += str.str();
-	     //s += std::to_string( trapl[j][i] ) + " ";
-	  }
+    {
+      std::stringstream str;
+      str << std::fixed << std::setprecision( debug_precision ) << wml[j][i] << " ";
+      s += str.str();
+    }
 
     std::stringstream str;
-    str << std::fixed << std::setprecision( debug_precision ) << wml[j].sum() ;
+    str << std::fixed << std::setprecision( debug_precision ) << wml[j].sum();
     s += "= " + str.str();
     //s += "= " + std::to_string( trapl[j].sum()  );
 
     //output( 10, "%05i: %s\n", j, s.c_str() );
-    output( 10, "%011.5f: %s  (x %f)\n", l * (double) parameters->n_levels, s.c_str(), wml_fill[j] );
+    output( 10, "%011.5f: %s  (x %f)\n", k * (double) parameters->n_levels, s.c_str(), wml_fill[j] );
 
-    l += wml_fill[j];
+    k += wml_fill[j];
   }
 }
+#endif
 
 
 void   cte_image_watermark::clock_charge_setup( void )
@@ -129,7 +122,9 @@ void   cte_image_watermark::clock_charge_setup( void )
 
   output( 1, "Using Olli's neo2 algorithm!\n" );
   if ( dark_mode )
+  {
     output( 1, " Using Dark_mode optimization!\n" );
+  }
 
   output( 10, "Create trap structure ...\n" );
 
@@ -197,8 +192,7 @@ void   cte_image_watermark::clock_charge_restore_traps( void )
 double cte_image_watermark::clock_charge_pixel_release( void )
 {
   double sum = 0.0;
-  double sum2, release;
-  int    i,j;
+  int    i, j;
 
   int    n_species  = parameters->n_species;
 
@@ -206,10 +200,10 @@ double cte_image_watermark::clock_charge_pixel_release( void )
   // trapped electrons relased exponentially
   for (j=0;j<nr_wml;++j)
   {
-    sum2 = 0.0;
+    double sum2 = 0.0;
     for (i=0;i<n_species;++i)
     {
-      release = wml[j][i] * exponential_factor[i];
+      double release = wml[j][i] * exponential_factor[i];
       wml[j][i] -= release;
       sum2 += release;
     }
@@ -226,7 +220,7 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   double total_capture = 0.0;
 
   int    j;
-  double h, h2;
+  double h;
 
   // express correction using i_pixel instead of express_factor_pixel
   trap_density_express = trap_density * i_pixelp1;
@@ -237,13 +231,11 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   // calculate the number of electrons which can be
   // captured  in the traps
 
-
-
   // scan all levels
   h = 0.0;
   for (j=nr_wml-1;j>=0;--j)
   {
-    h2 = h + wml_fill[j];
+    double h2 = h + wml_fill[j];
 
     // don't need to check for max. because
     // n_electrons_per_trap_express is always higher or
@@ -263,7 +255,9 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
     }
     h = h2;
     if ( h > cloud_height )
+    {
       break;
+    }
   }
 
   // h has the height of all used levels
@@ -275,7 +269,9 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   #ifdef __debug
   double traps_total2 = 0.0;
   for (i=0;i<nr_wml;++i)
+  {
     traps_total2 += wml[i].sum() * wml_fill[i];
+  }
   output( 10, "ntrap_total : %.15f\n", traps_total2 );
 
   print_wml( wml, wml_fill, n_species, nr_wml );
@@ -286,7 +282,6 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   #endif
 
   return total_capture;
-
 }
 
 
@@ -380,7 +375,7 @@ void   cte_image_watermark::clock_charge_pixel_capture_ov( double d )
   #endif
 
   // copy the temporary array back
-  for (j=new_nr_wml-1,i=0;j>=0;--j,++i)
+  for (j=new_nr_wml-1, i=0;j>=0;--j, ++i)
   {
     wml[i]      = new_wml[j];
     wml_fill[i] = new_wml_fill[j];
@@ -411,9 +406,13 @@ void   cte_image_watermark::clock_charge_pixel_capture_full( void )
   {
     h += wml_fill[nr_wml-1];
     if ( h > cloud_height )
+    {
       break;
+    }
     else
+    {
       skip = h;
+    }
     --nr_wml;
   }
   // skip now containes the number of previous filled levels which
@@ -475,9 +474,13 @@ void   cte_image_watermark::clock_charge_pixel_capture_full( void )
 
       test_height = cloud_height - skip;
       if ( test_height < neo2_split_limit )
+      {
         --nr_wml;
+      }
       else
-        wml_fill[nr_wml-1] -= cloud_height - skip;   // absorbes levels
+      {
+        wml_fill[nr_wml-1] -= cloud_height - skip;   // absorbed levels
+      }
 
       // check what to do anyway, if there is a chance to modify the
       // big level!
@@ -493,13 +496,13 @@ void   cte_image_watermark::clock_charge_pixel_capture_full( void )
 
 void   cte_image_watermark::clock_charge_pixel_cleanup( void )
 {
-  int i, j;
   // cleanup the array
   // removing duplicate levels ...
 
   if ( dark_mode  == 1 )
   {
-    j = 0;
+    int j = 0;
+    int i;
     for (i=1;i<nr_wml;++i)
     {
       #ifdef __debug
@@ -578,7 +581,9 @@ double cte_image_watermark::clock_charge_trap_info( void )
   double total = 0.0;
 
   for (unsigned int i=0;i<nr_wml;++i)
+  {
      total += wml[i].sum() * wml_fill[i];
+  }
 
   return total;
 }

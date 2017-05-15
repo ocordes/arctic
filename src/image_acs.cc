@@ -22,7 +22,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -125,7 +125,6 @@ int acs_image::clock_charge_prepare( void )
 }
 
 
-
 // internal private functions
 
 double  acs_image::date2double( std::string & s )
@@ -149,7 +148,7 @@ double  acs_image::date2double( std::string & s )
                          stime.tm_mday,
                          stime.tm_hour,
                          stime.tm_min,
-			 stime.tm_sec );
+                         stime.tm_sec );
     }
 
   output( 1, "strptime failed for '%s'!\n", s.c_str() );

@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-03
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -39,8 +39,7 @@
 
 
 #define min_limit( x ) if ( ( x ) < 0 ) x = 0
-#define output_range( x ) for (unsigned int n=0;n<x.size();n++) output( 10, "   %i\n", x[n] )
-
+#define output_range( x ) for (unsigned int n=0;n<x.size();n++) { output( 10, "   %i\n", x[n] ); }
 
 
 params_fits::params_fits() : params()
@@ -190,9 +189,13 @@ void  params_fits::parse_args_algorithm( std::string & key, std::string & val, i
     bool b = tobool( val, true );
 
     if ( b )
-	    algorithm = ALGORITHM_CLASSIC;
+    {
+      algorithm = ALGORITHM_CLASSIC;
+    }
     else
+    {
       algorithm = ALGORITHM_NEO;
+    }
 
     output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );
     error = PARSE_OK;
@@ -204,9 +207,13 @@ void  params_fits::parse_args_algorithm( std::string & key, std::string & val, i
     bool b = tobool( val, true );
 
     if ( b )
+    {
       algorithm = ALGORITHM_NEO;
+    }
     else
+    {
       algorithm = ALGORITHM_CLASSIC;
+    }
 
     output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );
     error = PARSE_OK;
@@ -218,9 +225,13 @@ void  params_fits::parse_args_algorithm( std::string & key, std::string & val, i
     bool b = tobool( val, true );
 
     if ( b )
-	    algorithm = ALGORITHM_NEO2;
+    {
+      algorithm = ALGORITHM_NEO2;
+    }
     else
+    {
       algorithm = ALGORITHM_CLASSIC;
+    }
 
     output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );
 
@@ -290,9 +301,13 @@ void params_fits::parse_args_imagedir( std::string & key, std::string &, int & e
   {
     rotate = ~rotate;
     if ( rotate == image_readout_y )
+    {
       output( 10, "params: readout_y selected\n" );
+    }
     else
+    {
       output( 10, "params: readout_x selected\n" );
+    }
     error = PARSE_OK;
     return;
   }

@@ -22,7 +22,7 @@
 /* params_acs.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-02-28
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -54,7 +54,6 @@ void params_acs::parse_args( std::string & key, std::string & val, int & error )
 }
 
 
-
 void params_acs::calc_trap_config( double date )
 {
   double launch_date = 2452334.5;       /* Date of SM3B when ACS was installed */
@@ -83,7 +82,7 @@ void params_acs::calc_trap_config( double date )
   #define n_sm4_trap_parameter 3
 
   //double sm4_trap_ratio[3]          = { 0.18, 0.61, 0.51 }; /* relative densities */
-  double sm4_trap_ratio[3]          = { 0.169333,0.450667,0.380000 }; /* updated for Massey et al. (2013b) */
+  double sm4_trap_ratio[3]          = { 0.169333, 0.450667, 0.380000 }; /* updated for Massey et al. (2013b) */
   double sm4_trap_ratio_sum;
   double sm4_temperature            = 273.15-81;            /* K */
   double k                          = 8.617343e-5;          /* eV/K */
@@ -96,10 +95,13 @@ void params_acs::calc_trap_config( double date )
   n_species = n_sm4_trap_parameter;
 
   if ( date < temperature_date )
+  {
     operating_temperature = 273.15-77;
+  }
   else
+  {
     operating_temperature = 273.15-81;
-
+  }
 
   /*
   output( 1, "operating_temperature=%f\n", operating_temperature );
@@ -110,28 +112,38 @@ void params_acs::calc_trap_config( double date )
   trap_lifetime = std::valarray<double>( 0.0, n_species );
 
   /* Trap release time propto exp(DeltaE/kT)/T^2 */
-  for (i=0;i<n_species;i++)
+  for (i=0;i<n_species;++i)
+  {
     trap_lifetime[i] = sm4_trap_release_time[i] *
       sqr( operating_temperature / sm4_temperature ) *
       exp( DeltaE[i] / ( k * sm4_temperature*operating_temperature ) *
            ( operating_temperature - sm4_temperature ) );
+  }
 
   /* Work out total trap densities at each observation */
-  for (i=0;i<n_species;i++)
+  for (i=0;i<n_species;++i)
+  {
+    if ( date < repair_date )
     {
-      if ( date < repair_date )
-        trap_density[i] = trap_initial_density_presm4 + trap_growth_rate_presm4 * ( date - launch_date );
-      else
-        trap_density[i] = trap_initial_density_postsm4 + trap_growth_rate_postsm4 * ( date - launch_date );
+      trap_density[i] = trap_initial_density_presm4 + trap_growth_rate_presm4 * ( date - launch_date );
     }
+    else
+    {
+      trap_density[i] = trap_initial_density_postsm4 + trap_growth_rate_postsm4 * ( date - launch_date );
+    }
+  }
 
   /* Split traps between the species */
   sm4_trap_ratio_sum = 0.0;
-  for (i=0;i<n_species;i++)
+  for (i=0;i<n_species;++i)
+  {
     sm4_trap_ratio_sum += sm4_trap_ratio[i];
+  }
 
-  for (i=0;i<n_species;i++)
+  for (i=0;i<n_species;++i)
+  {
     trap_density[i] *= (sm4_trap_ratio[i] / sm4_trap_ratio_sum );
+  }
 
 
   output( 1, "Model has %f traps per pixel, %f days after launch.\n", trap_density.sum(), (date-launch_date) );

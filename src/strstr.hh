@@ -1,7 +1,7 @@
 // strstr.hh
 
 // written by: Oliver Cordes 2005
-// changed by: Oliver Cordes 2015-07-20
+// changed by: Oliver Cordes 2017-05-16
 
 /*
 C   opyright (C) 2005 Oliver-Mark Cordes
@@ -44,7 +44,7 @@ class std::CString : public std::string
   CString() : string() { lastpos = 0; };
   CString( const char *s ) : string( s ) { lastpos = 0; };
   CString( const string & s, size_type pos = 0, size_type n = npos )
-    : string( s, pos , n ) { lastpos = 0; };
+    : string( s, pos, n ) { lastpos = 0; };
   string strtok( bool  start, const string & delim );
   string clean_start( const char );
   string clean_char( const char );

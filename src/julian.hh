@@ -15,14 +15,14 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with arctic.  If not, see <http://www.gnu.org/licenses/>. 
+    along with arctic. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 /* julian.hh
 
    written by: Oliver Cordes 2013-02-04
-   changed by: Oliver Cordes 2013-02-04
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 

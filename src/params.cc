@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-03
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -54,7 +54,13 @@ std::string algorithm_names[] = { "CLASSIC",
                                   "NEO2" };
 
 
-params::params()
+params::params() :
+ algorithm( ALGORITHM_NEO ),
+ rotate( image_readout_y ),
+ direction( image_forward ),
+ force( false ),
+ working_mode( "" ),
+ config_filename( "" )
 {
   algorithm             = ALGORITHM_NEO;
   well_depth            = 84700;
@@ -86,15 +92,6 @@ params::params()
   n_species             = 0;
 
 
-  // imaage variables
-  rotate = image_readout_y;
-  direction = image_forward;
-
-  force = false;
-
-  config_filename   = "";
-  working_mode      = "";
-
   output( 11, "params::params()\n" );
 }
 
@@ -115,40 +112,42 @@ void params::load_config( std::string filename )
 
   std::CString  s;
 
+
   //f.exceptions ( std::ifstream::failbit | std::ifstream::badbit );
   f.exceptions ( std::ifstream::failbit );
   try {
-    f.open( filename );
+    f.open( filename, std::ifstream::in );
 
-    while (!f.eof())
+    while ( f.eof() == false )
     {
       getline(f, s);
 
       int error;
 
-	    // ignore empty lines and comments
-	    if ( ( s == "" ) || ( s[0] == '#' ) )
-	      continue;
+      // ignore empty lines and comments
+      if ( ( s == "" ) || ( s[0] == '#' ) )
+      {
+        continue;
+      }
 
-
-	    // clean spaces
-	    s = s.clean_white();
+      // clean spaces
+      s = s.clean_white();
 
       // add line into condfig_entry array for saving information in FITS header
       config_entries.push_back( s );
 
-	    //std::cout << s << std::endl;
+      //std::cout << s << std::endl;
 
-	    std::CString key = s.strtok( true, "=#" );
-	    std::CString val = s.strtok( false, "=#" );
+      std::CString key = s.strtok( true, "=#" );
+      std::CString val = s.strtok( false, "=#" );
 
-	    // convert key into upper cases
-	    key = key.toupper();
+      // convert key into upper cases
+      key = key.toupper();
 
-	    // std::cout << "key=" << key << " val=" << val << std::endl;
+      // std::cout << "key=" << key << " val=" << val << std::endl;
 
       error = PARSE_ERROR;
-	    parse_args( key, val, error );
+      parse_args( key, val, error );
       switch (error)
       {
         case PARSE_OK:
@@ -219,64 +218,63 @@ void params::set_args( int *argc, char **argv[]  )
   int i = 1; // the first argument is always the program name ;-)
 
   //std::cout << (*argc) << std::endl;
-  while( i < nargc )
+  while ( i < nargc )
   {
     //std::cout << (*argv)[i] << std::endl;
 
     // check if this an option
     if ( (*argv)[i][0] == '-' )
-	  {
+    {
       // read at least one argument
       (*argc)--;
 
-	    if ( ( std::strcmp( (*argv)[i], "-c" ) == 0 ) ||
+      if ( ( std::strcmp( (*argv)[i], "-c" ) == 0 ) ||
            ( std::strcmp( (*argv)[i], "-d" ) == 0 ) ||
            ( std::strcmp( (*argv)[i], "-m" ) == 0 ) )
-	    {
+      {
         // check if one more argument is available
         if ( (i+1) < nargc )
         {
-	        (*argc)--;
-	        i++;
+          (*argc)--;
+          i++;
           if ( (*argv)[i-1][1] == 'c' )
           {
-	          std::string s = (*argv)[i];
-	          load_config( s );
+            std::string s = (*argv)[i];
+            load_config( s );
           }
         }
-	      i++;
-	      continue;
-	    }
+        i++;
+        continue;
+      }
 
-	    // default
+      // default
 
-	    // split parameter  for further checks
+      // split parameter  for further checks
 
-	    std::CString s( (*argv)[i] );
-	    s = s.clean_start( '-' );
-	    std::CString key = s.strtok( true, "=#\0\n" );
-	    std::CString val = s.strtok( false, "=#\0\n" );
+      std::CString s( (*argv)[i] );
+      s = s.clean_start( '-' );
+      std::CString key = s.strtok( true, "=#\0\n" );
+      std::CString val = s.strtok( false, "=#\0\n" );
 
-	    // convert key into upper cases
-	    key = key.toupper();
+      // convert key into upper cases
+      key = key.toupper();
 
       error = PARSE_ERROR;
       parse_args( key, val, error );
       parse_error_msg( error, key, val );
-	  } // end of if (*argv)[0]  == '-'
+    } // end of if (*argv)[0]  == '-'
     else
-	  {
+    {
       if ( i != outp )
       {
-	      (*argv)[outp] = (*argv)[i];
-	      (*argv)[i] = NULL;
+        (*argv)[outp] = (*argv)[i];
+        (*argv)[i] = NULL;
       }
       outp++;
-	  }
+    }
 
     i++;
   }
-
 
   // finally check parameter for consistency
   check_params();
@@ -298,21 +296,6 @@ std::valarray<double> params::str2array( std::CString s )
 }
 
 
-std::valarray<long> params::str2array_long( std::CString s )
-{
-  std::vector<long> temp_vec;
-
-  std::CString p = s.strtok( true, "," );
-  while ( p != "" )
-    {
-      temp_vec.push_back( atoi( p.c_str() ) );
-      p = s.strtok( false, "," );
-    }
-
-  return std::valarray<long> ( &temp_vec[0], temp_vec.size() );
-}
-
-
 void params::str2minmax_long( std::CString s, long & min, long & max )
 {
   min = 0;
@@ -320,12 +303,15 @@ void params::str2minmax_long( std::CString s, long & min, long & max )
 
   std::CString p = s.strtok( true, "," );
   if ( p != "" )
+  {
     min = atoi( p.c_str() );
-    p = s.strtok( false, "," );
+  }
+  p = s.strtok( false, "," );
   if ( p != "" )
+  {
     max = atoi( p.c_str() );
   }
-
+}
 
 
 // special function to get the working mode
@@ -333,38 +319,43 @@ void params::str2minmax_long( std::CString s, long & min, long & max )
 int get_working_mode( int argc, char *argv[] )
 {
   for (int i=1;i<argc;i++)
+  {
+    if ( std::strcmp( argv[i], "-m" ) == 0 )
     {
-      if ( std::strcmp( argv[i], "-m" ) == 0 )
-	{
-	  i++;
-	  if ( i == argc )
-	    {
-	      std::cout << "Warning: no mode parameter given! Returning default values!" << std::endl;
-#ifdef IS_EUCLID_ENVIRONMENT
-	        return WORKING_MODE_EUCLID;
-#else
-	        return WORKING_MODE_FITS;
-#endif
-	    }
-	  else
-	    {
-	      std::string s = argv[i];
+      i++;
+      if ( i == argc )
+      {
+        std::cout << "Warning: no mode parameter given! Returning default values!" << std::endl;
+        #ifdef IS_EUCLID_ENVIRONMENT
+        return WORKING_MODE_EUCLID;
+        #else
+        return WORKING_MODE_FITS;
+        #endif
+      }
+      else
+      {
+        std::string s = argv[i];
 
-	      if ( s == "FITS" )
-		return WORKING_MODE_FITS;
-	      if ( s == "ACS" )
-		return WORKING_MODE_ACS;
-	      if ( s == "EUCLID" )
-		return WORKING_MODE_EUCLID;
-	    }
-	}
-
+        if ( s == "FITS" )
+        {
+          return WORKING_MODE_FITS;
+        }
+        if ( s == "ACS" )
+        {
+          return WORKING_MODE_ACS;
+        }
+        if ( s == "EUCLID" )
+        {
+          return WORKING_MODE_EUCLID;
+        }
+      }
     }
-#ifdef IS_EUCLID_ENVIRONMENT
-    return WORKING_MODE_EUCLID;
-#else
-    return WORKING_MODE_FITS;
-#endif
+  }
+  #ifdef IS_EUCLID_ENVIRONMENT
+  return WORKING_MODE_EUCLID;
+  #else
+  return WORKING_MODE_FITS;
+  #endif
 }
 
 
@@ -374,13 +365,16 @@ bool tobool( std::string & val, bool defaults )
 {
   int b = false;
 
-  if ( val == "" ) return defaults;
+  if ( val == "" )
+  {
+    return defaults;
+  }
 
   std::CString s = val;
   s = s.toupper();
 
-  switch( s[0] )
-    {
+  switch ( s[0] )
+  {
     case '\0':
       break;
     case 'Y':
@@ -394,7 +388,7 @@ bool tobool( std::string & val, bool defaults )
     case '0':
       b = false;
       break;
-    }
+  }
 
   return b;
 }

@@ -19,10 +19,10 @@
 
 */
 
-/* output.c
+/* output.cc
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2016-11-24
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -40,7 +40,6 @@
 #include <iostream>
 
 #include "output.hh"
-
 
 
 /* global variables */
@@ -62,10 +61,8 @@ void debug_generate_timestamp( void )
   times = time( NULL );
   timep = localtime( &times );
 
-  snprintf( timestamp, 20, "%02i:%02i.%02i",
-	          timep->tm_hour, timep->tm_min, timep->tm_sec );
+  snprintf( timestamp, 20, "%02i:%02i.%02i", timep->tm_hour, timep->tm_min, timep->tm_sec );
 }
-
 
 
 // special function to parse the debug level
@@ -75,20 +72,19 @@ void debug_init( int argc, char *argv[] )
   for (int i=1;i<argc;i++)
   {
     if ( std::strcmp( argv[i], "-d" ) == 0 )
-	  {
-	    i++;
-	    if ( i == argc )
-	    {
-	      std::cout << "Warning: no debug parameter given! Returning default values!" << std::endl;
-	      return;
-	    }
-	    else
-	    {
-	      debug_level = atoi( argv[i] );
-	      //std::cout << "new debug level=" << debug_level << std::endl;
-	    }
-	  }
-
+    {
+      i++;
+      if ( i == argc )
+      {
+        std::cout << "Warning: no debug parameter given! Returning default values!" << std::endl;
+        return;
+      }
+      else
+      {
+        debug_level = atoi( argv[i] );
+        //std::cout << "new debug level=" << debug_level << std::endl;
+      }
+    }
   }
 }
 
@@ -97,7 +93,9 @@ bool is_debug( int dlevel )
 {
   // be completly quiet or do nothing
   if ( debug_level == 0 )
+  {
     return false;
+  }
 
   return dlevel <= debug_level;
 }
@@ -109,19 +107,21 @@ void output( int dlevel, const char *format, ... )
   {
     va_list ap;
 
-	  /* generate output */
-	  va_start( ap, format );
-	  vsnprintf( dummy, 1000, format, ap );
-	  va_end( ap );
+    // generate output
+    va_start( ap, format );
+    vsnprintf( dummy, 1000, format, ap );
+    va_end( ap );
 
-	  if ( debug_level == 1 )
-	    printf( "%s", dummy );
-	  else
-	  {
-	    debug_generate_timestamp();
-	    printf( "%s: %s", timestamp, dummy );
-	  }
+    if ( debug_level == 1 )
+    {
+      printf( "%s", dummy );
+    }
+    else
+    {
+      debug_generate_timestamp();
+      printf( "%s: %s", timestamp, dummy );
+    }
 
-	  fflush( stdout );
+    fflush( stdout );
   }
 }

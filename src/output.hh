@@ -19,10 +19,10 @@
 
 */
 
-/* output.h
+/* output.hh
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2016-11-24
+   changed by: Oliver Cordes 2017-05-17
 
    $Id$
 
@@ -33,7 +33,6 @@
 
 
 #define __output_h 1
-
 
 
 extern int debug_level;

@@ -22,7 +22,7 @@
 /* image_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -38,10 +38,6 @@
 #include "params_acs.hh"
 
 #include <CCfits/CCfits>
-
-using namespace CCfits;
-
-// Defines the simple FITS image class
 
 
 class acs_image : public image{

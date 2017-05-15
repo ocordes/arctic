@@ -11,6 +11,10 @@ sonar_cxx_cppcheck_reportFile="sonar/sonar_cxx_cppcheck_report.xml"
 sonar_cxx_vera_reportFile="sonar/sonar_cxx_vera_report.xml"
 sonar_cxx_rats_reportFile="sonar/sonar_cxx_rats_report.xml"
 
+rm -f $sonar_cxx_cppcheck_reportFile
+rm -f $sonar_cxx_vera_reportFile
+rm -f $sonar_cxx_rats_reportFile
+
 function runCppcheck
 {
   if [ "$DBUG" == "0" ]; then

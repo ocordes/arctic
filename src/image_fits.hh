@@ -22,7 +22,7 @@
 /* image_fits.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-02-25
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -39,10 +39,6 @@
 
 
 #include <CCfits/CCfits>
-
-using namespace CCfits;
-
-// Defines the simple FITS image class
 
 
 class fits_image : public image{

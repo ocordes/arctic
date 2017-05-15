@@ -63,9 +63,18 @@ std::string get_working_path()
 }
 
 
-image::image( int argc, char *argv[] )
+// initialize the image class and its memebers
+image::image( int argc, char *argv[] ) :
+  sci_mode_dark( false ),
+  electrons_per_sec( false ),
+  exptime( 0.0 ),
+  prgname( "" ),
+  infilename( ""),
+  outfilename( "" ),
+  image_data(),
+  image_width( 0 ),
+  image_height( 0 )
 {
-  prgname = "";
   for (int i=0;i<argc;++i)
   {
     if ( prgname == "" )
@@ -78,16 +87,7 @@ image::image( int argc, char *argv[] )
     }
   }
 
-  infilename        = "";
-  outfilename       = "";
-  image_width       = 0;
-  image_height      = 0;
-  sci_mode_dark     = false;
-  electrons_per_sec = false;
-  exptime           = 0.0;
-
-  FITS_image        = NULL;
-  image_data        = std::valarray<double>();
+  FITS_image =  NULL;
 }
 
 

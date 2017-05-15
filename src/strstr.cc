@@ -1,7 +1,7 @@
 // strstr.cc
 
 // written by: Oliver Cordes 2005
-// changed by: Oliver Cordes 2015-06-22
+// changed by: Oliver Cordes 2017-05-15
 
 /*
     This file is part of arctic project.
@@ -39,24 +39,29 @@ std::string std::CString::strtok ( bool  start, const std::string& delim  )
   std::string retstr;
 
   if ( start == true )
+  {
     lastpos = 0;
+  }
 
   if ( lastpos != npos )   // noch nicht am Ende des strings ? <WB>
+  {
+    // nein, noch nicht ... <WB>
+    startpos = find_first_not_of( delim, lastpos ); // ueberlese alle delim
+
+    endpos = find_first_of( delim, startpos ); // suche 1. delim nach char
+
+    lastpos = endpos;
+
+    if ( endpos == npos )
     {
-      // nein, noch nicht ... <WB>
-      startpos = find_first_not_of( delim, lastpos ); // ueberlese alle delim
-
-      endpos = find_first_of( delim, startpos ); // suche 1. delim nach char
-
-      lastpos = endpos;
-
-      if ( endpos == npos )
-	endpos = length();
-
-      if ( startpos != npos )
-	retstr.assign( *this, startpos, endpos-startpos );
+      endpos = length();
     }
 
+    if ( startpos != npos )
+    {
+      retstr.assign( *this, startpos, endpos-startpos );
+    }
+  }
 
   return retstr;
 }
@@ -68,7 +73,10 @@ std::string std::CString::clean_start( const char c )
 
   unsigned int pos = 0;
 
-  while ( (*this)[pos] == c ) pos++;
+  while ( (*this)[pos] == c )
+  {
+    pos++;
+  }
 
   retstr.assign( *this, pos, length() );
 
@@ -82,14 +90,13 @@ std::string std::CString::clean_char( const char c )
 
   std::string::size_type pos;
 
-
   while ( ( pos = retstr.find( c ) ) != retstr.npos )
+  {
     retstr.erase( pos, 1 );
-
+  }
 
   return retstr;
 }
-
 
 
 std::string std::CString::clean_white( void )
@@ -105,7 +112,9 @@ std::string std::CString::toupper( void )
   std::locale loc;
 
   for (std::string::size_type i=0; i<retstr.length(); ++i)
-    retstr[i] = std::toupper(retstr[i],loc);
+  {
+    retstr[i] = std::toupper(retstr[i], loc);
+  }
 
   return retstr;
 }

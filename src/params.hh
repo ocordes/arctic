@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-03
+   changed by: Oliver Cordes 2017-05-15
 
    $Id$
 
@@ -118,7 +118,6 @@ public:
   void set_args(  int *argc, char **argv[] );
 
   std::valarray<double> str2array( std::CString );
-  std::valarray<long> str2array_long( std::CString );
   void str2minmax_long( std::CString, long &, long & );
 };
 
