@@ -55,10 +55,8 @@ std::string algorithm_names[] = { "CLASSIC",
 
 
 params::params() :
- algorithm( ALGORITHM_NEO ),
- rotate( image_readout_y ),
- direction( image_forward ),
- force( false ),
+ trap_density( { 0 } ),
+ trap_lifetime( { 0 } ),
  working_mode( "" ),
  config_filename( "" )
 {
@@ -80,8 +78,9 @@ params::params() :
   end_x                 = LONG_MAX;
   start_y               = 0;
   end_y                 = LONG_MAX;
-  trap_density          = { 0.0 };
-  trap_lifetime         = { 0.0 };
+
+  rotate                = image_readout_y;
+  direction             = image_forward;
 
   cut_upper_limit       = false;
   upper_limit           = 65536.-3;
@@ -91,6 +90,7 @@ params::params() :
   // only for reading parameters, not used in the CTE code
   n_species             = 0;
 
+  force                 = false;
 
   output( 11, "params::params()\n" );
 }
