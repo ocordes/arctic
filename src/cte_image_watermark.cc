@@ -22,7 +22,7 @@ w
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-22
 
 
    $Id$
@@ -57,7 +57,12 @@ w
 //#define compariaon
 
 
-cte_image_watermark::cte_image_watermark( std::shared_ptr<params> p )
+cte_image_watermark::cte_image_watermark( void )
+                                        : cte_image( )
+{
+}
+
+cte_image_watermark::cte_image_watermark( std::shared_ptr<params> & p )
                                         : cte_image( p )
 {
     // initialize variables

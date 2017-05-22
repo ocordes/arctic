@@ -22,7 +22,7 @@
 /* cte_image_watermark.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-22
 
    $Id$
 
@@ -42,7 +42,8 @@
 
 class cte_image_watermark : public cte_image {
 public:
-  cte_image_watermark( std::shared_ptr<params> p);
+  cte_image_watermark( void );
+  cte_image_watermark( std::shared_ptr<params> & p);
 
   virtual void   clock_charge_setup( void );
   virtual void   clock_charge_clear( void );

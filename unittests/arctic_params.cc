@@ -66,23 +66,25 @@ BOOST_AUTO_TEST_CASE( params_test_str2array_long )
   std::string test_str4 = ",-01,";
   std::valarray<long> res_array4 {-1};
 
-  // we cannot evaluate std::valarray with boost directly, so project it down into a single bool
-  std::valarray<bool> a1 = p.str2array_long(test_str1) == res_array1;
-  bool is_equal1 = std::all_of(begin(a1), end(a1), [](bool b){return b;});
-
-  std::valarray<bool> a2 = p.str2array_long(test_str2) == res_array2;
-  bool is_equal2 = std::all_of(begin(a2), end(a2), [](bool b){return b;});
-
-  std::valarray<bool> a3 = p.str2array_long(test_str3) == res_array3;
-  bool is_equal3 = std::all_of(begin(a3), end(a3), [](bool b){return b;});
-
-  std::valarray<bool> a4 = p.str2array_long(test_str4) == res_array4;
-  bool is_equal4 = std::all_of(begin(a4), end(a4), [](bool b){return b;});
-
-  BOOST_CHECK_EQUAL(is_equal1, true);
-  BOOST_CHECK_EQUAL(is_equal2, true);
-  BOOST_CHECK_EQUAL(is_equal3, true);
-  BOOST_CHECK_EQUAL(is_equal4, true);
+  // check this:
+  // str2array_long is removed from the main code OC 2017-05-17
+  // // we cannot evaluate std::valarray with boost directly, so project it down into a single bool
+  // std::valarray<bool> a1 = p.str2array_long(test_str1) == res_array1;
+  // bool is_equal1 = std::all_of(begin(a1), end(a1), [](bool b){return b;});
+  //
+  // std::valarray<bool> a2 = p.str2array_long(test_str2) == res_array2;
+  // bool is_equal2 = std::all_of(begin(a2), end(a2), [](bool b){return b;});
+  //
+  // std::valarray<bool> a3 = p.str2array_long(test_str3) == res_array3;
+  // bool is_equal3 = std::all_of(begin(a3), end(a3), [](bool b){return b;});
+  //
+  // std::valarray<bool> a4 = p.str2array_long(test_str4) == res_array4;
+  // bool is_equal4 = std::all_of(begin(a4), end(a4), [](bool b){return b;});
+  //
+  // BOOST_CHECK_EQUAL(is_equal1, true);
+  // BOOST_CHECK_EQUAL(is_equal2, true);
+  // BOOST_CHECK_EQUAL(is_equal3, true);
+  // BOOST_CHECK_EQUAL(is_equal4, true);
 
 }
 

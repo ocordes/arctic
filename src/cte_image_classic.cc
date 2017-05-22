@@ -22,7 +22,7 @@ w
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-12
+   changed by: Oliver Cordes 2017-05-22
 
 
    $Id$
@@ -58,8 +58,12 @@ w
 
 // endof macros
 
+cte_image_classic::cte_image_classic( void )
+                                    : cte_image( )
+{
+}
 
-cte_image_classic::cte_image_classic( std::shared_ptr<params> p )
+cte_image_classic::cte_image_classic( std::shared_ptr<params> & p )
                                     : cte_image( p )
 {
   // initialize variables

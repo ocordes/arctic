@@ -22,7 +22,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-05-22
 
    $Id$
 
@@ -45,8 +45,8 @@ public:
   std::shared_ptr<params>              parameters;
 
   cte_image ( void );
-  cte_image( std::shared_ptr<params> );
-  void     setup( long, long );
+  cte_image( std::shared_ptr<params> & );
+  void     setup( unsigned int, unsigned int );
   virtual ~cte_image() {};
   void   clock_charge( std::valarray<double> & );
   virtual void clock_charge_setup( void );
@@ -62,36 +62,33 @@ public:
   virtual double clock_charge_trap_info( void );
 //private:
   double get_difftime( struct timeval start, struct timeval end );
-  long   get_sparse_pixels( std::valarray<double> &, double );
+  unsigned int get_sparse_pixels( std::valarray<double> &, double );
   void   limit_to_max( std::valarray<double> &, double );
 
-  void   clock_charge_column( std::valarray<double> & image,
-                                       long );
+  void   clock_charge_column( std::valarray<double> &, unsigned int );
   void   clock_charge_image( std::valarray<double> & );
 
-  double get_sum_double_array( double *array, int width, int height );
 
-
-  void   create_express_multiplier( std::valarray<int> & express_multiplier );
+  void   create_express_multiplier( std::valarray<unsigned int> & express_multiplier );
   void   create_exponential_factor( void );
 
 protected:
-  long                                 image_width;
-  long                                 image_height;
-  long                                 width;
-  long                                 height;
+  unsigned int                         image_width;
+  unsigned int                         image_height;
+  unsigned int                         width;
+  unsigned int                         height;
 
   std::image_slice                     is;
 
   // CTE local parameters
-  int                                  n_species;
+  unsigned int                         n_species;
   double                               traps_total;
-  std::valarray<int>                   express_multiplier;
+  std::valarray<unsigned int>          express_multiplier;
   std::valarray<double>                exponential_factor;
-  long                                 start_x;
-  long                                 end_x;
-  long                                 start_y;
-  long                                 end_y;
+  unsigned int                         start_x;
+  unsigned int                         end_x;
+  unsigned int                         start_y;
+  unsigned int                         end_y;
 };
 
 #endif

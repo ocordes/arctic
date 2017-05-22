@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-12
+   changed by: Oliver Cordes 2017-05-22
 
 
    $Id$
@@ -69,7 +69,7 @@ cte_image_neo::cte_image_neo( void )
 }
 
 
-cte_image_neo::cte_image_neo( std::shared_ptr<params> p )
+cte_image_neo::cte_image_neo( std::shared_ptr<params> & p )
                             : cte_image( p  )
 {
 }
