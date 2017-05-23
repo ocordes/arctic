@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-23
 
 
    $Id$
@@ -77,18 +77,15 @@ cte_image_neo::cte_image_neo( std::shared_ptr<params> & p )
 #ifdef __debug
 void cte_image_neo::print_trapl( void )
 {
-  int i, j, k;
-
-  std::string s;
-
   output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
           parameters->n_species, nr_trapl );
-  k = 0;
+
+  unsigned int k = 0;
   //for (j=0;j<nr_trapl;j++)
-  for (j=nr_trapl-1;j>=0;--j)
+  for (unsigned int j=nr_trapl-1;j>=0;--j)
   {
-    s = "";
-    for (i=0;i<parameters->n_species;++i)
+    std::string s = "";
+    for (unsigned int i=0;i<parameters->n_species;++i)
     {
       std::stringstream str;
       str << std::fixed << std::setprecision( debug_precision ) << trapl[j][i] << " ";
@@ -209,9 +206,6 @@ void cte_image_neo::clock_charge_restore_traps( void )
 
 double cte_image_neo::clock_charge_pixel_release( void )
 {
-  static double sum = 0.0;
-  static double release;
-
   int    n_species = parameters->n_species;
 
   // Release any trapped electrons, using the appropriate decay half-life
@@ -219,13 +213,13 @@ double cte_image_neo::clock_charge_pixel_release( void )
   // release a number of electrons in the traps
   // trapped electrons relased exponentially
 
-  sum = 0.0;
-  for (int j=0;j<nr_trapl;++j)
+  double sum = 0.0;
+  for (unsigned int j=0;j<nr_trapl;++j)
   {
     double sum2 = 0.0;
     for (int i=0;i<n_species;++i)
     {
-      release = trapl[j][i] * exponential_factor[i];
+      double release = trapl[j][i] * exponential_factor[i];
       trapl[j][i] -= release;
       sum2 += release;
     }
@@ -242,7 +236,6 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
    double total_capture = 0.0;
    double c;
 
-   int    i, j, h;
 
    // prepare the work
 
@@ -272,10 +265,12 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
    //total_capture = 0.0;
 
    // scan all levels
-   h = 0;
-   for (j=nr_trapl-1;j>=0;--j)
+   unsigned int h = 0;
+
+   // check this part with int <=> unsigned int for j !!! OC HALLO
+   for (int j=nr_trapl-1;j>=0;--j)
    {
-     int h2 = h + trapl_fill[j];
+     unsigned int h2 = h + trapl_fill[j];
 
      // don't need to check for max. because
      // n_electrons_per_trap_express is always higher or
@@ -294,7 +289,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
        total_capture += ( n_electrons_per_trap_express_total - trapl[j].sum() )
                                                  * ( cheight - h );
 
-       for (i=0;i<n_species;++i)
+       for (unsigned int i=0;i<n_species;++i)
        {
          c = n_electrons_per_trap_express_ov[i]  - trapl[j][i];
          if ( c > 0.0 )
