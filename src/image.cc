@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-12
+   changed by: Oliver Cordes 2017-05-24
 
    $Id$
 
@@ -58,8 +58,22 @@ using namespace CCfits;
 
 std::string get_working_path()
 {
-   char temp[MAXPATHLEN];
-   return ( getcwd(temp, MAXPATHLEN) ? std::string( temp ) : std::string("") );
+   std::string s;
+
+   char *p;
+
+   p = getcwd( NULL, 0 );
+   if ( p == NULL )
+   {
+     s = "";
+   }
+   else
+   {
+     s = std::string( p );
+     free( p );
+   }
+
+   return s;
 }
 
 

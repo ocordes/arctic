@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-23
+   changed by: Oliver Cordes 2017-05-24
 
 
    $Id$
@@ -66,13 +66,44 @@
 cte_image_neo::cte_image_neo( void )
                             : cte_image( )
 {
+  // initialize the member variables
+  dark_mode                          = false;
+
+  empty_trap_limit                   = 1e-14;
+
+  nr_trapl                           = 0;
+  new_nr_trapl                       = 0;
+  saved_nr_trapl                     = 0;
+
+  n_electrons_per_trap_total         = 0.0;
+  n_electrons_per_trap_express_total = 0.0;
+
+  dheight                            = 0.0;
+  cheight                            = 0;
+  ov                                 = 0.0;
 }
 
 
 cte_image_neo::cte_image_neo( std::shared_ptr<params> & p )
                             : cte_image( p  )
 {
+  // initialize the member variables
+  dark_mode                          = false;
+
+  empty_trap_limit                   = 1e-14;
+
+  nr_trapl                           = 0;
+  new_nr_trapl                       = 0;
+  saved_nr_trapl                     = 0;
+
+  n_electrons_per_trap_total         = 0.0;
+  n_electrons_per_trap_express_total = 0.0;
+
+  dheight                            = 0.0;
+  cheight                            = 0;
+  ov                                 = 0.0;
 }
+
 
 #ifdef __debug
 void cte_image_neo::print_trapl( void )
@@ -82,26 +113,26 @@ void cte_image_neo::print_trapl( void )
 
   unsigned int k = 0;
   //for (j=0;j<nr_trapl;j++)
-  for (unsigned int j=nr_trapl-1;j>=0;--j)
+  for (unsigned int j=nr_trapl;j>0;--j)
   {
     std::string s = "";
     for (unsigned int i=0;i<parameters->n_species;++i)
     {
       std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << trapl[j][i] << " ";
+      str << std::fixed << std::setprecision( debug_precision ) << trapl[j-1][i] << " ";
       s += str.str();
       //s += std::to_string( trapl[j][i] ) + " ";
     }
 
     std::stringstream str;
-    str << std::fixed << std::setprecision( debug_precision ) << trapl[j].sum();
+    str << std::fixed << std::setprecision( debug_precision ) << trapl[j-1].sum();
     s += "= " + str.str();
     //s += "= " + std::to_string( trapl[j].sum()  );
 
     //output( 10, "%05i: %s\n", j, s.c_str() );
-    output( 10, "%05i: %s  (x %05i)\n", k, s.c_str(), trapl_fill[j] );
+    output( 10, "%05i: %s  (x %05i)\n", k, s.c_str(), trapl_fill[j-1] );
 
-    k += trapl_fill[j];
+    k += trapl_fill[j-1];
   }
 }
 #endif
@@ -124,6 +155,11 @@ void cte_image_neo::clock_charge_setup( void  )
 {
   output( 1, "Using Olli's neo algorithm!\n" );
 
+
+  // setup variables
+  empty_trap_limit = parameters->empty_trap_limit;
+  dark_mode        = parameters->dark_mode;
+
   if ( dark_mode )
   {
     output( 1, " Using Dark_mode optimization!\n" );
@@ -133,12 +169,6 @@ void cte_image_neo::clock_charge_setup( void  )
   output( 1, "Using n_levels=%i\n", parameters->n_levels );
 
   // setup variables
-  check_empty_traps = parameters->check_empty_traps;
-  empty_trap_limit = parameters->empty_trap_limit;
-  empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
-
-  dark_mode        = parameters->dark_mode;
-
   n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) parameters->n_levels );
   n_electrons_per_trap_total = traps_total / parameters->n_levels;
   output( 10, "Create trap structure ...\n" );
@@ -267,7 +297,8 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
    // scan all levels
    unsigned int h = 0;
 
-   // check this part with int <=> unsigned int for j !!! OC HALLO
+   // in this case the for loop can only be done with int
+   // if one want to use unsinged int, only a while loop is usable
    for (int j=nr_trapl-1;j>=0;--j)
    {
      unsigned int h2 = h + trapl_fill[j];
@@ -313,7 +344,7 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
 
    #ifdef __debug
    double traps_total2 = 0.0;
-   for (i=0;i<nr_trapl;++i)
+   for (unsigned int i=0;i<nr_trapl;++i)
    {
      traps_total2 += trapl[i].sum() * trapl_fill[i];
    }
@@ -333,11 +364,12 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
 }
 
 
+// modify a specific trap level
+//
+// j is the number of the level
 void cte_image_neo::clock_charge_pixel_capture_ov_modify( int j, double d )
 {
-  int i;
-
-  for (i=0;i<n_species;++i)
+  for (unsigned i=0;i<n_species;++i)
   {
     if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
     {
@@ -353,12 +385,14 @@ void cte_image_neo::clock_charge_pixel_capture_ov_modify( int j, double d )
   ++new_nr_trapl;
 }
 
+
 void cte_image_neo::clock_charge_pixel_capture_ov_copyback_temp( void )
 {
-  int i, j;
+  unsigned int i, j;
 
   // copy the temporary array back
-  for (j=new_nr_trapl-1, i=0;j>=0;--j, ++i)
+  //for (j=new_nr_trapl-1, i=0;j>=0;--j, ++i)
+  for ( i=0, j=new_nr_trapl-1;i<new_nr_trapl;++i, --j)
   {
     trapl[i]      = new_trapl[j];
     trapl_fill[i] = new_trapl_fill[j];
@@ -499,7 +533,7 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
 void cte_image_neo::clock_charge_pixel_capture_full( void )
 {
-  int          j, h, skip;
+  unsigned int h, skip;
 
 
   // cheight full levels
@@ -609,7 +643,7 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
         }
 
         // fill only the species which needs to be filled
-        for (j=0;j<n_species;++j)
+        for (unsigned int j=0;j<n_species;++j)
         {
           // modify if there are free
           if ( trapl[nr_trapl-1][j] < n_electrons_per_trap_express_ov[j] )
@@ -638,15 +672,13 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
 
 void cte_image_neo::clock_charge_pixel_cleanup( void )
 {
-  int i, j;
-
   // cleanup the array
   // - removing/merge duplicated levels ...
   // maybe it is better to stop the scanning after the first valid level?
-  if ( dark_mode  == 1 )
+  if ( dark_mode )
   {
-    j = 0;
-    for (i=1;i<nr_trapl;++i)
+    unsigned j = 0;
+    for (unsigned i=1;i<nr_trapl;++i)
     {
       #ifdef __debug
       output( 10, "i,j: %i %i\n", i, j );

@@ -22,7 +22,7 @@ w
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-24
 
 
    $Id$
@@ -60,51 +60,72 @@ w
 cte_image_watermark::cte_image_watermark( void )
                                         : cte_image( )
 {
+  // initialize member variables
+  check_empty_traps          = false;
+  empty_trap_limit           = 1e-14;
+  empty_trap_limit_neo2      = 1e-14;
+  neo2_split_limit           = 1e-10;
+
+  dark_mode                  = false;
+
+  nr_wml                     = 0;
+  new_nr_wml                 = 0;
+  saved_nr_wml               = 0;
+
+  trap_density_total         = 0.0;
+  trap_density_express_total = 0.0;
+
+  cloud_height               = 0.0;
 }
+
 
 cte_image_watermark::cte_image_watermark( std::shared_ptr<params> & p )
                                         : cte_image( p )
 {
-    // initialize variables
-  check_empty_traps     = parameters->check_empty_traps;
-  empty_trap_limit      = parameters->empty_trap_limit;
-  empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
-  neo2_split_limit      = parameters->neo2_split_limit;
+  // initialize member variables
+  check_empty_traps          = false;
+  empty_trap_limit           = 1e-14;
+  empty_trap_limit_neo2      = 1e-14;
+  neo2_split_limit           = 1e-10;
 
-  dark_mode = parameters->dark_mode;
+  dark_mode                  = false;
+
+  nr_wml                     = 0;
+  new_nr_wml                 = 0;
+  saved_nr_wml               = 0;
+
+  trap_density_total         = 0.0;
+  trap_density_express_total = 0.0;
+
+  cloud_height               = 0.0;
 }
 
 
 #ifdef __debug
 void cte_image_watermark::print_wml( void )
 {
-  int i, j;
-  double k;
-
-  std::string s;
-
   output( 10, "trap array output (n_species=%i, trap_levels=%i):\n",
           parameters->n_species, nr_wml );
-  k = 0.0;
-  for (j=nr_wml-1;j>=0;--j)
+  double k = 0.0;
+  for (unsigned int j=nr_wml;j>0;--j)
   {
-    s = "";
-    for (i=0;i<parameters->n_species;i++)
+    std::string s = "";
+    for (unsigned int i=0;i<parameters->n_species;i++)
     {
       std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << wml[j][i] << " ";
+      str << std::fixed << std::setprecision( debug_precision ) << wml[j-1][i] << " ";
       s += str.str();
     }
 
     std::stringstream str;
-    str << std::fixed << std::setprecision( debug_precision ) << wml[j].sum();
+    str << std::fixed << std::setprecision( debug_precision ) << wml[j-1].sum();
     s += "= " + str.str();
     //s += "= " + std::to_string( trapl[j].sum()  );
 
     //output( 10, "%05i: %s\n", j, s.c_str() );
-    output( 10, "%011.5f: %s  (x %f)\n", k * (double) parameters->n_levels, s.c_str(), wml_fill[j] );
+    output( 10, "%011.5f: %s  (x %f)\n", k * (double) parameters->n_levels, s.c_str(), wml_fill[j-1] );
 
-    k += wml_fill[j];
+    k += wml_fill[j-1];
   }
 }
 #endif
@@ -125,7 +146,16 @@ void   cte_image_watermark::clock_charge_setup( void )
   output( 10, "= WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! WARNING! =\n" );
   output( 10, "===========================================================================\n" );
 
-  output( 1, "Using Olli's neo2 algorithm!\n" );
+  output( 1, "Using Olli's watermark algorithm!\n" );
+
+  check_empty_traps     = parameters->check_empty_traps;
+  empty_trap_limit      = parameters->empty_trap_limit;
+  empty_trap_limit_neo2 = parameters->empty_trap_limit_neo2;
+  neo2_split_limit      = parameters->neo2_split_limit;
+
+  dark_mode = parameters->dark_mode;
+
+
   if ( dark_mode )
   {
     output( 1, " Using Dark_mode optimization!\n" );
@@ -137,7 +167,7 @@ void   cte_image_watermark::clock_charge_setup( void )
   // pixels in the working column, because in the worst case 2 new entries
   // will be created per pixel!
 
-  int max_wm_levels = height * 2;
+  unsigned int max_wm_levels = height * 2;
 
   trap_density = parameters->trap_density;
   trap_density_total          = trap_density.sum();
@@ -196,17 +226,14 @@ void   cte_image_watermark::clock_charge_restore_traps( void )
 
 double cte_image_watermark::clock_charge_pixel_release( void )
 {
-  double sum = 0.0;
-  int    i, j;
-
   int    n_species  = parameters->n_species;
 
-
+  double sum = 0.0;
   // trapped electrons relased exponentially
-  for (j=0;j<nr_wml;++j)
+  for (unsigned int j=0;j<nr_wml;++j)
   {
     double sum2 = 0.0;
-    for (i=0;i<n_species;++i)
+    for (unsigned int i=0;i<n_species;++i)
     {
       double release = wml[j][i] * exponential_factor[i];
       wml[j][i] -= release;
@@ -224,8 +251,6 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
 {
   double total_capture = 0.0;
 
-  int    j;
-  double h;
 
   // express correction using i_pixel instead of express_factor_pixel
   trap_density_express = trap_density * i_pixelp1;
@@ -237,8 +262,8 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   // captured  in the traps
 
   // scan all levels
-  h = 0.0;
-  for (j=nr_wml-1;j>=0;--j)
+  double h = 0.0;
+  for (int j=nr_wml-1;j>=0;--j)
   {
     double h2 = h + wml_fill[j];
 
@@ -273,7 +298,7 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
 
   #ifdef __debug
   double traps_total2 = 0.0;
-  for (i=0;i<nr_wml;++i)
+  for (unsigned int i=0;i<nr_wml;++i)
   {
     traps_total2 += wml[i].sum() * wml_fill[i];
   }
@@ -289,6 +314,22 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   return total_capture;
 }
 
+void cte_image_watermark::clock_charge_pixel_capture_ov_copyback_temp( void )
+{
+  #ifdef __debug
+  output( 10, "Copying back the temporary data ..\n" );
+  #endif
+
+  // copy the temporary array back
+  unsigned int i, j;
+  for (i=0, j=new_nr_wml-1; i<new_nr_wml; ++i, --j)
+  {
+    wml[i]      = new_wml[j];
+    wml_fill[i] = new_wml_fill[j];
+  }
+  nr_wml = new_nr_wml;
+}
+
 
 void   cte_image_watermark::clock_charge_pixel_capture_ov( double d )
 {
@@ -296,14 +337,13 @@ void   cte_image_watermark::clock_charge_pixel_capture_ov( double d )
   double test_height;
   double h;
 
-  int    i, j;
 
   new_nr_wml = 0;
 
 
   // walk through all entries
   h = 0.0;
-  for (j=nr_wml-1;j>=0;--j)
+  for (int j=nr_wml-1;j>=0;--j)
   {
     if ( cloud_height2 < 0.0 )
     {
@@ -375,18 +415,7 @@ void   cte_image_watermark::clock_charge_pixel_capture_ov( double d )
     ++new_nr_wml;
   }
 
-  #ifdef __debug
-  output( 10, "Copying back the temporary data ..\n" );
-  #endif
-
-  // copy the temporary array back
-  for (j=new_nr_wml-1, i=0;j>=0;--j, ++i)
-  {
-    wml[i]      = new_wml[j];
-    wml_fill[i] = new_wml_fill[j];
-  }
-  nr_wml = new_nr_wml;
-
+  clock_charge_pixel_capture_ov_copyback_temp();
 }
 
 
@@ -504,11 +533,11 @@ void   cte_image_watermark::clock_charge_pixel_cleanup( void )
   // cleanup the array
   // removing duplicate levels ...
 
-  if ( dark_mode  == 1 )
+  if ( dark_mode )
   {
-    int j = 0;
-    int i;
-    for (i=1;i<nr_wml;++i)
+    // here is much mork to do ... OC
+    unsigned int j = 0;
+    for ( unsigned int i=1;i<nr_wml;++i)
     {
       #ifdef __debug
       output( 10, "i,j: %i %i\n", i, j );

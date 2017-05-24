@@ -22,7 +22,7 @@
 /* cte_image_watermark.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-24
 
    $Id$
 
@@ -60,6 +60,7 @@ private:
   #ifdef __debug
   void   print_wml( void );
   #endif
+  void   clock_charge_pixel_capture_ov_copyback_temp();
 protected:
   // extern declarated variables
   bool                                 check_empty_traps;
@@ -67,27 +68,27 @@ protected:
   double                               empty_trap_limit_neo2;
   double                               neo2_split_limit;
 
-  int                                  dark_mode;
+  bool                                 dark_mode;
 
   // trap definitions
   std::valarray<std::valarray<double>> wml;
-  std::valarray<double>               wml_fill;
-  long                                nr_wml;
+  std::valarray<double>                wml_fill;
+  unsigned int                         nr_wml;
 
   std::valarray<std::valarray<double>> new_wml;
-  std::valarray<double>               new_wml_fill;
-  long                                new_nr_wml;
+  std::valarray<double>                new_wml_fill;
+  unsigned int                         new_nr_wml;
 
   std::valarray<std::valarray<double>> saved_wml;
-  std::valarray<double>               saved_wml_fill;
-  long                                saved_nr_wml;
+  std::valarray<double>                saved_wml_fill;
+  unsigned int                         saved_nr_wml;
 
-  std::valarray<double>               trap_density;
-  double                              trap_density_total;
-  std::valarray<double>               trap_density_express;
-  double                              trap_density_express_total;
+  std::valarray<double>                trap_density;
+  double                               trap_density_total;
+  std::valarray<double>                trap_density_express;
+  double                               trap_density_express_total;
 
-  double                              cloud_height;
+  double                               cloud_height;
 };
 
 

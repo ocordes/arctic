@@ -22,7 +22,7 @@
 /* cte_image_classic.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-24
 
    $Id$
 
@@ -72,15 +72,15 @@ protected:
 
   // trap definitions
   std::valarray<double>                traps;
-  int                                  n_levels_traps;
-  int                                  stat_count;
+  unsigned int                         n_levels_traps;
+  unsigned int                         stat_count;
   std::valarray<double>                n_electrons_per_trap;
   double                               n_electrons_per_trap_total;
   std::valarray<double>                n_electrons_per_trap_express;
   double                               n_electrons_per_trap_express_total;
   std::valarray<double>                n_electrons_per_trap_express_ov;
 
-  int                                  cheight;
+  unsigned int                         cheight;
 };
 
 #endif

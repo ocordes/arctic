@@ -22,7 +22,7 @@
 /* output.cc
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-24
 
    $Id$
 
@@ -47,21 +47,18 @@
 int debug_level = 1;  /* be quiet */
 
 
-char dummy[1000];
-
-
-char timestamp[20];
-
-
-void debug_generate_timestamp( void )
+char *debug_generate_timestamp( void )
 {
   struct tm   *timep;
   time_t       times;
+  char        *p;
 
   times = time( NULL );
   timep = localtime( &times );
 
-  snprintf( timestamp, 20, "%02i:%02i.%02i", timep->tm_hour, timep->tm_min, timep->tm_sec );
+  asprintf( &p, "%02i:%02i.%02i", timep->tm_hour, timep->tm_min, timep->tm_sec );
+
+  return p;
 }
 
 
@@ -103,24 +100,29 @@ bool is_debug( int dlevel )
 
 void output( int dlevel, const char *format, ... )
 {
+  char *os;
+
   if ( is_debug( dlevel) )
   {
     va_list ap;
 
     // generate output
     va_start( ap, format );
-    vsnprintf( dummy, 1000, format, ap );
+    vasprintf( &os, format, ap );
     va_end( ap );
 
     if ( debug_level == 1 )
     {
-      printf( "%s", dummy );
+      printf( "%s", os );
     }
     else
     {
-      debug_generate_timestamp();
-      printf( "%s: %s", timestamp, dummy );
+      char *ts = debug_generate_timestamp();
+      printf( "%s: %s", ts, os );
+      free( ts );
     }
+
+    free( os );
 
     fflush( stdout );
   }

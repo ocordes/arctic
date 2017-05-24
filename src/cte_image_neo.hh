@@ -22,7 +22,7 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-24
 
    $Id$
 
@@ -67,22 +67,19 @@ private:
   void   clock_charge_pixel_capture_ov_copyback_temp( void );
 protected:
   // extern declarated variables
-  bool                                 check_empty_traps;
   double                               empty_trap_limit;
-  double                               empty_trap_limit_neo2;
-
-  int                                  dark_mode;
+  bool                                 dark_mode;
 
   // trap definitions
   std::valarray<std::valarray<double>> trapl;
   std::valarray<int>                   trapl_fill;
-  long                                 nr_trapl;
+  unsigned int                         nr_trapl;
   std::valarray<std::valarray<double>> new_trapl;
   std::valarray<int>                   new_trapl_fill;
-  long                                 new_nr_trapl;
+  unsigned int                         new_nr_trapl;
   std::valarray<std::valarray<double>> saved_trapl;
   std::valarray<int>                   saved_trapl_fill;
-  long                                 saved_nr_trapl;
+  unsigned int                         saved_nr_trapl;
 
   std::valarray<double>                n_electrons_per_trap;
   double                               n_electrons_per_trap_total;

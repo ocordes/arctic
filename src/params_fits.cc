@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-24
 
    $Id$
 
@@ -39,7 +39,16 @@
 
 
 #define min_limit( x ) if ( ( x ) < 0 ) x = 0
-#define output_range( x ) for (unsigned int n=0;n<x.size();n++) { output( 10, "   %i\n", x[n] ); }
+
+
+// helper output function
+void output_range( std::valarray<double> & x )
+{
+  for (unsigned int n=0;n<x.size();++n)
+  {
+    output( 10, "   %f\n", x[n] );
+  }
+}
 
 
 params_fits::params_fits() : params()
