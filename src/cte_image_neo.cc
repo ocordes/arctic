@@ -58,8 +58,6 @@
 
 // define some macros for the neo code
 
-#define newtrap( new_h, new_val) ( trapl_fill[nr_trapl] = new_h; trapl[nr_trapl] = new_val; ++nr_trapl; )
-
 // endof macros
 
 
@@ -169,7 +167,8 @@ void cte_image_neo::clock_charge_setup( void  )
   output( 1, "Using n_levels=%i\n", parameters->n_levels );
 
   // setup variables
-  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) parameters->n_levels );
+  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density /
+                                                (double) parameters->n_levels );
   n_electrons_per_trap_total = traps_total / parameters->n_levels;
   output( 10, "Create trap structure ...\n" );
 
@@ -180,13 +179,12 @@ void cte_image_neo::clock_charge_setup( void  )
   int max_trap_levels = height * 2;
 
   // trap level information implementations
-  trapl = std::valarray<std::valarray<double>> ( std::valarray<double>(0.0, parameters->n_species), max_trap_levels );
+  trapl = std::valarray<std::valarray<double>> ( std::valarray<double>( 0.0, parameters->n_species),
+                                                                        max_trap_levels );
   trapl_fill = std::valarray<int> ( 0, max_trap_levels );
   nr_trapl = 0;
 
   // helper array for the d < 0.0 mode
-  //std::valarray<std::valarray<double>> new_trapl( std::valarray<double>(0.0, n_species), max_trap_levels );
-  //std::valarray<int> new_trapl_fill( 0, max_trap_levels );
   new_trapl = trapl;
   new_trapl_fill = trapl_fill;
   new_nr_trapl = 0;
@@ -194,8 +192,6 @@ void cte_image_neo::clock_charge_setup( void  )
   n_electrons_per_trap_express = n_electrons_per_trap;
   n_electrons_per_trap_express_ov = n_electrons_per_trap;
 
-  //std::valarray<std::valarray<double>> saved_trapl( std::valarray<double>(0.0, n_species), max_trap_levels );
-  //std::valarray<int> saved_trapl_fill( 0, max_trap_levels );
   saved_trapl = trapl;
   saved_trapl_fill = trapl_fill;
   saved_nr_trapl = 0;
@@ -482,16 +478,6 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
     {
       // if ov == 0! then no additional level is needed
       clock_charge_pixel_capture_ov_modify( j, d );
-      // for (i=0;i<n_species;++i)
-      // {
-      //   if ( trapl[j][i] < n_electrons_per_trap_express_ov[i] )
-      //     new_trapl[new_nr_trapl][i] = trapl[j][i]
-      //                             + ( ( n_electrons_per_trap_express_ov[i]  ) - trapl[j][i] ) * d;
-      //   else
-      //     new_trapl[new_nr_trapl][i] = trapl[j][i];
-      // }
-      // new_trapl_fill[new_nr_trapl] = 1;
-      // ++new_nr_trapl;
     }
 
     trapl_fill[j] -= ceil( dheight );

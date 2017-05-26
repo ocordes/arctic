@@ -22,7 +22,7 @@
 /* arctic.cc
 
    written by: Oliver Cordes 2013-02-05
-   changed by: Oliver Cordes 2017-02-20
+   changed by: Oliver Cordes 2017-05-26
 
    $Id$
 
@@ -53,21 +53,31 @@ void help_check( int argc, char *argv[] )
         || ( std::strcmp( argv[i], "--help" ) == 0 ) )
         {
           // print the syntax information
-          std::cout << "SYNTAX: arctic -m MODE <INFILE> <OUTFILE> <OPTIONS>" << std::endl;
-          std::cout << "  MODE is one of the following:" << std::endl;
-          std::cout << "    FITS   :  working on simple FITS files (default)" << std::endl;
-          std::cout << "    ACS    :  working on ACS files, using the observation date" << std::endl;
-          std::cout << "              for setting the trap specification" << std::endl;
-          std::cout << "    EUCLID :  working on EUCLID files in a special environment" << std::endl;
+          std::cout << "SYNTAX: arctic -m MODE <INFILE> <OUTFILE> <OPTIONS>"
+                    << std::endl;
+          std::cout << "  MODE is one of the following:"
+                    << std::endl;
+          std::cout << "    FITS   :  working on simple FITS files (default)"
+                    << std::endl;
+          std::cout << "    ACS    :  working on ACS files, using the observation date"
+                    << std::endl;
+          std::cout << "              for setting the trap specification"
+                    << std::endl;
+          std::cout << "    EUCLID :  working on EUCLID files in a special environment"
+                    << std::endl;
           std::cout << std::endl;
-          std::cout << "  OPTIONS are special for different working modes:" << std::endl;
-          std::cout << "   FITS options:" << std::endl;
+          std::cout << "  OPTIONS are special for different working modes:"
+                    << std::endl;
+          std::cout << "   FITS options:"
+                    << std::endl;
           syntax_fits();
           std::cout << std::endl;
-          std::cout << "   ACS options (inherit all FITS options):" << std::endl;
+          std::cout << "   ACS options (inherit all FITS options):"
+                    << std::endl;
           syntax_acs();
           std::cout << std::endl;
-          std::cout << "   EUCLID options (inherit all FITS options):" << std::endl;
+          std::cout << "   EUCLID options (inherit all FITS options):"
+                    << std::endl;
           syntax_euclid();
           std::cout << std::endl;
 
@@ -99,7 +109,8 @@ int main( int argc, char *argv[])
 
   image *im = NULL;
 
-  try {
+  try
+  {
     std::cout << "Working in ";
     switch ( working_mode )
     {
@@ -121,6 +132,7 @@ int main( int argc, char *argv[])
         break;
     }
   }
+
   catch ( char const *s )
   {
     std::cerr << s << " Program aborted!" <<  std::endl;

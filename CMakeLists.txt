@@ -38,6 +38,13 @@ else()
 endif()
 
 
+if ( COVERAGE )
+  message( STATUS "Coverage build" )
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage" )
+  #INCLUDE(CodeCoverage)
+  SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -std=c++0x")
+endif()
+
 # define the target and parameter
 
 # these instructions search the directory tree when cmake is
@@ -62,12 +69,12 @@ add_library( libarctic STATIC ${sources} )
 set_target_properties( libarctic PROPERTIES OUTPUT_NAME arctic )
 target_compile_options( libarctic  PUBLIC  -g -O3 -Wall)
 
-if(LINUX) 
+if(LINUX)
    #message(STATUS ">>> Linux")
    target_compile_options( libarctic PUBLIC -fPIC )
 else()
    #message(STATUS ">>> Not Linux")
-   # stuff that should happen not on Linux 
+   # stuff that should happen not on Linux
 endif()
 
 # this lets me include files relative to the root src dir with a <> pair

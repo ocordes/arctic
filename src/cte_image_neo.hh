@@ -22,15 +22,15 @@
 /* cte_image_neo.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-24
+   changed by: Oliver Cordes 2017-05-26
 
    $Id$
 
 */
 
-#ifndef __cte_image_neo_h
+#ifndef CTE_IMAGE_NEO_H
 
-#define __cte_image_neo_h 1
+#define CTE_IMAGE_NEO_H 1
 
 
 #include <valarray>
@@ -41,7 +41,8 @@
 #include "cte_image.hh"
 #include "params.hh"
 
-class cte_image_neo : public cte_image {
+class cte_image_neo : public cte_image
+{
 public:
   cte_image_neo( void );
   cte_image_neo( std::shared_ptr<params> & );

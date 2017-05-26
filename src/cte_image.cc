@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-26
 
 
    $Id$
@@ -230,20 +230,20 @@ void cte_image::create_express_multiplier( std::valarray<unsigned int> & emp )
 
       pos = (i_express*(height+1))+i_pixel;
       emp[pos] = d;
-     }
     }
-    #ifdef __debug
-    for (unsigned int i=0; i<height;++i)
-    {
-      std::cout << i << " : ";
+  }
+  #ifdef __debug
+  for (unsigned int i=0; i<height;++i)
+  {
+    std::cout << i << " : ";
 
-      for (unsigned int j=0;j<parameters->express;++j)
-      {
-        std::cout << emp[j*(height+1)+i] << " ";
-      }
-      std::cout << std::endl;
+    for (unsigned int j=0;j<parameters->express;++j)
+    {
+      std::cout << emp[j*(height+1)+i] << " ";
     }
-    #endif
+    std::cout << std::endl;
+  }
+  #endif
   output( 10, "Done.\n" );
 }
 
@@ -352,10 +352,10 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
     // traps are empty
     clock_charge_clear();
 
-    // good question if this is really necessary, because the array is used via nr_trapl as an indication
-    // how much levels are really used, these levels have then also valid entries ...
-    //trapl = std::valarray<std::valarray<double>>( std::valarray<double>(0.0, n_species), n_levels );
-    //trapl_fill = std::valarray<int> ( 0, n_levels );
+    // good question if this is really necessary, because the array is used via nr_trapl
+    // as an indication how much levels are really used, these levels have then also
+    // valid entries ...
+    
     is.reset( i_column ); // initialize the image slicer
 
     for (unsigned i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)

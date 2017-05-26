@@ -10,13 +10,11 @@ DEBUG=1
 sonar_cxx_cppcheck_reportFile="sonar/sonar_cxx_cppcheck_report.xml"
 sonar_cxx_vera_reportFile="sonar/sonar_cxx_vera_report.xml"
 sonar_cxx_rats_reportFile="sonar/sonar_cxx_rats_report.xml"
-
-rm -f $sonar_cxx_cppcheck_reportFile
-rm -f $sonar_cxx_vera_reportFile
-rm -f $sonar_cxx_rats_reportFile
+sonar_cxx_coverage_reportFile="sonar/sonar_cxx_coverage_report.xml"
 
 function runCppcheck
 {
+  rm -f $sonar_cxx_cppcheck_reportFile
   if [ "$DBUG" == "0" ]; then
     out="-q"
   else
@@ -45,11 +43,25 @@ function runVera++
 
 function runRats
 {
+  rm -f $sonar_cxx_rats_reportFile
   rats -w 3 --xml src > $sonar_cxx_rats_reportFile
 } # runrats
 
+
+function runCppCoverage
+{
+  rm -f $sonar_cxx_coverage_reportFile
+  mkdir build.gcovr
+  rm -rf build.gcovr/*
+
+  (cd build.gcovr; cmake -DCOVERAGE=1 ..; make; make test )
+
+  gcovr -r . --exclude '.*/unittests/.*' --xml -o $sonar_cxx_coverage_reportFile
+}
+
 # main
 
-runCppcheck
-runVera++
-runRats
+#runCppcheck
+#runVera++
+#runRats
+runCppCoverage

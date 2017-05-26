@@ -22,7 +22,7 @@
 /* cte_image_watermark.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-24
+   changed by: Oliver Cordes 2017-05-26
 
    $Id$
 

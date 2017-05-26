@@ -22,15 +22,15 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-22
+   changed by: Oliver Cordes 2017-05-26
 
    $Id$
 
 */
 
-#ifndef __cte_image_h
+#ifndef CTE_IMAGE_H
 
-#define __cte_image_h 1
+#define CTE_IMAGE_H 1
 
 
 #include <valarray>
@@ -40,7 +40,8 @@
 
 #include "params.hh"
 
-class cte_image {
+class cte_image
+{
 public:
   std::shared_ptr<params>              parameters;
 

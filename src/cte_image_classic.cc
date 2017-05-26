@@ -22,7 +22,7 @@ w
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-24
+   changed by: Oliver Cordes 2017-05-26
 
 
    $Id$
@@ -109,13 +109,15 @@ void cte_image_classic::print_traps( void )
     {
       if ( j > 0 )
       {
-        if ( fabs( traps[(j*parameters->n_species)+i] - traps[((j-1)*parameters->n_species)+i] ) < 1e-14 )
+        if ( fabs( traps[(j*parameters->n_species)+i]
+                 - traps[((j-1)*parameters->n_species)+i] ) < 1e-14 )
         {
           ++c;
         }
       }
       std::stringstream str;
-      str << std::fixed << std::setprecision( debug_precision ) << traps[(j*parameters->n_species)+i] << " ";
+      str << std::fixed << std::setprecision( debug_precision )
+          << traps[(j*parameters->n_species)+i] << " ";
       s += str.str();
       //s += std::to_string( t[(j*n_species)+i] ) + " ";
       d +=  traps[(j*parameters->n_species)+i];
@@ -143,7 +145,8 @@ void   cte_image_classic::clock_charge_setup( void )
 
   check_empty_traps = parameters->check_empty_traps;
   empty_trap_limit = parameters->empty_trap_limit;
-  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density / (double) parameters->n_levels );
+  n_electrons_per_trap = std::valarray<double> ( parameters->trap_density /
+                                                (double) parameters->n_levels );
   n_electrons_per_trap_total = traps_total / parameters->n_levels;
 
   output( 10, "Create trap structure ...\n" );
