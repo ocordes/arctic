@@ -61,7 +61,7 @@ function runCppCoverage
 
 # main
 
-#runCppcheck
-#runVera++
-#runRats
+runCppcheck
+runVera++
+runRats
 runCppCoverage
