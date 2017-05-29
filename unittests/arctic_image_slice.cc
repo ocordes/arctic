@@ -4,6 +4,9 @@
 
 #include "image_slice.hh"
 
+// written by: Ole Marggraf 2017-??-??
+// changed by: Oliver Cordes 2017-05-29
+
 
 BOOST_AUTO_TEST_SUITE( image_slice_test_suite )
 
@@ -78,6 +81,8 @@ BOOST_AUTO_TEST_CASE( imageslice_test1 )
 // check whether exceptions are thrown properly
 BOOST_AUTO_TEST_CASE( imageslice_exceptions )
 {
+  // Test the setup configuration and exceptions
+
   // image_slice(width, height, offset, rotation, direction)
   std::image_slice is_y_ok(20, 10, 0, image_readout_y, image_forward);
   std::image_slice is_y(20, 10, 10, image_readout_y, image_forward);
@@ -86,9 +91,32 @@ BOOST_AUTO_TEST_CASE( imageslice_exceptions )
   // throwing exceptions here does not depend on forward or reverse readout
   // reset col parameter is irrelevant because the initialization is set already
   // such that we are out of bounds
-//  BOOST_CHECK_NO_THROW(is_y_ok.reset(0));
-//  BOOST_CHECK_THROW(is_y.reset(0), std::slice_exception);
-//  BOOST_CHECK_THROW(is_x.reset(0), std::slice_exception);
+  BOOST_CHECK_NO_THROW( is_y_ok.reset(0) );
+  BOOST_CHECK_THROW( is_y.reset(0), std::runtime_error );
+  BOOST_CHECK_THROW( is_x.reset(0), std::runtime_error );
+
+
+  // test the out of bounds exceptins with the ++i and i++ operators
+
+  std::image_slice is_forward_out1( 10, 1, 0, image_readout_y, image_forward );
+  is_forward_out1.reset( 0 );
+  ++is_forward_out1;
+  BOOST_CHECK_THROW( ++is_forward_out1, std::runtime_error );
+
+  std::image_slice is_forward_out2( 10, 1, 0, image_readout_y, image_forward );
+  is_forward_out2.reset( 0 );
+  is_forward_out2++;
+  BOOST_CHECK_THROW( is_forward_out2++, std::runtime_error );
+
+  std::image_slice is_reverse_out1( 10, 1, 0, image_readout_y, image_reverse );
+  is_reverse_out1.reset( 0 );
+  ++is_reverse_out1;
+  BOOST_CHECK_THROW( ++is_reverse_out1, std::runtime_error );
+
+  std::image_slice is_reverse_out2( 10, 1, 0, image_readout_y, image_reverse );
+  is_reverse_out2.reset( 0 );
+  is_reverse_out2++;
+  BOOST_CHECK_THROW( is_reverse_out2++, std::runtime_error );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

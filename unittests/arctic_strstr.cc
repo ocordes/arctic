@@ -4,8 +4,18 @@
 
 #include "strstr.hh"
 
+// written by: Ole Marggraf 2017-??-??
+// changed by: Oliver Cordes 2017-05-29
+
 
 BOOST_AUTO_TEST_SUITE( CString )
+
+BOOST_AUTO_TEST_CASE( constructor )
+{
+  std::CString test_str1;
+
+  BOOST_CHECK_EQUAL( test_str1, "" );
+}
 
 BOOST_AUTO_TEST_CASE( strtok )
 {

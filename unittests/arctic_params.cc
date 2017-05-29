@@ -88,4 +88,55 @@ BOOST_AUTO_TEST_CASE( params_test_str2array_long )
 
 }
 
+BOOST_AUTO_TEST_CASE( get_working_mode_test )
+{
+  char **argv_test;
+
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[1] = strdup( "-m" );
+  argv_test[0] = strdup( "Foo" );
+
+  argv_test[2] = strdup( "FITS" );
+  BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_FITS );
+  free( argv_test[2] );
+
+  argv_test[2] = strdup( "ACS" );
+  BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_ACS );
+  free( argv_test[2] );
+
+  argv_test[2] = strdup( "EUCLID" );
+  BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_EUCLID );
+  free( argv_test[2] );
+
+  argv_test[2] = strdup( "BAR" );
+  BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_FITS );
+  free( argv_test[2] );
+
+  free( argv_test[1] );
+  free( argv_test[0] );
+
+  free( argv_test );
+}
+
+BOOST_AUTO_TEST_CASE( tobool_test )
+{
+  std::string s = "";
+  BOOST_CHECK_EQUAL( tobool( s, true ), true );
+  BOOST_CHECK_EQUAL( tobool( s, false ), false);
+  s = "Y";
+  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  s = "J";
+  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  s = "T";
+  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  s = "1";
+  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  s = "N";
+  BOOST_CHECK_EQUAL( tobool( s, false ), false );
+  s = "F";
+  BOOST_CHECK_EQUAL( tobool( s, false ), false );
+  s = "0";
+  BOOST_CHECK_EQUAL( tobool( s, false ), false );
+}
+
 BOOST_AUTO_TEST_SUITE_END()

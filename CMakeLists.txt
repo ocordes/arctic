@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-04-04
+# changed by: Oliver Cordes 2017-05-26
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -24,6 +24,13 @@ execute_process(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE BUILD)
 string( REPLACE "\n" "" BUILD ${BUILD})
 message(STATUS "Compilation date = ${BUILD}")
 
+if ( COVERAGE )
+  message( STATUS "Coverage build" )
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage" )
+  #INCLUDE(CodeCoverage)
+  SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+endif()
+
 
 # Compile with C++11 support.  Disable __STRICT_ANSI__ to support
 include(CheckCXXCompilerFlag)
@@ -37,13 +44,6 @@ else()
         message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
-
-if ( COVERAGE )
-  message( STATUS "Coverage build" )
-  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage" )
-  #INCLUDE(CodeCoverage)
-  SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -std=c++0x")
-endif()
 
 # define the target and parameter
 
