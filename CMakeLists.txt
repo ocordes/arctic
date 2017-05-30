@@ -121,6 +121,15 @@ add_unit_test( Boost_arctic_image_slice_test unittests/arctic_image_slice.cc
 add_unit_test( Boost_arctic_params_test unittests/arctic_params.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
+add_unit_test( Boost_arctic_params_fits_test unittests/arctic_params_fits.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_params_acs_test unittests/arctic_params_acs.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_params_euclid_test unittests/arctic_params_euclid.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
 
 
 

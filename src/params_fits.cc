@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-24
+   changed by: Oliver Cordes 2017-05-30
 
    $Id$
 
@@ -239,7 +239,7 @@ void  params_fits::parse_args_algorithm( std::string & key, std::string & val, i
     }
     else
     {
-      algorithm = ALGORITHM_CLASSIC;
+      algorithm = ALGORITHM_NEO;
     }
 
     output( 10, "params: ALGORITHM = %s\n", algorithm_names[algorithm].c_str() );

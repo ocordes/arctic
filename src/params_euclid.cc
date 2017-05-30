@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-30
 
    $Id$
 
@@ -38,8 +38,8 @@
 
 
 params_euclid::params_euclid() : params_fits(),
-  has_local_n_species( false ),
-  has_local_trap_density( false ),
+  has_local_n_species( false ),      // try to load the mission database
+  has_local_trap_density( false ),   // try to load the mission database
   ccd( 0 )
 {
   working_mode = "EUCLID";

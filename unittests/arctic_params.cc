@@ -7,6 +7,13 @@
 
 BOOST_AUTO_TEST_SUITE( params_test_suite )
 
+BOOST_AUTO_TEST_CASE( constructor_destructor_test )
+{
+  params p;
+
+  BOOST_CHECK_EQUAL( p.algorithm, ALGORITHM_NEO );
+}
+
 BOOST_AUTO_TEST_CASE( params_test_str2array )
 {
   params p;

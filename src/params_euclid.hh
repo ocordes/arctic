@@ -28,9 +28,9 @@
 
 */
 
-#ifndef __params_euclid_h
+#ifndef PARAMS_EUCLID_H
 
-#define __params_euclid_h 1
+#define PARAMS_EUCLID_H 1
 
 
 #include <cstring>
@@ -42,18 +42,19 @@
 #include "params_fits.hh"
 
 
-class params_euclid : public params_fits {
-private:
-  bool        has_local_n_species;
-  bool        has_local_trap_density;
-
-  int         ccd;
+class params_euclid : public params_fits
+{
 public:
   params_euclid();
 
   void set_args( int *argc, char **argv[]  );
   virtual void parse_args( std::string &, std::string &, int &);
   virtual void check_params ( void );
+
+  bool        has_local_n_species;
+  bool        has_local_trap_density;
+
+  int         ccd;
 };
 
 
