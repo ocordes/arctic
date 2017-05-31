@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-31
 
    $Id$
 
@@ -199,7 +199,7 @@ void params::parse_error_msg( int status, std::string & key, std::string & val )
     case PARSE_OK:
       break;
     case PARSE_UNKNOWN:
-      std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
+      std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << std::endl;
       break;
     case PARSE_ERROR:
       std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
@@ -214,6 +214,8 @@ void params::set_args( int *argc, char **argv[]  )
   int outp  = 1;
 
   int error;
+
+  output( 11, "params::set_args: called\n" );
 
   int i = 1; // the first argument is always the program name ;-)
 

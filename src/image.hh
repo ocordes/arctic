@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-05-31
 
    $Id$
 
@@ -53,6 +53,7 @@ public:
 
   template <typename T>  T readkey( CCfits::PHDU & pHDU, std::string key );
 
+  std::string                            prgname;
 private:
   void         update_header( CCfits::PHDU & hdu);
   void         update_header_serial( CCfits::PHDU & hdu );
@@ -65,7 +66,6 @@ protected:
   bool                                   electrons_per_sec;
   double                                 exptime;
 
-  std::string                            prgname;
   std::shared_ptr<params>                parameters;
   std::string                            infilename;
   std::string                            outfilename;

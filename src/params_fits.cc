@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-30
+   changed by: Oliver Cordes 2017-05-31
 
    $Id$
 
@@ -308,7 +308,7 @@ void params_fits::parse_args_imagedir( std::string & key, std::string &, int & e
 {
   if ( key == "ROTATE" )
   {
-    rotate = ~rotate;
+    rotate = !rotate;
     if ( rotate == image_readout_y )
     {
       output( 10, "params: readout_y selected\n" );

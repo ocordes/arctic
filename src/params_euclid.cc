@@ -22,7 +22,7 @@
 /* params_euclid.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-30
+   changed by: Oliver Cordes 2017-05-31
 
    $Id$
 
@@ -57,7 +57,7 @@ void params_euclid::set_args( int *argc, char **argv[]  )
   // load_global_mission_database();
   // load_local_mission_database();
 
-  // copy pnly data from thw database is necessary
+  // copy only data from the database if necessary
   if ( has_local_n_species == true)
   {
     output( 10, "Using local n_species ...\n" );

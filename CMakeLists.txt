@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2017-05-26
+# changed by: Oliver Cordes 2017-05-31
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -128,6 +128,21 @@ add_unit_test( Boost_arctic_params_acs_test unittests/arctic_params_acs.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
 add_unit_test( Boost_arctic_params_euclid_test unittests/arctic_params_euclid.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_output_test unittests/arctic_output.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_image_test unittests/arctic_image.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_image_fits_test unittests/arctic_image_fits.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_image_acs_test unittests/arctic_image_acs.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_image_euclid_test unittests/arctic_image_euclid.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
 

@@ -1,11 +1,33 @@
 #define BOOST_TEST_MODULE MyTest
 
 #include <boost/test/unit_test.hpp>
+#include <boost/test/output_test_stream.hpp>
+#include <iostream>
 
 #include "params.hh"
 
 
+// written by: Ole Marggraf 2016-??-??
+// changed by; Oliver cordes 2017-05-31
+
+
 BOOST_AUTO_TEST_SUITE( params_test_suite )
+
+// define something which make it possible to check std::cout output
+struct cout_redirect {
+    cout_redirect( std::streambuf * new_buffer )
+        : old( std::cout.rdbuf( new_buffer ) )
+    { }
+
+    ~cout_redirect( ) {
+        std::cout.rdbuf( old );
+    }
+
+private:
+    std::streambuf * old;
+};
+
+
 
 BOOST_AUTO_TEST_CASE( constructor_destructor_test )
 {
@@ -95,13 +117,43 @@ BOOST_AUTO_TEST_CASE( params_test_str2array_long )
 
 }
 
+BOOST_AUTO_TEST_CASE( parse_error_msg_test )
+{
+  std::string key( "key" );
+  std::string val( "val" );
+
+  params p;
+
+  boost::test_tools::output_test_stream output;
+  {
+    cout_redirect guard( output.rdbuf( ) );
+
+    p.parse_error_msg( PARSE_UNKNOWN, key, val );
+  }
+  BOOST_CHECK( output.is_equal( "Parse error: unhandled value for parameter  key : val\n" ) );
+
+  {
+    cout_redirect guard( output.rdbuf( ) );
+
+    p.parse_error_msg( PARSE_ERROR, key, val );
+  }
+  BOOST_CHECK( output.is_equal( "Parse error: unhandled parameter: key (val=val)\n" ) );
+
+  {
+    cout_redirect guard( output.rdbuf( ) );
+
+    p.parse_error_msg( PARSE_OK, key, val );
+  }
+  BOOST_CHECK( output.is_equal( "" ) );
+}
+
 BOOST_AUTO_TEST_CASE( get_working_mode_test )
 {
   char **argv_test;
 
   argv_test = (char**) malloc( sizeof( void * ) * 3);
   argv_test[1] = strdup( "-m" );
-  argv_test[0] = strdup( "Foo" );
+  argv_test[0] = strdup( "Program_name_test" );
 
   argv_test[2] = strdup( "FITS" );
   BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_FITS );
@@ -118,6 +170,9 @@ BOOST_AUTO_TEST_CASE( get_working_mode_test )
   argv_test[2] = strdup( "BAR" );
   BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_FITS );
   free( argv_test[2] );
+
+  // no value given
+  BOOST_CHECK_EQUAL( get_working_mode( 2, argv_test ), WORKING_MODE_FITS );
 
   free( argv_test[1] );
   free( argv_test[0] );

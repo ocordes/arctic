@@ -1,8 +1,3 @@
 #!/bin/sh
 
-GITHUB_ACCESS_TOKEN=37525fe2b1267a65a91f6afa72fe75fd1c766a89
-SONARQUBE_ACCES_TOKEN=5b9e10337f58084d72d590dbcd8d8d5cf614e23a
-
-sonar-scanner -Dsonar.analysis.mode=publish \
-              -Dsonar.host.url=http://sonar-qube.astro.uni-bonn.de:9000 \
-              -Dsonar.login=$SONARQUBE_ACCESS_TOKEN
+sonar-scanner-aifa -Dsonar.analysis.mode=publish

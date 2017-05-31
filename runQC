@@ -7,56 +7,74 @@
 
 DEBUG=1
 
+# create the report directory
+mkdir -p sonar
+
 sonar_cxx_cppcheck_reportFile="sonar/sonar_cxx_cppcheck_report.xml"
 sonar_cxx_vera_reportFile="sonar/sonar_cxx_vera_report.xml"
 sonar_cxx_rats_reportFile="sonar/sonar_cxx_rats_report.xml"
 sonar_cxx_coverage_reportFile="sonar/sonar_cxx_coverage_report.xml"
 
+
+# check for executables
+CPPCHECK=`which cppcheck`
+VERA=`which vera++`
+RATS=`which rats`
+GCOVR=`which gcovr`
+
 function runCppcheck
 {
   rm -f $sonar_cxx_cppcheck_reportFile
-  if [ "$DBUG" == "0" ]; then
-    out="-q"
-  else
-    out=""
+  if [ ${CPPCHECK} ]; then
+   if [ "$DEBUG" == "0" ]; then
+     out="-q"
+   else
+     out=""
+   fi
+   #INCLUDES="-I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1 \
+   #           -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include \
+   #         -I /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers/machine/ \
+   #           -I /usr/include -I /usr/local/include -I /Users/ocordes/git/arctic/build"
+   INCLUDES="-I /usr/include -I /usr/include/c++/4.2.1 -I /usr/local/include -I /Users/ocordes/git/arctic/build"
+   INCLUDES="-I /usr/local/include -I /Users/ocordes/git/arctic/build"
+   cppcheck --force --xml --std=c++11  --enable=all --suppress=missingInclude src/ $out $INCLUDES 2> $sonar_cxx_cppcheck_reportFile
   fi
-  #INCLUDES="-I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1 \
-  #           -I /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.0.0/include \
-  #         -I /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/Kernel.framework/Versions/A/Headers/machine/ \
-  #           -I /usr/include -I /usr/local/include -I /Users/ocordes/git/arctic/build"
-  INCLUDES="-I /usr/include -I /usr/include/c++/4.2.1 -I /usr/local/include -I /Users/ocordes/git/arctic/build"
-  INCLUDES="-I /usr/local/include -I /Users/ocordes/git/arctic/build"
-  cppcheck --force --xml --std=c++11  --enable=all --suppress=missingInclude src/ $out $INCLUDES 2> $sonar_cxx_cppcheck_reportFile
-
 } # runCppcheck
 
 
 function runVera++
 {
   rm -f $sonar_cxx_vera_reportFile
-  export VERA_ROOT=/usr/local/lib/vera++
+  if [ ${VERA}]; then
+   export VERA_ROOT=/usr/local/lib/vera++
 
-  #find src -regex ".*\.cc\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
-  find src  -type f | vera++ -s -c $sonar_cxx_vera_reportFile
+   #find src -regex ".*\.cc\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
+   find src  -type f | vera++ -s -c $sonar_cxx_vera_reportFile
+  fi
 } # runVera++
 
 
 function runRats
 {
   rm -f $sonar_cxx_rats_reportFile
-  rats -w 3 --xml src > $sonar_cxx_rats_reportFile
+  if [ ${RATS} ]; then
+   rats -w 3 --xml src > $sonar_cxx_rats_reportFile
+  fi
 } # runrats
 
 
 function runCppCoverage
 {
   rm -f $sonar_cxx_coverage_reportFile
-  mkdir build.gcovr
-  rm -rf build.gcovr/*
 
-  (cd build.gcovr; cmake -DCOVERAGE=1 ..; make; make test )
+  if [ ${GCOVR} ]; then
+   mkdir -p build.gcovr
+   rm -rf build.gcovr/*
 
-  gcovr -r . --exclude '.*/unittests/.*' --xml -o $sonar_cxx_coverage_reportFile
+   (cd build.gcovr; cmake -DCOVERAGE=1 ..; make; make test )
+
+   gcovr -r . --exclude '.*/unittests/.*' --xml -o $sonar_cxx_coverage_reportFile
+ fi
 }
 
 # main
