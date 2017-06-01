@@ -54,13 +54,6 @@ public:
   template <typename T>  T readkey( CCfits::PHDU & pHDU, std::string key );
 
   std::string                            prgname;
-private:
-  void         update_header( CCfits::PHDU & hdu);
-  void         update_header_serial( CCfits::PHDU & hdu );
-  void         update_header_parallel( CCfits::PHDU & hdu );
-
-
-protected:
   int          correct_units( void );
   bool                                   sci_mode_dark;
   bool                                   electrons_per_sec;
@@ -76,6 +69,10 @@ protected:
 
   long                                   image_width;
   long                                   image_height;
+private:
+  void         update_header( CCfits::PHDU & hdu);
+  void         update_header_serial( CCfits::PHDU & hdu );
+  void         update_header_parallel( CCfits::PHDU & hdu );
 };
 
 template <typename T>
