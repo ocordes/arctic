@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-31
+   changed by: Oliver Cordes 2017-06-01
 
    $Id$
 
@@ -94,6 +94,5 @@ T image::readkey( CCfits::PHDU & pHDU, std::string key )
 
   return val;
 }
-
 
 #endif

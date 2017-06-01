@@ -22,7 +22,7 @@
 /* image_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-06-01
 
    $Id$
 
@@ -40,13 +40,14 @@
 #include <CCfits/CCfits>
 
 
-class acs_image : public image{
-public:
-  acs_image( int argc, char *argv[] );
-  virtual ~acs_image();
-  virtual int clock_charge_prepare( void );
-private:
-  double  date2double( std::string & s );
+class acs_image : public image
+{
+  public:
+    acs_image( int argc, char *argv[] );
+    virtual ~acs_image();
+    virtual int clock_charge_prepare( void );
+
+    double  date2double( std::string & s );
 };
 
 

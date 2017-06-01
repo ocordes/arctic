@@ -22,15 +22,15 @@
 /* image_euclid.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-06-01
 
    $Id$
 
 */
 
-#ifndef __image_euclid_h
+#ifndef IMAGE_EUCLID_H
 
-#define __image_euclid_h 1
+#define IMAGE_EUCLID_H 1
 
 
 #include "image.hh"

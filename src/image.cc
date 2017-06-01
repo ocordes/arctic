@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-24
+   changed by: Oliver Cordes 2017-06-01
 
    $Id$
 
@@ -79,16 +79,18 @@ std::string get_working_path()
 
 // initialize the image class and its memebers
 image::image( int argc, char *argv[] ) :
-  sci_mode_dark( false ),
-  electrons_per_sec( false ),
-  exptime( 0.0 ),
   prgname( "" ),
   infilename( ""),
   outfilename( "" ),
-  image_data(),
-  image_width( 0 ),
-  image_height( 0 )
+  image_data()
 {
+  sci_mode_dark     = false;
+  electrons_per_sec = false;
+  exptime           = 0.0;
+
+  image_width       = 0;
+  image_height      = 0;
+
   for (int i=0;i<argc;++i)
   {
     if ( prgname == "" )

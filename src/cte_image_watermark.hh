@@ -38,57 +38,60 @@
 
 #include <sys/time.h>
 
+#include "cte_image.hh"
 #include "params.hh"
 
-class cte_image_watermark : public cte_image {
-public:
-  cte_image_watermark( void );
-  cte_image_watermark( std::shared_ptr<params> & p);
 
-  virtual void   clock_charge_setup( void );
-  virtual void   clock_charge_clear( void );
+class cte_image_watermark : public cte_image
+{
+  public:
+    cte_image_watermark( void );
+    cte_image_watermark( std::shared_ptr<params> & p);
 
-  virtual void   clock_charge_save_traps( void );
-  virtual void   clock_charge_restore_traps( void );
-  virtual double clock_charge_pixel_release( void );
-  virtual double clock_charge_pixel_total_capture( double, double );
-  virtual void   clock_charge_pixel_capture_ov( double );
-  virtual void   clock_charge_pixel_capture_full( void );
-  virtual void   clock_charge_pixel_cleanup( void );
-  virtual double clock_charge_trap_info( void );
-private:
-  #ifdef __debug
-  void   print_wml( void );
-  #endif
-  void   clock_charge_pixel_capture_ov_copyback_temp();
-protected:
-  // extern declarated variables
-  bool                                 check_empty_traps;
-  double                               empty_trap_limit;
-  double                               empty_trap_limit_neo2;
-  double                               neo2_split_limit;
+    virtual void   clock_charge_setup( void );
+    virtual void   clock_charge_clear( void );
 
-  bool                                 dark_mode;
+    virtual void   clock_charge_save_traps( void );
+    virtual void   clock_charge_restore_traps( void );
+    virtual double clock_charge_pixel_release( void );
+    virtual double clock_charge_pixel_total_capture( double, double );
+    virtual void   clock_charge_pixel_capture_ov( double );
+    virtual void   clock_charge_pixel_capture_full( void );
+    virtual void   clock_charge_pixel_cleanup( void );
+    virtual double clock_charge_trap_info( void );
+  private:
+    #ifdef __debug
+    void   print_wml( void );
+    #endif
+    void   clock_charge_pixel_capture_ov_copyback_temp();
+  protected:
+    // extern declarated variables
+    bool                                 check_empty_traps;
+    double                               empty_trap_limit;
+    double                               empty_trap_limit_neo2;
+    double                               neo2_split_limit;
 
-  // trap definitions
-  std::valarray<std::valarray<double>> wml;
-  std::valarray<double>                wml_fill;
-  unsigned int                         nr_wml;
+    bool                                 dark_mode;
 
-  std::valarray<std::valarray<double>> new_wml;
-  std::valarray<double>                new_wml_fill;
-  unsigned int                         new_nr_wml;
+    // trap definitions
+    std::valarray<std::valarray<double>> wml;
+    std::valarray<double>                wml_fill;
+    unsigned int                         nr_wml;
 
-  std::valarray<std::valarray<double>> saved_wml;
-  std::valarray<double>                saved_wml_fill;
-  unsigned int                         saved_nr_wml;
+    std::valarray<std::valarray<double>> new_wml;
+    std::valarray<double>                new_wml_fill;
+    unsigned int                         new_nr_wml;
 
-  std::valarray<double>                trap_density;
-  double                               trap_density_total;
-  std::valarray<double>                trap_density_express;
-  double                               trap_density_express_total;
+    std::valarray<std::valarray<double>> saved_wml;
+    std::valarray<double>                saved_wml_fill;
+    unsigned int                         saved_nr_wml;
 
-  double                               cloud_height;
+    std::valarray<double>                trap_density;
+    double                               trap_density_total;
+    std::valarray<double>                trap_density_express;
+    double                               trap_density_express_total;
+
+    double                               cloud_height;
 };
 
 

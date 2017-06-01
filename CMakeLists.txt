@@ -145,7 +145,18 @@ add_unit_test( Boost_arctic_image_acs_test unittests/arctic_image_acs.cc
 add_unit_test( Boost_arctic_image_euclid_test unittests/arctic_image_euclid.cc
                LINK_LIBRARIES CCfits libarctic TYPE Boost
               )
-
+add_unit_test( Boost_arctic_cte_image_test unittests/arctic_cte_image.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_cte_image_classic_test unittests/arctic_cte_image_classic.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_cte_image_neo_test unittests/arctic_cte_image_neo.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
+add_unit_test( Boost_arctic_cte_image_watermark_test unittests/arctic_cte_image_watermark.cc
+               LINK_LIBRARIES CCfits libarctic TYPE Boost
+              )
 
 
 # sphinx part, try to detect sphinx, but if not
