@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-01
+   changed by: Oliver Cordes 2017-06-02
 
    $Id$
 
@@ -91,5 +91,7 @@ T image::readkey( CCfits::PHDU & pHDU, std::string key )
 
   return val;
 }
+
+std::string get_working_path( void );
 
 #endif

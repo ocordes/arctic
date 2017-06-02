@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-01
+   changed by: Oliver Cordes 2017-06-02
 
    $Id$
 
@@ -56,7 +56,7 @@ using namespace CCfits;
 
 // some aditional C++ functions
 
-std::string get_working_path()
+std::string get_working_path( void )
 {
    std::string s;
 
@@ -449,7 +449,7 @@ int image::correct_units( void )
     electrons_per_sec = true;
 
     // get the exposure time
-    exptime = readkey<double>( FITS_image->pHDU(), "EXPTIMEE" );
+    exptime = readkey<double>( FITS_image->pHDU(), "EXPTIME" );
 
     if ( std::isnan( exptime ) )
     {
@@ -469,6 +469,8 @@ int image::correct_units( void )
       {
         exptime = mexptime;
       }
+
+      output( 1, "exptime=%f\n", exptime );
     }
 
     // recreate electrons from electrons/s

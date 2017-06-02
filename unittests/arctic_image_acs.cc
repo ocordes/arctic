@@ -36,10 +36,30 @@ BOOST_AUTO_TEST_CASE( constructor )
 
 BOOST_AUTO_TEST_CASE( clock_charge_prepare_test )
 {
+  std::string in_filename = "clock_charge_prepare_test.fits";
+
+  long naxes[2] = { 10, 10 };
+
+  {
+    std::unique_ptr<FITS> pFits;
+
+    int naxis = 2;
+
+    std::string filename( "!"+in_filename );
+    pFits.reset( new FITS( filename , FLOAT_IMG , naxis, naxes ) );
+
+    PHDU& hdu = pFits->pHDU();
+
+    double date = 3506.238668981474;
+
+    hdu.addKey( "DATE", date, "" );
+  }
+  //  FITS file is now written
+
   char **argv_test;
   argv_test = (char**) malloc( sizeof( void * ) * 3);
   argv_test[0] = strdup( "Program_name_test" );
-  argv_test[1] = strdup( "infile" );
+  argv_test[1] = strdup( in_filename.c_str() );
   argv_test[2] = strdup( "outfile" );
 
   acs_image im( 3, argv_test );
@@ -49,14 +69,10 @@ BOOST_AUTO_TEST_CASE( clock_charge_prepare_test )
   free( argv_test[0] );
   free( argv_test );
 
-  //std::unique_ptr<FITS> pFits;
+  BOOST_CHECK_EQUAL( im.read_file(), 0 );
 
-  int naxis = 2;
-  long naxes[2] = { 10, 10 };
-
-  std::string filename = "!clock_charge_prepare_test.fits";
-
-  im.FITS_image.reset( new FITS( filename , FLOAT_IMG , naxis, naxes ) );
+  BOOST_CHECK_EQUAL( im.image_width, naxes[0] );
+  BOOST_CHECK_EQUAL( im.image_height, naxes[1] );
 }
 
 BOOST_AUTO_TEST_CASE( date2double_test )
