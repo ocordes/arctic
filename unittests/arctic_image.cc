@@ -12,7 +12,7 @@
 using namespace CCfits;
 
 // written by: Oliver Cordes 2017-05-31
-// changed by: Oliver Cordes 2017-06-02
+// changed by: Oliver Cordes 2017-06-04
 
 
 BOOST_AUTO_TEST_SUITE( image_test_suite )
@@ -306,8 +306,9 @@ BOOST_AUTO_TEST_CASE( correct_units_test5 )
 
   im.sci_mode_dark = true;
   BOOST_CHECK_EQUAL( im.correct_units(), 0 );
-  
-  BOOST_CHECK_CLOSE( im.image_data[0], 1.0, 1e-10 );
+
+  bool b = fabs( im.image_data[0] ) < 1e-14;
+  BOOST_CHECK_EQUAL( b, true );
 
   unlink( in_filename.c_str() );
 }

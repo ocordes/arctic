@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-02
+   changed by: Oliver Cordes 2017-06-04
 
    $Id$
 
@@ -32,6 +32,7 @@
 
 #define __image_h 1
 
+#include <cmath>
 
 #include "params.hh"
 
@@ -52,6 +53,7 @@ public:
   int          clock_charge( void );
 
   template <typename T>  T readkey( CCfits::PHDU & pHDU, std::string key );
+  double readkeyd( CCfits::PHDU & pHDU, std::string key );
 
   std::string                            prgname;
   int          correct_units( void );
@@ -89,8 +91,10 @@ T image::readkey( CCfits::PHDU & pHDU, std::string key )
       std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;
     }
 
+
   return val;
 }
+
 
 std::string get_working_path( void );
 

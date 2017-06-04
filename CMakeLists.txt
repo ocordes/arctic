@@ -28,7 +28,9 @@ if ( COVERAGE )
   message( STATUS "Coverage build" )
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage" )
   #INCLUDE(CodeCoverage)
-  SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
+  SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage -Wall")
+else()
+  SET(CMAKE_CXX_FLAGS "-g -O3 -Wall" )
 endif()
 
 
@@ -67,7 +69,7 @@ find_package(CCFITS REQUIRED)
 # compile all sources into a static libarctic.a file
 add_library( libarctic STATIC ${sources} )
 set_target_properties( libarctic PROPERTIES OUTPUT_NAME arctic )
-target_compile_options( libarctic  PUBLIC  -g -O3 -Wall)
+#target_compile_options( libarctic  PUBLIC  -g -O3 -Wall)
 
 if(LINUX)
    #message(STATUS ">>> Linux")

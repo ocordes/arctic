@@ -22,7 +22,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-06-04
 
    $Id$
 
@@ -93,7 +93,9 @@ int acs_image::clock_charge_prepare( void )
 
 
   // first check the date keyword
-  double date = readkey<double>( FITS_image->pHDU(), "DATE" );
+  double date = readkeyd( FITS_image->pHDU(), "DATE" );   // OC problem test type of FITS key
+
+  //output( 1, "DATE=%f\n", date );
 
   if ( std::isnan( date ) )
   {

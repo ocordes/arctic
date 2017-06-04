@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-02
+   changed by: Oliver Cordes 2017-06-04
 
    $Id$
 
@@ -484,4 +484,23 @@ int image::correct_units( void )
   std::cout << "Image UNITS are not in ELECTRONS or ELECTRONS/S! Program aborted!" << std::endl;
 
   return 1;
+}
+
+
+double image::readkeyd( CCfits::PHDU & pHDU, std::string key )
+{
+  double val;
+
+  try {
+    pHDU.readKey( key, val );
+  }
+  catch (CCfits::FitsException&)
+    {
+      std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
+      std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;
+
+      return nan( "" );
+    }
+
+  return val;
 }
