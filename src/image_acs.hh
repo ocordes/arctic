@@ -22,7 +22,7 @@
 /* image_acs.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-01
+   changed by: Oliver Cordes 2017-06-05
 
    $Id$
 

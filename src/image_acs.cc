@@ -22,7 +22,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-04
+   changed by: Oliver Cordes 2017-06-05
 
    $Id$
 
@@ -43,7 +43,6 @@
 #include "cte_image_classic.hh"
 #include "cte_image_neo.hh"
 #include "cte_image_watermark.hh"
-#include "image.hh"
 #include "image_acs.hh"
 #include "julian.hh"
 #include "output.hh"

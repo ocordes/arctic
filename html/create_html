@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "$1" == "clean" ]; then
+ rm -f *.html
+ exit 0
+fi
+
+rm -f *.html
+(cd ..; gcovr --html --html-details -r .  --exclude '.*/unittests/.*' -o html/arctic.html)
