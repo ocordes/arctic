@@ -22,7 +22,7 @@ w
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-26
+   changed by: Oliver Cordes 2017-06-21
 
 
    $Id$
@@ -226,7 +226,7 @@ void   cte_image_watermark::clock_charge_restore_traps( void )
 
 double cte_image_watermark::clock_charge_pixel_release( void )
 {
-  int    n_species  = parameters->n_species;
+  unsigned int n_species  = parameters->n_species;
 
   double sum = 0.0;
   // trapped electrons relased exponentially

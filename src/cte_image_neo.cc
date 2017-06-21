@@ -21,8 +21,8 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-06
-   
+   changed by: Oliver Cordes 2017-06-21
+
 
    $Id$
 
@@ -232,7 +232,7 @@ void cte_image_neo::clock_charge_restore_traps( void )
 
 double cte_image_neo::clock_charge_pixel_release( void )
 {
-  int    n_species = parameters->n_species;
+  unsigned int n_species = parameters->n_species;
 
   // Release any trapped electrons, using the appropriate decay half-life
 
@@ -243,7 +243,7 @@ double cte_image_neo::clock_charge_pixel_release( void )
   for (unsigned int j=0;j<nr_trapl;++j)
   {
     double sum2 = 0.0;
-    for (int i=0;i<n_species;++i)
+    for (unsigned int i=0;i<n_species;++i)
     {
       double release = trapl[j][i] * exponential_factor[i];
       trapl[j][i] -= release;

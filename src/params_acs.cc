@@ -22,7 +22,7 @@
 /* params_acs.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-06-21
 
    $Id$
 
@@ -90,7 +90,6 @@ void params_acs::calc_trap_config( double date )
 
   double operating_temperature;
 
-  int    i;
 
   n_species = n_sm4_trap_parameter;
 
@@ -112,7 +111,7 @@ void params_acs::calc_trap_config( double date )
   trap_lifetime = std::valarray<double>( 0.0, n_species );
 
   /* Trap release time propto exp(DeltaE/kT)/T^2 */
-  for (i=0;i<n_species;++i)
+  for (unsigned int i=0;i<n_species;++i)
   {
     trap_lifetime[i] = sm4_trap_release_time[i] *
       sqr( operating_temperature / sm4_temperature ) *
@@ -121,7 +120,7 @@ void params_acs::calc_trap_config( double date )
   }
 
   /* Work out total trap densities at each observation */
-  for (i=0;i<n_species;++i)
+  for (unsigned int i=0;i<n_species;++i)
   {
     if ( date < repair_date )
     {
@@ -135,12 +134,12 @@ void params_acs::calc_trap_config( double date )
 
   /* Split traps between the species */
   sm4_trap_ratio_sum = 0.0;
-  for (i=0;i<n_species;++i)
+  for (unsigned int i=0;i<n_species;++i)
   {
     sm4_trap_ratio_sum += sm4_trap_ratio[i];
   }
 
-  for (i=0;i<n_species;++i)
+  for (unsigned int i=0;i<n_species;++i)
   {
     trap_density[i] *= (sm4_trap_ratio[i] / sm4_trap_ratio_sum );
   }

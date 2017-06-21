@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-06
+   changed by: Oliver Cordes 2017-06-21
 
 
    $Id$
@@ -531,7 +531,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
 
   output( 1, "Model has %i trap species:\n", parameters->n_species );
   output( 1, " Nr  density  lifetime\n" );
-  for (int i=0;i<parameters->n_species;i++)
+  for (unsigned int i=0;i<parameters->n_species;i++)
   {
     output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
   }

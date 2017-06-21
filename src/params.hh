@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-15
+   changed by: Oliver Cordes 2017-06-21
 
    $Id$
 
@@ -89,7 +89,7 @@ public:
   long                     end_x;
   long                     start_y;
   long                     end_y;
-  int                      n_species;
+  unsigned int             n_species;
   std::valarray<double>    trap_density;
   std::valarray<double>    trap_lifetime;
   bool                     cut_upper_limit;

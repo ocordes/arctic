@@ -15,10 +15,8 @@ BOOST_AUTO_TEST_CASE( constructor )
   char **argv_test;
   argv_test = (char**) malloc( sizeof( void * ) * 3);
   argv_test[0] = strdup( "Program_name_test" );
-  argv_test[1] = strdup( "infile" );
-  argv_test[2] = strdup( "outfile" );
 
-  BOOST_CHECK_THROW( fits_image im( 1, argv_test ), char const* );
+  
 
   fits_image im1( 3, argv_test );
 
