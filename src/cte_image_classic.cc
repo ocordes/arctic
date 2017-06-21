@@ -190,9 +190,6 @@ double cte_image_classic::clock_charge_pixel_release( void )
 
   double sum = 0.0;
 
-  unsigned int n_species = parameters->n_species;
-
-
   for (unsigned int i=0;i<n_levels_traps*n_species;++i)
   {
     double release = traps[i] * exponential_factor[i];
@@ -238,11 +235,10 @@ double cte_image_classic::clock_charge_pixel_release( void )
 // prepare the electron caputre by calculating the total_capture
 double cte_image_classic::clock_charge_pixel_total_capture( double el_height, double i_pixelp1 )
 {
-  double       trap_sum, total_capture;
+  double trap_sum, total_capture;
 
-  double       dheight, ov;
+  double dheight, ov;
 
-  unsigned int n_species = parameters->n_species;
 
   // prepare the work
 
@@ -313,8 +309,6 @@ double cte_image_classic::clock_charge_pixel_total_capture( double el_height, do
 
 void   cte_image_classic::clock_charge_pixel_capture_ov( double d )
 {
-  unsigned int n_species = parameters->n_species;
-
   // less electrons than required for capturing process
   for (unsigned int i=0;i<cheight;++i)
   {
@@ -343,8 +337,6 @@ void   cte_image_classic::clock_charge_pixel_capture_full( void )
 
   // more electrons than required for capturing process
   // -> fill all traps to the max
-
-  unsigned int n_species = parameters->n_species;
 
   for (unsigned int i=0;i<cheight;++i)
   {

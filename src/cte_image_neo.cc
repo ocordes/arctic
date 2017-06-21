@@ -232,8 +232,6 @@ void cte_image_neo::clock_charge_restore_traps( void )
 
 double cte_image_neo::clock_charge_pixel_release( void )
 {
-  unsigned int n_species = parameters->n_species;
-
   // Release any trapped electrons, using the appropriate decay half-life
 
   // release a number of electrons in the traps

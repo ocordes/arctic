@@ -226,8 +226,6 @@ void   cte_image_watermark::clock_charge_restore_traps( void )
 
 double cte_image_watermark::clock_charge_pixel_release( void )
 {
-  unsigned int n_species  = parameters->n_species;
-
   double sum = 0.0;
   // trapped electrons relased exponentially
   for (unsigned int j=0;j<nr_wml;++j)
