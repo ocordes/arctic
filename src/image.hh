@@ -52,6 +52,7 @@ public:
   virtual int  clock_charge_prepare( void );
   int          clock_charge( void );
 
+  int          has_key( CCfits::PHDU & pHDU, std::string key );
   template <typename T>  T readkey( CCfits::PHDU & pHDU, std::string key );
   double readkeyd( CCfits::PHDU & pHDU, std::string key );
 

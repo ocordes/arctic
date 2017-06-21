@@ -92,6 +92,7 @@ int acs_image::clock_charge_prepare( void )
 
 
   // first check the date keyword
+  has_key( FITS_image->pHDU(), "DATE" );
   double date = readkeyd( FITS_image->pHDU(), "DATE" );   // OC problem test type of FITS key
 
   //output( 1, "DATE=%f\n", date );

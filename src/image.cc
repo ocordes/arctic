@@ -486,6 +486,33 @@ int image::correct_units( void )
   return 1;
 }
 
+int image::has_key( CCfits::PHDU & pHDU, std::string key )
+{
+  pHDU.makeThisCurrent();
+  std::map<string,Keyword*>::const_iterator itInKeys = pHDU.keyWord().begin();
+  std::map<string,Keyword*>::const_iterator itInKeysEnd = pHDU.keyWord().end();
+  while (itInKeys != itInKeysEnd)
+  {
+    // int keyClass = fits_get_keyclass(const_cast<char*>(itInKeys->first.c_str()));
+    output( 1, "has_key: %s\n" , itInKeys->first.c_str() );
+
+    ++itInKeys;
+  }
+
+  std::map<String,Keyword*>::iterator itOld = pHDU.keyWord().find(  "BUNIT" );
+
+  if ( itOld != itInKeysEnd )
+  {
+    output( 1, "key found\n" );
+  }
+  else
+  {
+    output( 1, "key not found\n" );
+  }
+
+  return 0;
+}
+
 
 double image::readkeyd( CCfits::PHDU & pHDU, std::string key )
 {

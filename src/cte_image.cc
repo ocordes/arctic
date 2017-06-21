@@ -22,7 +22,7 @@ w
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-26
+   changed by: Oliver Cordes 2017-06-06
 
 
    $Id$
@@ -355,7 +355,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
     // good question if this is really necessary, because the array is used via nr_trapl
     // as an indication how much levels are really used, these levels have then also
     // valid entries ...
-    
+
     is.reset( i_column ); // initialize the image slicer
 
     for (unsigned i_pixel=0;i_pixel<(end_y-start_y);++i_pixel)
@@ -539,7 +539,7 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
   // info about the image and algorithm
   unsigned int sparse_pixels = get_sparse_pixels( image, traps_total );
 
-  output( 1, "There are %i pixels containing more traps than charge.", sparse_pixels );
+  output( 1, "There are %i pixels containing more traps than charge.\n", sparse_pixels );
   output( 1, "The order in which these traps should be filled is ambiguous.\n" );
 
   output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
