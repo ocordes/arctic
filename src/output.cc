@@ -22,7 +22,7 @@
 /* output.cc
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2017-05-24
+   changed by: Oliver Cordes 2017-06-21
 
    $Id$
 
@@ -56,7 +56,10 @@ char *debug_generate_timestamp( void )
   times = time( NULL );
   timep = localtime( &times );
 
-  asprintf( &p, "%02i:%02i.%02i", timep->tm_hour, timep->tm_min, timep->tm_sec );
+  if ( asprintf( &p, "%02i:%02i.%02i", timep->tm_hour, timep->tm_min, timep->tm_sec ) == -1 )
+  {
+    p = strdup( "asprintf error state" );
+  }
 
   return p;
 }
@@ -108,8 +111,14 @@ void output( int dlevel, const char *format, ... )
 
     // generate output
     va_start( ap, format );
-    vasprintf( &os, format, ap );
+    int erg = vasprintf( &os, format, ap );
     va_end( ap );
+
+    // check a possible error state
+    if ( erg == -1 )
+    {
+      os = strdup( "vasprintf error state" );
+    }
 
     if ( debug_level == 1 )
     {

@@ -80,10 +80,10 @@ public:
   bool                     check_empty_traps;
   bool                     charge_injection;
   unsigned int             n_iterations;
-  int                      express;
-  int                      n_levels;
+  unsigned int             express;
+  unsigned int             n_levels;
   bool                     unclock;
-  int                      readout_offset;
+  unsigned int             readout_offset;
   bool                     dark_mode;
   long                     start_x;
   long                     end_x;
