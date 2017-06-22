@@ -93,8 +93,8 @@ function runValgrind
       for i in ${EXEs}; do
         EXE=`basename ${i}`
         if [ -x ${GCOVR_DIR}/${EXE} ]; then
-          #${VALGRIND} --leak-check=full --track-origins=yes --xml=yes --xml-file=${sonar_cxx_valgrind_reportFile}_${EXE}.xml ${GCOVR_DIR}/${EXE}
-          ${VALGRIND} --leak-check=full --xml=yes --xml-file=${sonar_cxx_valgrind_reportFile}_${EXE}.xml ${GCOVR_DIR}/${EXE}
+          ${VALGRIND} --leak-check=full --track-origins=yes --xml=yes --xml-file=${sonar_cxx_valgrind_reportFile}_${EXE}.xml ${GCOVR_DIR}/${EXE}
+          #${VALGRIND} --leak-check=full --xml=yes --xml-file=${sonar_cxx_valgrind_reportFile}_${EXE}.xml ${GCOVR_DIR}/${EXE}
         fi
       done
     else

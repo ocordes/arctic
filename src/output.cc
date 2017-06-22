@@ -22,7 +22,7 @@
 /* output.cc
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2017-06-21
+   changed by: Oliver Cordes 2017-06-22
 
    $Id$
 
@@ -103,10 +103,10 @@ bool is_debug( int dlevel )
 
 void output( int dlevel, const char *format, ... )
 {
-  char *os;
-
   if ( is_debug( dlevel) )
   {
+    char *os;
+
     va_list ap;
 
     // generate output
