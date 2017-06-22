@@ -12,7 +12,7 @@
 using namespace CCfits;
 
 // written by: Oliver Cordes 2017-05-31
-// changed by: Oliver Cordes 2017-06-04
+// changed by: Oliver Cordes 2017-06-22
 
 
 BOOST_AUTO_TEST_SUITE( image_test_suite )
@@ -323,8 +323,11 @@ BOOST_AUTO_TEST_CASE( get_working_path_test )
 {
   // first try to use /tmp but on MacOS failed since /tmp -> /private/tmp
 
-  chdir( "/usr");
-  BOOST_CHECK_EQUAL( get_working_path(), "/usr" );
+  int erg = chdir( "/usr");
+  if ( erg == 0 )
+  {
+    BOOST_CHECK_EQUAL( get_working_path(), "/usr" );
+  }
 }
 
 
