@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-04
+   changed by: Oliver Cordes 2017-06-22
 
    $Id$
 
@@ -52,9 +52,7 @@ public:
   virtual int  clock_charge_prepare( void );
   int          clock_charge( void );
 
-  int          has_key( CCfits::PHDU & pHDU, std::string key );
-  template <typename T>  T readkey( CCfits::PHDU & pHDU, std::string key );
-  double readkeyd( CCfits::PHDU & pHDU, std::string key );
+  template <typename T>  T readkey( CCfits::PHDU &, std::string, T );
 
   std::string                            prgname;
   int          correct_units( void );
@@ -78,8 +76,12 @@ private:
   void         update_header_parallel( CCfits::PHDU & hdu );
 };
 
+
+//readkey must have a fallback in the case that a key doesn't exist in
+//the FITS header.
+
 template <typename T>
-T image::readkey( CCfits::PHDU & pHDU, std::string key )
+T image::readkey( CCfits::PHDU & pHDU, std::string key, T error_default )
 {
   T val;
 
@@ -90,6 +92,7 @@ T image::readkey( CCfits::PHDU & pHDU, std::string key )
     {
       std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
       std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;
+      val = error_default;
     }
 
 

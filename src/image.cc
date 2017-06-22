@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-04
+   changed by: Oliver Cordes 2017-06-22
 
    $Id$
 
@@ -430,7 +430,7 @@ int image::correct_units( void )
 {
   // check the image UNITS
 
-  std::string bunit = readkey<std::string>( FITS_image->pHDU(), "BUNIT" );
+  std::string bunit = readkey<std::string>( FITS_image->pHDU(), "BUNIT", "ELECTRONS" );
 
   for (unsigned int i=0;i<bunit.length();i++)
   {
@@ -449,7 +449,8 @@ int image::correct_units( void )
     electrons_per_sec = true;
 
     // get the exposure time
-    exptime = readkey<double>( FITS_image->pHDU(), "EXPTIME" );
+    //exptime = readkeyd( FITS_image->pHDU(), "EXPTIME" );
+    exptime = readkey<double>( FITS_image->pHDU(), "EXPTIME", nan( "" ) );
 
     if ( std::isnan( exptime ) )
     {
@@ -459,7 +460,7 @@ int image::correct_units( void )
 
     if ( sci_mode_dark )
     {
-      double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP" );
+      double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP", nan("") );
 
       if ( std::isnan( mexptime ) )
       {
@@ -470,7 +471,7 @@ int image::correct_units( void )
         exptime = mexptime;
       }
 
-      output( 1, "exptime=%f\n", exptime );
+      output( 10, "exptime=%f\n", exptime );
     }
 
     // recreate electrons from electrons/s
@@ -484,50 +485,4 @@ int image::correct_units( void )
   std::cout << "Image UNITS are not in ELECTRONS or ELECTRONS/S! Program aborted!" << std::endl;
 
   return 1;
-}
-
-int image::has_key( CCfits::PHDU & pHDU, std::string key )
-{
-  pHDU.makeThisCurrent();
-  std::map<string,Keyword*>::const_iterator itInKeys = pHDU.keyWord().begin();
-  std::map<string,Keyword*>::const_iterator itInKeysEnd = pHDU.keyWord().end();
-  while (itInKeys != itInKeysEnd)
-  {
-    // int keyClass = fits_get_keyclass(const_cast<char*>(itInKeys->first.c_str()));
-    output( 1, "has_key: %s\n" , itInKeys->first.c_str() );
-
-    ++itInKeys;
-  }
-
-  std::map<String,Keyword*>::iterator itOld = pHDU.keyWord().find(  "BUNIT" );
-
-  if ( itOld != itInKeysEnd )
-  {
-    output( 1, "key found\n" );
-  }
-  else
-  {
-    output( 1, "key not found\n" );
-  }
-
-  return 0;
-}
-
-
-double image::readkeyd( CCfits::PHDU & pHDU, std::string key )
-{
-  double val;
-
-  try {
-    pHDU.readKey( key, val );
-  }
-  catch (CCfits::FitsException&)
-    {
-      std::cerr << " Fits Exception Thrown by readkey function" << std::endl;
-      std::cerr << " Can't read the key " << key << " or key is not a string!" <<  std::endl;
-
-      return nan( "" );
-    }
-
-  return val;
 }

@@ -4,6 +4,9 @@
 # runQC
 #
 # runs some quality control tests for sonar
+#
+# written by: Oliver Cordes 2017-04-01
+# changed by: Oliver Cordes 2017-06-22
 
 DEBUG=1
 
@@ -14,13 +17,16 @@ sonar_cxx_cppcheck_reportFile="sonar/sonar_cxx_cppcheck_report.xml"
 sonar_cxx_vera_reportFile="sonar/sonar_cxx_vera_report.xml"
 sonar_cxx_rats_reportFile="sonar/sonar_cxx_rats_report.xml"
 sonar_cxx_coverage_reportFile="sonar/sonar_cxx_coverage_report.xml"
+sonar_cxx_valgrind_reportFile="sonar/sonar_cxx_valgrind_report"
 
+GCOVR_DIR=build.gcovr
 
 # check for executables
 CPPCHECK=`which cppcheck`
 VERA=`which vera++`
 RATS=`which rats`
 GCOVR=`which gcovr`
+VALGRIND=`which valgrind`
 
 function runCppcheck
 {
@@ -45,7 +51,7 @@ function runCppcheck
 function runVera++
 {
   rm -f $sonar_cxx_vera_reportFile
-  if [ ${VERA}]; then
+  if [ ${VERA} ]; then
    export VERA_ROOT=/usr/local/lib/vera++
 
    #find src -regex ".*\.cc\|.*\.h" | vera++ -s -c $sonar_cxx_vera_reportFile
@@ -68,18 +74,49 @@ function runCppCoverage
   rm -f $sonar_cxx_coverage_reportFile
 
   if [ ${GCOVR} ]; then
-   mkdir -p build.gcovr
-   rm -rf build.gcovr/*
+   mkdir -p ${GCOVR_DIR}
+   rm -rf ${GCOVR_DIR}/*
 
-   (cd build.gcovr; cmake -DCOVERAGE=1 ..; make; make test )
+   (cd ${GCOVR_DIR}; cmake -DCOVERAGE=1 ..; make; make test )
 
    gcovr -r . --exclude '.*/unittests/.*' --xml -o $sonar_cxx_coverage_reportFile
  fi
 }
 
+function runValgrind
+{
+  rm -f ${sonar_cxx_valgrind_reportFile}*.xml
+
+  if [ ${VALGRIND} ]; then
+    if [ -d ${GCOVR_DIR} ]; then
+      EXEs=`cd ${GCOVR_DIR}; find . -type f -depth 1 -name "Boost*"`
+      for i in ${EXEs}; do
+        EXE=`basename ${i}`
+        if [ -x ${GCOVR_DIR}/${EXE} ]; then
+          #${VALGRIND} --leak-check=full --track-origins=yes --xml=yes --xml-file=${sonar_cxx_valgrind_reportFile}_${EXE}.xml ${GCOVR_DIR}/${EXE}
+          ${VALGRIND} --leak-check=full --xml=yes --xml-file=${sonar_cxx_valgrind_reportFile}_${EXE}.xml ${GCOVR_DIR}/${EXE}
+        fi
+      done
+    else
+       echo "No executables for valgrind found."
+    fi
+  fi
+}
+
 # main
+
+# doing some measurements
+SECONDS=0
+
+# run all commands
 
 runCppcheck
 runVera++
 runRats
 runCppCoverage
+runValgrind
+
+# finished!
+
+duration=$SECONDS
+echo "All tests don in $(($duration / 60)) minutes and $(($duration % 60)) seconds!"

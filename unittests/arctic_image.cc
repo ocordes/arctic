@@ -264,6 +264,9 @@ BOOST_AUTO_TEST_CASE( correct_units_test4 )
   unlink( in_filename.c_str() );
 }
 
+// given ELECTRONS/S in header but the exptime or mexptime is missing
+// asume expteim of 1s
+
 BOOST_AUTO_TEST_CASE( correct_units_test5 )
 {
   std::string in_filename = "correct_units_test5.fits";
@@ -282,6 +285,7 @@ BOOST_AUTO_TEST_CASE( correct_units_test5 )
 
     PHDU& hdu = pFits->pHDU();
     hdu.addKey( "BUNIT", "ELECTRONS/S", "" );
+
 
     long  fpixel(1);  // ???? what the heck is this useful ...
 
@@ -307,8 +311,9 @@ BOOST_AUTO_TEST_CASE( correct_units_test5 )
   im.sci_mode_dark = true;
   BOOST_CHECK_EQUAL( im.correct_units(), 0 );
 
-  bool b = fabs( im.image_data[0] ) < 1e-14;
-  BOOST_CHECK_EQUAL( b, true );
+  //bool b = fabs( im.image_data[0] ) < 1e-14;
+  //BOOST_CHECK_EQUAL( b, true );
+  BOOST_CHECK_CLOSE( im.image_data[0], 1.0, 1e-10 );
 
   unlink( in_filename.c_str() );
 }
