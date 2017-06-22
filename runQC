@@ -89,7 +89,7 @@ function runValgrind
 
   if [ ${VALGRIND} ]; then
     if [ -d ${GCOVR_DIR} ]; then
-      EXEs=`cd ${GCOVR_DIR}; find . -type f -depth 1 -name "Boost*"`
+      EXEs=`cd ${GCOVR_DIR}; find . -maxdepth 1 -type f -name "Boost*"`
       for i in ${EXEs}; do
         EXE=`basename ${i}`
         if [ -x ${GCOVR_DIR}/${EXE} ]; then
