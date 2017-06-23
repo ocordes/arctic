@@ -6,7 +6,7 @@
 # runs some quality control tests for sonar
 #
 # written by: Oliver Cordes 2017-04-01
-# changed by: Oliver Cordes 2017-06-22
+# changed by: Oliver Cordes 2017-06-23
 
 DEBUG=1
 
@@ -18,6 +18,7 @@ sonar_cxx_vera_reportFile="sonar/sonar_cxx_vera_report.xml"
 sonar_cxx_rats_reportFile="sonar/sonar_cxx_rats_report.xml"
 sonar_cxx_coverage_reportFile="sonar/sonar_cxx_coverage_report.xml"
 sonar_cxx_valgrind_reportFile="sonar/sonar_cxx_valgrind_report"
+sonar_cxx_xunit_reportFile="sonar/sonar_cxx_xunit_report"
 
 GCOVR_DIR=build.gcovr
 
@@ -71,14 +72,25 @@ function runRats
 
 function runCppCoverage
 {
-  rm -f $sonar_cxx_coverage_reportFile
+  rm -f ${sonar_cxx_coverage_reportFile}
+  rm -f ${sonar_cxx_xunit_reportFile}
 
   if [ ${GCOVR} ]; then
    mkdir -p ${GCOVR_DIR}
-   rm -rf ${GCOVR_DIR}/*
+   #rm -rf ${GCOVR_DIR}/*
 
-   (cd ${GCOVR_DIR}; cmake -DCOVERAGE=1 ..; make; make test )
-
+   if [ -d ${GCOVR_DIR} ]; then
+     (cd ${GCOVR_DIR}; cmake -DCOVERAGE=1 ..; make )
+     (cd ${GCOVR_DIR}; find . -name "*.gcda" -delete )
+     #(cd ${GCOVR_DIR}; make test ) # old version
+     EXEs=`cd ${GCOVR_DIR}; find . -maxdepth 1 -type f -name "Boost*"`
+     for i in ${EXEs}; do
+       EXE=`basename ${i}`
+       if [ -x ${GCOVR_DIR}/${EXE} ]; then
+         ${GCOVR_DIR}/${EXE} --log_format=XML --log_sink=${sonar_cxx_xunit_reportFile}_${EXE}.xml  --log_level=all --report_level=no
+       fi
+     done
+   fi
    gcovr -r . --exclude '.*/unittests/.*' --xml -o $sonar_cxx_coverage_reportFile
  fi
 }
@@ -110,10 +122,10 @@ SECONDS=0
 
 # run all commands
 
-runCppcheck
-runVera++
-runRats
-runCppCoverage
+#runCppcheck
+#runVera++
+#runRats
+#runCppCoverage
 runValgrind
 
 # finished!
