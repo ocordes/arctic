@@ -77,7 +77,7 @@ function runCppCoverage
 
   if [ ${GCOVR} ]; then
    mkdir -p ${GCOVR_DIR}
-   #rm -rf ${GCOVR_DIR}/*
+   rm -rf ${GCOVR_DIR}/*
 
    if [ -d ${GCOVR_DIR} ]; then
      (cd ${GCOVR_DIR}; cmake -DCOVERAGE=1 ..; make )
@@ -122,10 +122,10 @@ SECONDS=0
 
 # run all commands
 
-#runCppcheck
-#runVera++
-#runRats
-#runCppCoverage
+runCppcheck
+runVera++
+runRats
+runCppCoverage
 runValgrind
 
 # finished!
