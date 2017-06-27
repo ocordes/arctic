@@ -1,7 +1,6 @@
 /* (C) Copyright 2013 by Oliver Cordes
         - ocordes ( at ) astro ( dot ) uni-bonn ( dot ) de
 
-
     This file is part of arctic-project.
 
     arctic is free software: you can redistribute it and/or modify
@@ -23,9 +22,6 @@
 
    written by: Oliver Cordes 2015-01-05
    changed by: Oliver Cordes 2017-05-26
-
-   $Id$
-
 */
 
 #ifndef CTE_IMAGE_H

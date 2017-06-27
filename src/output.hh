@@ -23,9 +23,6 @@
 
    written by: Oliver Cordes 2010-07-20
    changed by: Oliver Cordes 2017-05-17
-
-   $Id$
-
 */
 
 

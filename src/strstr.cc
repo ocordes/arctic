@@ -20,9 +20,6 @@
     along with arctic.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// $Log$
-// $Id$
-
 
 #include <string>
 #include <locale>

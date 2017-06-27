@@ -4,7 +4,7 @@
 // changed by: Oliver Cordes 2017-05-16
 
 /*
-C   opyright (C) 2005 Oliver-Mark Cordes
+   Copyright (C) 2005-2017 Oliver-Mark Cordes
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,10 +21,6 @@ C   opyright (C) 2005 Oliver-Mark Cordes
    Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 */
-
-// $Log$
-// $Id$
-//
 
 #ifndef __strstr_h
 #define __strstr_h 1

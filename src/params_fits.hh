@@ -23,9 +23,6 @@
 
    written by: Oliver Cordes 2015-01-05
    changed by: Oliver Cordes 2017-03-06
-
-   $Id$
-
 */
 
 #ifndef __params_fits_h

@@ -22,10 +22,6 @@
 
    written by: Oliver Cordes 2015-01-05
    changed by: Oliver Cordes 2017-06-21
-
-
-   $Id$
-
 */
 
 #include <cstdlib>
