@@ -23,9 +23,6 @@
 
    written by: Oliver Cordes 2013-02-04
    changed by: Oliver Cordes 2017-05-15
-
-   $Id$
-
 */
 
 #ifndef __julian_h

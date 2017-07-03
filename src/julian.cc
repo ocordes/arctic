@@ -24,9 +24,6 @@
    written by: Oliver Cordes 2013-02-04
    changed by: Oliver Cordes 2017-05-15
    changed by: Ole Marggraf 2015-06-23
-
-   $Id$
-
 */
 
 #include <cmath>
