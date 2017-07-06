@@ -21,7 +21,7 @@
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-21
+   changed by: Oliver Cordes 2017-07-04
 */
 
 #include <cstdlib>
@@ -42,7 +42,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-// #define __debug
+//#define __debug 1
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -170,7 +170,7 @@ unsigned int cte_image::get_sparse_pixels( std::valarray<double> & v, double lim
   {
     if ( ( v[i] > 0.0 ) && ( v[i] < limit ) )
     {
-      nr++;
+      ++nr;
     }
   }
 

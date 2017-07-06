@@ -1,3 +1,4 @@
 #!/bin/sh
 
-sonar-scanner-aifa -X -Dsonar.analysis.mode=publish > scanner.log 2>&1
+#sonar-scanner-aifa -X -Dsonar.analysis.mode=publish > scanner.log 2>&1
+sonar-scanner-aifa -Dsonar.analysis.mode=publish > scanner.log 2>&1
