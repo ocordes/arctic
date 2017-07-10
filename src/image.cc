@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-22
+   changed by: Oliver Cordes 2017-07-10
 */
 
 
@@ -342,7 +342,18 @@ void image::write_file( void )
 
     // make a copy of the old image including the header dedfinitions
     // pFits.reset( new FITS( fileName, (*FITS_image) ) );
-    pFits.reset( new FITS( fileName, (*FITS_image) ) );
+    if ( FITS_image != NULL )
+    {
+      pFits.reset( new FITS( fileName, (*FITS_image) ) );
+    }
+    else
+    {
+      // used for unit testings
+
+      long naxes[2] = { image_width, image_height };
+      int naxis = 2;
+      pFits.reset( new FITS( fileName, FLOAT_IMG , naxis, naxes ) );
+    }
   }
   catch (FITS::CantCreate)
   {

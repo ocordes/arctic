@@ -21,7 +21,7 @@
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-21
+   changed by: Oliver Cordes 2017-07-10
 */
 
 #include <cstdlib>
@@ -62,6 +62,8 @@ cte_image_classic::cte_image_classic( void )
 
   n_levels_traps                     = 0;
   stat_count                         = 0;
+  saved_n_levels_traps               = 0;
+  saved_stat_count                   = 0;
 
   n_electrons_per_trap_total         = 0.0;
   n_electrons_per_trap_express_total = 0.0;
@@ -79,6 +81,8 @@ cte_image_classic::cte_image_classic( std::shared_ptr<params> & p )
 
   n_levels_traps                     = 0;
   stat_count                         = 0;
+  saved_n_levels_traps               = 0;
+  saved_stat_count                   = 0;
 
   n_electrons_per_trap_total         = 0.0;
   n_electrons_per_trap_express_total = 0.0;
@@ -146,6 +150,7 @@ void   cte_image_classic::clock_charge_setup( void )
 
   output( 10, "Create trap structure ...\n" );
   traps = std::valarray<double>( 0.0, parameters->n_species * parameters->n_levels );
+  saved_traps = std::valarray<double>( 0.0, parameters->n_species * parameters->n_levels );
 
   n_electrons_per_trap_express = n_electrons_per_trap;
   n_electrons_per_trap_express_ov = n_electrons_per_trap;
@@ -166,13 +171,17 @@ void   cte_image_classic::clock_charge_clear( void )
 
 void   cte_image_classic::clock_charge_save_traps( void )
 {
-
+  saved_traps = traps;
+  saved_n_levels_traps = n_levels_traps;
+  saved_stat_count = stat_count;
 }
 
 
 void   cte_image_classic::clock_charge_restore_traps( void )
 {
-
+  traps = saved_traps;
+  n_levels_traps = saved_n_levels_traps;
+  stat_count = saved_stat_count;
 }
 
 
@@ -292,7 +301,6 @@ double cte_image_classic::clock_charge_pixel_total_capture( double el_height, do
   print_traps();
   output( 10, "dheight     : %.15f\n", dheight );
   output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight);
-  output( 10, "max_capture : %.15f\n", total_capture );
   output( 10, "pot_capture : %.15f %.15f %.15f = %.15f\n",
   pot_capture[0], pot_capture[1], pot_capture[2], pot_capture.sum() );
   #endif

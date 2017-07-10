@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-21
+   changed by: Oliver Cordes 2017-07-10
 */
 
 #include <cstdlib>
@@ -42,8 +42,6 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
-
-// #define __debug
 
 #define debug_precision 15
 #define debug_pixel 800
@@ -346,7 +344,6 @@ double cte_image_neo::clock_charge_pixel_total_capture( double el_height, double
 
    output( 10, "dheight     : %.15f\n", dheight );
    output( 10, "cheight,ch-1: %i %i\n", cheight+1, cheight );
-   output( 10, "max_capture : %.15f\n", total_capture );
 
    #endif
 
@@ -409,12 +406,16 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
   while ( dheight > 0.0 )
   {
     #ifdef __debug
+    output( 10, "j             : %i\n", j );
     output( 10, "dheight       : %f\n", dheight );
     output( 10, "cheight       : %i\n", cheight );
     output( 10, "trapl_fill[j] : %i\n", trapl_fill[j] );
     #endif
     if ( j < 0 )
     {
+      #ifdef __debug
+      output( 10, "the cloud is higher than levels available to modify\n" );
+      #endif
       // add a missing level
       if ( cheight > 0 )
       {
@@ -431,6 +432,9 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
     if ( dheight > trapl_fill[j] )
     {
       // use the whole level
+      #ifdef __debug
+      output( 10, "Use the existing level for filling\n" );
+      #endif
       new_trapl[new_nr_trapl] = trapl[j]
                                 + ( n_electrons_per_trap_express - trapl[j] ) * d;
       new_trapl_fill[new_nr_trapl] = trapl_fill[j];
@@ -445,6 +449,10 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
     if ( trapl_fill[j]  == 1 )
     {
       // just one level to work on, easy
+      #ifdef __debug
+      output( 10, "modify a single level\n" );
+      #endif
+
       clock_charge_pixel_capture_ov_modify( j, d );
 
       dheight -= trapl_fill[j];
@@ -457,7 +465,7 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
     #ifdef __debug
     //output( 10, "cheight       : %i\n", cheight );
-    output( 10, "split 3 parts\n" );
+    output( 10, "split level into 2 parts\n" );
     #endif
     if ( cheight > 0 )
     {
@@ -478,11 +486,20 @@ void cte_image_neo::clock_charge_pixel_capture_ov( double d )
 
     if ( trapl_fill[j] == 0 )
     {
+      // this is a rarely event, which means that the remaining level is now
+      // not necessary anymore, so just delete that level
+      #ifdef __debug
+      output( 10, "create unwanted a level -> delete this one\n" );
+      #endif
       --j;      // fix BUG which was also in the 1st implementation
     }
 
     dheight = 0.0;
   }
+
+  #ifdef __debug
+  output( 10, "Loop ends! Position in stack: %i\n", j );
+  #endif
 
   while ( j >= 0 )
   {
@@ -549,7 +566,9 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
 
   #ifdef __debug
   output( 10, "h,nr_trapl,d: %i %i %.15f\n", h, nr_trapl, dheight );
+  output( 10, "skip        : %i\n" ,skip );
   #endif
+
 
   if ( std::abs(skip - dheight) < 1e-14 )
   {

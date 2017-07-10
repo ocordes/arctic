@@ -28,6 +28,7 @@
 
 #define CTE_IMAGE_NEO_H 1
 
+//#define __debug 1
 
 #include <valarray>
 #include <memory>

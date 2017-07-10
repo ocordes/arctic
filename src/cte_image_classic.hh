@@ -21,7 +21,7 @@
 /* cte_image_classic.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-26
+   changed by: Oliver Cordes 2017-07-10
 */
 
 #ifndef CTE_IMAGE_CLASSIC_H
@@ -71,6 +71,9 @@ protected:
   std::valarray<double>                traps;
   unsigned int                         n_levels_traps;
   unsigned int                         stat_count;
+  std::valarray<double>                saved_traps;
+  unsigned int                         saved_n_levels_traps;
+  unsigned int                         saved_stat_count;
   std::valarray<double>                n_electrons_per_trap;
   double                               n_electrons_per_trap_total;
   std::valarray<double>                n_electrons_per_trap_express;

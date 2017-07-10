@@ -21,7 +21,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-26
+   changed by: Oliver Cordes 2017-07-10
 */
 
 #ifndef CTE_IMAGE_H
@@ -35,6 +35,8 @@
 #include <sys/time.h>
 
 #include "params.hh"
+
+// #define __debug 1
 
 class cte_image
 {

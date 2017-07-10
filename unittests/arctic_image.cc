@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "image.hh"
+#include "params.hh"
 
 #include <CCfits/CCfits>
 
@@ -70,6 +71,35 @@ BOOST_AUTO_TEST_CASE( read_test )
   BOOST_CHECK_EQUAL( im.read_file(), 1 );
 
   unlink( in_filename.c_str() );
+}
+
+BOOST_AUTO_TEST_CASE( write_test )
+{
+  std::string out_filename = "image_write_test.fits";
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  im.outfilename = out_filename;
+  im.parameters  = std::shared_ptr<params>( new params() );
+  im.image_width = 10;
+  im.image_height = 10;
+  im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
+  im.write_file();
+
+  image im2( 1, argv_test );
+  im2.infilename = out_filename;
+  free( argv_test[0] );
+  free( argv_test );
+
+  BOOST_CHECK_EQUAL( im2.read_file(), 0 );
+  BOOST_CHECK_EQUAL( im2.image_width, im.image_width );
+  BOOST_CHECK_EQUAL( im2.image_height, im.image_height );
+
+  unlink( out_filename.c_str() );
 }
 
 

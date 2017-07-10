@@ -42,8 +42,6 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-//#define __debug 1
-
 #define debug_precision 15
 #define debug_pixel 800
 
@@ -195,7 +193,7 @@ void cte_image::create_express_multiplier( std::valarray<unsigned int> & emp )
   unsigned int ix;
 
   output( 10, "Create express_multiplier...\n" );
-  output( 1, "h=%i w=%i\n", height, width );
+  //output( 1, "h=%i w=%i\n", height, width );
   for (unsigned int i_pixel=0;i_pixel<height+1;++i_pixel)
   {
     unsigned int i_sum = 0;
@@ -450,6 +448,10 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
             total_capture = 1e-14;
           }
 
+          #ifdef __debug
+          output( 10, "max_capture : %f\n", total_capture );
+          #endif
+
           //  d gives a hint of how much electrons are available
           // for the capturing process
           // d > 1  more electrons are available
@@ -531,19 +533,6 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
     output( 1, " %2i: %f %f\n", i+1, parameters->trap_density[i], parameters->trap_lifetime[i] );
   }
 
-  // info about the image and algorithm
-  unsigned int sparse_pixels = get_sparse_pixels( image, traps_total );
-
-  output( 1, "There are %i pixels containing more traps than charge.\n", sparse_pixels );
-  output( 1, "The order in which these traps should be filled is ambiguous.\n" );
-
-  output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
-
-
-    // create the exponentia factors
-  create_exponential_factor();
-
-
   // initialize variables
   n_species        = parameters->n_species;
   traps_total      = parameters->trap_density.sum();
@@ -561,6 +550,19 @@ void cte_image::clock_charge_image( std::valarray<double> & image )
 
   output( 10, "start_x=%i end_x=%i\n", start_x, end_x );
   output( 10, "start_y=%i end_y=%i\n", start_y, end_y );
+
+
+  // info about the image and algorithm
+  unsigned int sparse_pixels = get_sparse_pixels( image, traps_total );
+
+  output( 1, "There are %i pixels containing more traps than charge.\n", sparse_pixels );
+  output( 1, "The order in which these traps should be filled is ambiguous.\n" );
+
+  output( 1, "Using Jay Anderson's trick to speed up runtime\n" );
+
+
+    // create the exponentia factors
+  create_exponential_factor();
 
 
   // run the algorithm specific setups

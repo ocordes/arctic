@@ -21,7 +21,7 @@
 /* cte_image_watermark.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-21
+   changed by: Oliver Cordes 2017-07-10
 */
 
 #include <cstdlib>
@@ -297,10 +297,9 @@ double cte_image_watermark::clock_charge_pixel_total_capture( double el_height, 
   }
   output( 10, "ntrap_total : %.15f\n", traps_total2 );
 
-  print_wml( wml, wml_fill, n_species, nr_wml );
+  print_wml();
 
-  output( 10, "dehight     : %.15f\n", freec, cloud_height );
-  output( 10, "max_capture : %.15f\n", total_capture );
+  output( 10, "dheight     : %.15f\n", cloud_height );
 
   #endif
 
