@@ -21,7 +21,7 @@
 /* image_acs.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-22
+   changed by: Oliver Cordes 2017-07-11
 */
 
 //#define _GLIBCXX_USE_CXX11_ABI 0
@@ -88,13 +88,13 @@ int acs_image::clock_charge_prepare( void )
 
 
   // first check the date keyword
-  double date = readkey<double>( FITS_image->pHDU(), "DATE", nan( "" ) );
+  double date = readkey<double>( "DATE", nan( "" ) );
 
   //output( 1, "DATE=%f\n", date );
 
   if ( std::isnan( date ) )
   {
-    std::string sdate = readkey<std::string>( FITS_image->pHDU(), "DATE", "1970-01-01" );
+    std::string sdate = readkey<std::string>( "DATE", "1970-01-01" );
     date = date2double( sdate );
   }
   else

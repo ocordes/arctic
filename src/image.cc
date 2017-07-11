@@ -438,7 +438,7 @@ int image::correct_units( void )
 {
   // check the image UNITS
 
-  std::string bunit = readkey<std::string>( FITS_image->pHDU(), "BUNIT", "ELECTRONS" );
+  std::string bunit = readkey<std::string>( "BUNIT", "ELECTRONS" );
 
   for (unsigned int i=0;i<bunit.length();i++)
   {
@@ -457,8 +457,7 @@ int image::correct_units( void )
     electrons_per_sec = true;
 
     // get the exposure time
-    //exptime = readkeyd( FITS_image->pHDU(), "EXPTIME" );
-    exptime = readkey<double>( FITS_image->pHDU(), "EXPTIME", nan( "" ) );
+    exptime = readkey<double>( "EXPTIME", nan( "" ) );
 
     if ( std::isnan( exptime ) )
     {
@@ -468,7 +467,7 @@ int image::correct_units( void )
 
     if ( sci_mode_dark )
     {
-      double mexptime = readkey<double>( FITS_image->pHDU(), "MEANEXP", nan("") );
+      double mexptime = readkey<double>( "MEANEXP", nan("") );
 
       if ( std::isnan( mexptime ) )
       {

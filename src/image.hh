@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-22
+   changed by: Oliver Cordes 2017-07-11
 */
 
 #ifndef __image_h
@@ -49,7 +49,7 @@ public:
   virtual int  clock_charge_prepare( void );
   int          clock_charge( void );
 
-  template <typename T>  T readkey( CCfits::PHDU &, std::string, T );
+  template <typename T>  T readkey( std::string, T );
 
   std::string                            prgname;
   int          correct_units( void );
@@ -78,12 +78,12 @@ private:
 //the FITS header.
 
 template <typename T>
-T image::readkey( CCfits::PHDU & pHDU, std::string key, T error_default )
+T image::readkey( std::string key, T error_default )
 {
   T val;
 
   try {
-    pHDU.readKey( key, val );
+    FITS_image->pHDU().readKey( key, val );
   }
   catch (CCfits::FitsException&)
     {
