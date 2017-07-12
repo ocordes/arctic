@@ -22,7 +22,7 @@
 /* output.cc
 
    written by: Oliver Cordes 2010-07-20
-   changed by: Oliver Cordes 2017-06-22
+   changed by: Oliver Cordes 2017-07-12
 */
 
 
@@ -119,12 +119,14 @@ void output( int dlevel, const char *format, ... )
 
     if ( debug_level == 1 )
     {
-      printf( "%s", os );
+      //printf( "%s", os );
+      std::cout << os;
     }
     else
     {
       char *ts = debug_generate_timestamp();
-      printf( "%s: %s", ts, os );
+      //printf( "%s: %s", ts, os );
+      std::cout << ts << ": " << os;
       free( ts );
     }
 

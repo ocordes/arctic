@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "image.hh"
+#include "image_slice.hh"
 #include "params.hh"
 
 #include <CCfits/CCfits>
@@ -13,7 +14,7 @@
 using namespace CCfits;
 
 // written by: Oliver Cordes 2017-05-31
-// changed by: Oliver Cordes 2017-06-22
+// changed by: Oliver Cordes 2017-07-11
 
 
 BOOST_AUTO_TEST_SUITE( image_test_suite )
@@ -73,9 +74,13 @@ BOOST_AUTO_TEST_CASE( read_test )
   unlink( in_filename.c_str() );
 }
 
-BOOST_AUTO_TEST_CASE( write_test )
+
+// write test simply to check the header
+// - parallel clocking
+// - forward clocking
+BOOST_AUTO_TEST_CASE( write_test1 )
 {
-  std::string out_filename = "image_write_test.fits";
+  std::string out_filename = "image_write1_test.fits";
 
   char **argv_test;
   argv_test = (char**) malloc( sizeof( void * ) * 3);
@@ -88,7 +93,7 @@ BOOST_AUTO_TEST_CASE( write_test )
   im.image_width = 10;
   im.image_height = 10;
   im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
-  im.write_file();
+  BOOST_CHECK_EQUAL( im.write_file(), 0 );
 
   image im2( 1, argv_test );
   im2.infilename = out_filename;
@@ -99,9 +104,142 @@ BOOST_AUTO_TEST_CASE( write_test )
   BOOST_CHECK_EQUAL( im2.image_width, im.image_width );
   BOOST_CHECK_EQUAL( im2.image_height, im.image_height );
 
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_READ", "HALLO" ), "PARALLEL" );
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_DIR", "HALLO" ), "FORWARD" );
+
   unlink( out_filename.c_str() );
 }
 
+// write test simply to check the header
+// - parallel clocking
+// - reverse clocking
+BOOST_AUTO_TEST_CASE( write_test2 )
+{
+  std::string out_filename = "image_write2_test.fits";
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  im.outfilename = out_filename;
+  im.parameters  = std::shared_ptr<params>( new params() );
+  im.image_width = 10;
+  im.image_height = 10;
+  im.parameters->direction = image_reverse;
+  im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
+  BOOST_CHECK_EQUAL( im.write_file(), 0 );
+
+  image im2( 1, argv_test );
+  im2.infilename = out_filename;
+  free( argv_test[0] );
+  free( argv_test );
+
+  BOOST_CHECK_EQUAL( im2.read_file(), 0 );
+  BOOST_CHECK_EQUAL( im2.image_width, im.image_width );
+  BOOST_CHECK_EQUAL( im2.image_height, im.image_height );
+
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_READ", "HALLO" ), "PARALLEL" );
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_DIR", "HALLO" ), "REVERSE" );
+
+  unlink( out_filename.c_str() );
+}
+
+// write test simply to check the header
+// - serial clocking
+// - forward clocking
+BOOST_AUTO_TEST_CASE( write_test3 )
+{
+  std::string out_filename = "image_write3_test.fits";
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  im.outfilename = out_filename;
+  im.parameters  = std::shared_ptr<params>( new params() );
+  im.image_width = 10;
+  im.image_height = 10;
+  im.parameters->rotate = image_readout_x;
+  im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
+  BOOST_CHECK_EQUAL( im.write_file(), 0 );
+
+  image im2( 1, argv_test );
+  im2.infilename = out_filename;
+  free( argv_test[0] );
+  free( argv_test );
+
+  BOOST_CHECK_EQUAL( im2.read_file(), 0 );
+  BOOST_CHECK_EQUAL( im2.image_width, im.image_width );
+  BOOST_CHECK_EQUAL( im2.image_height, im.image_height );
+
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_READ", "HALLO" ), "SERIAL" );
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_DIR", "HALLO" ), "FORWARD" );
+
+  unlink( out_filename.c_str() );
+}
+
+// write test simply to check the header
+// - serial clocking
+// - reverse clocking
+BOOST_AUTO_TEST_CASE( write_test4 )
+{
+  std::string out_filename = "image_write4_test.fits";
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  im.outfilename = out_filename;
+  im.parameters  = std::shared_ptr<params>( new params() );
+  im.image_width = 10;
+  im.image_height = 10;
+  im.parameters->rotate = image_readout_x;
+  im.parameters->direction = image_reverse;
+  im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
+  BOOST_CHECK_EQUAL( im.write_file(), 0 );
+
+  image im2( 1, argv_test );
+  im2.infilename = out_filename;
+  free( argv_test[0] );
+  free( argv_test );
+
+  BOOST_CHECK_EQUAL( im2.read_file(), 0 );
+  BOOST_CHECK_EQUAL( im2.image_width, im.image_width );
+  BOOST_CHECK_EQUAL( im2.image_height, im.image_height );
+
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_READ", "HALLO" ), "SERIAL" );
+  BOOST_CHECK_EQUAL( im2.readkey<std::string>( "CTE_DIR", "HALLO" ), "REVERSE" );
+
+  unlink( out_filename.c_str() );
+}
+
+// write test can't create file
+BOOST_AUTO_TEST_CASE( write_test5 )
+{
+  std::string out_filename = "/usr/image_write5_test.fits";
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  im.outfilename = out_filename;
+  im.parameters  = std::shared_ptr<params>( new params() );
+  im.image_width = 10;
+  im.image_height = 10;
+  im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
+  BOOST_CHECK_EQUAL( im.write_file(), 1 );
+
+  free( argv_test[0] );
+  free( argv_test );
+}
 
 BOOST_AUTO_TEST_CASE( correct_units_test1 )
 {

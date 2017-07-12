@@ -22,7 +22,7 @@
 /* image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-11
+   changed by: Oliver Cordes 2017-07-12
 */
 
 #ifndef __image_h
@@ -45,14 +45,14 @@ public:
   virtual     ~image();
   void         fits_info( void );
   virtual int  read_file( void );
-  virtual void write_file( void );
+  virtual int  write_file( void );
   virtual int  clock_charge_prepare( void );
   int          clock_charge( void );
+  int          correct_units( void );
 
   template <typename T>  T readkey( std::string, T );
 
   std::string                            prgname;
-  int          correct_units( void );
   bool                                   sci_mode_dark;
   bool                                   electrons_per_sec;
   double                                 exptime;

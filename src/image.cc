@@ -22,7 +22,7 @@
 /* image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-10
+   changed by: Oliver Cordes 2017-07-12
 */
 
 
@@ -130,7 +130,7 @@ int image::read_file( void )
 {
   output( 1, "Reading file %s\n", infilename.c_str() );
 
-  if ( debug_level > 1 )
+  if ( is_debug( 2 ) )
   {
     FITS::setVerboseMode(true);
   }
@@ -318,7 +318,7 @@ void image::update_header( PHDU & hdu)
 }
 
 
-void image::write_file( void )
+int image::write_file( void )
 {
   std::unique_ptr<FITS> pFits;
 
@@ -359,7 +359,16 @@ void image::write_file( void )
   {
     // ... or not, as the case may be.
     std::cout << "Error: Can't write to '" << outfilename << "'!" << std::endl;
-    return;
+    return 1;
+  }
+
+  // irritating this exception will be thrown in the case
+  // that the system is not able to create a new file ...  e.g. permission problems.
+  catch (FITS::CantOpen)
+  {
+    // ... or not, as the case may be.
+    std::cout << "Error: Can't write to '" << outfilename << "'!" << std::endl;
+    return 1;
   }
 
   // references for clarity.
@@ -381,6 +390,8 @@ void image::write_file( void )
   hdu.write( fpixel, nelements, image_data );
 
   output( 1, "Done.\n" );
+
+  return 0;
 }
 
 
