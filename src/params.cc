@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-31
+   changed by: Oliver Cordes 2017-07-13
 */
 
 #include <cstdlib>
@@ -145,17 +145,7 @@ void params::load_config( std::string filename )
 
       error = PARSE_ERROR;
       parse_args( key, val, error );
-      switch (error)
-      {
-        case PARSE_OK:
-          break;
-        case PARSE_UNKNOWN:
-          std::cout << "Parse error: unhandled value for parameter  " << key << " : " << val << " " << std::endl;
-          break;
-        case PARSE_ERROR:
-          std::cout << "Parse error: unhandled parameter: " << key << " (val=" << val << ")" << std::endl;
-          break;
-      }
+      parse_error_msg( error, key, val );
     }
     f.close();
   }
@@ -219,7 +209,7 @@ void params::set_args( int *argc, char **argv[]  )
   //std::cout << (*argc) << std::endl;
   while ( i < nargc )
   {
-    //std::cout << (*argv)[i] << std::endl;
+    // std::cout << (*argv)[i] << std::endl;
 
     // check if this an option
     if ( (*argv)[i][0] == '-' )
@@ -313,6 +303,69 @@ void params::str2minmax_long( std::CString s, long & min, long & max )
 }
 
 
+double params::val2double( std::string & s, int & error )
+{
+  if ( s == "" )
+  {
+    error = PARSE_UNKNOWN;
+    return 0.0;
+  }
+
+  error = PARSE_OK;
+  return atof( s.c_str() );
+}
+
+
+int    params::val2int( std::string & s, int & error )
+{
+  if ( s == "" )
+  {
+    error = PARSE_UNKNOWN;
+    return 0;
+  }
+
+  error = PARSE_OK;
+  return atoi( s.c_str() );
+}
+
+// helper functions
+
+bool params::tobool( std::string & val, bool defaults, int & error )
+{
+  int b = false;
+
+  if ( val == "" )
+  {
+    error = PARSE_UNKNOWN;
+    return defaults;
+  }
+
+  std::CString s = val; // savety copying
+  s = s.toupper();
+  error = PARSE_OK;
+
+  switch ( s[0] )
+  {
+    case 'Y':
+    case 'J':
+    case 'T':
+    case '1':
+      b = true;
+      break;
+    case 'F':
+    case 'N':
+    case '0':
+      b = false;
+      break;
+    default:
+      error = PARSE_UNKNOWN;
+      b = defaults;
+  }
+
+  return b;
+}
+
+
 // special function to get the working mode
 
 int get_working_mode( int argc, char *argv[] )
@@ -355,39 +408,4 @@ int get_working_mode( int argc, char *argv[] )
   #else
   return WORKING_MODE_FITS;
   #endif
-}
-
-
-// helper functions
-
-bool tobool( std::string & val, bool defaults )
-{
-  int b = false;
-
-  if ( val == "" )
-  {
-    return defaults;
-  }
-
-  std::CString s = val;
-  s = s.toupper();
-
-  switch ( s[0] )
-  {
-    case '\0':
-      break;
-    case 'Y':
-    case 'J':
-    case 'T':
-    case '1':
-      b = true;
-      break;
-    case 'F':
-    case 'N':
-    case '0':
-      b = false;
-      break;
-  }
-
-  return b;
 }

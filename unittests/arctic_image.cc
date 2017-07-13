@@ -5,11 +5,15 @@
 #include "image.hh"
 #include "image_slice.hh"
 #include "params.hh"
+#include "params_fits.hh"
 
 #include <CCfits/CCfits>
 
 #include <unistd.h>
 #include <math.h>
+
+#include <iostream>
+#include <fstream>
 
 using namespace CCfits;
 
@@ -240,6 +244,58 @@ BOOST_AUTO_TEST_CASE( write_test5 )
   free( argv_test[0] );
   free( argv_test );
 }
+
+// write test including cpnfig file
+BOOST_AUTO_TEST_CASE( write_test6 )
+{
+  std::string filename = "config_test1.conf";
+  std::ofstream f( filename, std::ios::out );
+  if ( f.is_open() )
+  {
+    f << "# Test config file" << std::endl;
+    f << "WELL_DEPTH2=100.0" << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK( false );
+  }
+  f.close();
+
+  std::shared_ptr<params_fits> p = std::shared_ptr<params_fits>( new params_fits() );
+
+  p->well_depth = 1234.5;
+  p->load_config( filename );
+
+  unlink( filename.c_str() );
+
+  // parameter set including config file
+
+  std::string out_filename = "image_write4_test.fits";
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  im.outfilename = out_filename;
+  im.parameters  = (std::shared_ptr<params>) p;
+  im.image_width = 10;
+  im.image_height = 10;
+  im.parameters->rotate = image_readout_x;
+  im.parameters->direction = image_reverse;
+  im.image_data = std::valarray<double>( 0.0, im.image_width*im.image_height );
+  BOOST_CHECK_EQUAL( im.write_file(), 0 );
+
+  image im2( 1, argv_test );
+  im2.infilename = out_filename;
+  free( argv_test[0] );
+  free( argv_test );
+
+  BOOST_CHECK_EQUAL( im2.read_file(), 0 );
+  // unlink( out_filename.c_str() );
+}
+
 
 BOOST_AUTO_TEST_CASE( correct_units_test1 )
 {

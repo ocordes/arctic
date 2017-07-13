@@ -116,10 +116,11 @@ public:
 
   std::valarray<double> str2array( std::CString );
   void str2minmax_long( std::CString, long &, long & );
+  double val2double( std::string &, int & );
+  int    val2int( std::string &, int & );
+  bool  tobool( std::string &, bool, int & );
 };
 
-
-bool  tobool( std::string &, bool );
 int get_working_mode( int argc, char *argv[] );
 
 

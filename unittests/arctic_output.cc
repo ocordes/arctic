@@ -108,20 +108,13 @@ BOOST_AUTO_TEST_CASE( output_test )
   seconds = time( NULL );
   std::string s1 = timestamp( seconds, (char*) "Test\n" );
   std::string s2 = timestamp( seconds-1, (char*) "Test\n" );
-  std::string s3 = timestamp( seconds+1, (char*) "Test\n" );
   check = false;
   check = soutput.is_equal( s1, false );
   if ( check == false)
   {
     check = soutput.is_equal( s2, false );
   }
-  if ( check == false )
-  {
-    check = soutput.is_equal( s3, false );
-  }
-
-  std::cout << check << std::endl;
-  BOOST_CHECK_EQUAL( check, true );
+  BOOST_CHECK( check );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

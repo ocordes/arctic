@@ -5,7 +5,7 @@
 #include "params_euclid.hh"
 
 // written by: Oliver Cordes 2017-05-30
-// changed by: Oliver Cordes 2017-05-31
+// changed by: Oliver Cordes 2017-07-13
 
 BOOST_AUTO_TEST_SUITE( params_euclid_test_suite )
 
@@ -66,14 +66,14 @@ BOOST_AUTO_TEST_CASE( parameter_setting_test )
 
   // check direct settings
   key = "N_SPECIES";
-  val = "";
+  val = "1";
   error = PARSE_ERROR;
   p.parse_args( key, val, error );
   BOOST_CHECK_EQUAL( p.has_local_n_species, true);
   BOOST_CHECK_EQUAL( error, PARSE_OK );
 
   key = "TRAP_DENSITY";
-  val = "";
+  val = "1.23";
   error = PARSE_ERROR;
   p.parse_args( key, val, error );
   BOOST_CHECK_EQUAL( p.has_local_trap_density, true);

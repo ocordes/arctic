@@ -2,10 +2,13 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <iostream>
+#include <fstream>
+
 #include "params_fits.hh"
 
 // written by: Oliver Cordes 2017-05-30
-// changed by: Oliver Cordes 2017-05-31
+// changed by: Oliver Cordes 2017-07-13
 
 
 BOOST_AUTO_TEST_SUITE( params_fits_test_suite )
@@ -345,5 +348,179 @@ BOOST_AUTO_TEST_CASE( parameter_setting_test6 )
   BOOST_CHECK_EQUAL( p.direction, image_reverse );
   BOOST_CHECK_EQUAL( error, PARSE_OK );
 }
+
+// load a config file
+// test existing keyword
+BOOST_AUTO_TEST_CASE( config_test1 )
+{
+  std::string filename = "config_test1.conf";
+  std::ofstream f( filename, std::ios::out );
+  if ( f.is_open() )
+  {
+    f << "# Test config file" << std::endl;
+    f << "WELL_DEPTH=100.0" << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK( false );
+  }
+  f.close();
+
+  params_fits p;
+
+  p.well_depth = 1234.5;
+  p.load_config( filename );
+
+  BOOST_CHECK_EQUAL( p.well_depth, 100.0 );
+
+  unlink( filename.c_str() );
+}
+
+// load a config file
+// test existing keyword, wrong value
+BOOST_AUTO_TEST_CASE( config_test2 )
+{
+  std::string filename = "config_test2.conf";
+  std::ofstream f( filename, std::ios::out );
+  if ( f.is_open() )
+  {
+    f << "# Test config file" << std::endl;
+    f << "WELL_DEPTH=" << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK( false );
+  }
+  f.close();
+
+  params_fits p;
+
+  p.well_depth = 1234.5;
+  p.load_config( filename );
+
+  BOOST_CHECK_EQUAL( p.well_depth, 0.0 );
+
+  unlink( filename.c_str() );
+}
+
+// load a config file
+// test wrong  keyword
+BOOST_AUTO_TEST_CASE( config_test3 )
+{
+  std::string filename = "config_test3.conf";
+  std::ofstream f( filename, std::ios::out );
+  if ( f.is_open() )
+  {
+    f << "# Test config file" << std::endl;
+    f << "WELL_DEPTH2=100.0" << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK( false );
+  }
+  f.close();
+
+  params_fits p;
+
+  p.well_depth = 1234.5;
+  p.load_config( filename );
+
+  BOOST_CHECK_EQUAL( p.well_depth, 1234.5 ); // test make no sense ...
+
+  unlink( filename.c_str() );
+}
+
+// load a config file via simulated command line
+BOOST_AUTO_TEST_CASE( config_test4 )
+{
+  std::string filename = "config_test4.conf";
+  std::ofstream f( filename, std::ios::out );
+  if ( f.is_open() )
+  {
+    f << "# Test config file" << std::endl;
+    f << "WELL_DEPTH=100.0" << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK( false );
+  }
+  f.close();
+
+  // setup parameters
+  char **argv_test;
+  int    argc;
+
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+  argv_test[1] = strdup( "-c" );
+  argv_test[2] = strdup( filename.c_str() );
+  argc = 3;
+
+  params_fits p;
+
+  p.well_depth = 1234.5;
+
+  p.set_args( &argc, &argv_test );
+
+  free( argv_test[2] );
+  free( argv_test[1] );
+  free( argv_test[0] );
+  free( argv_test );
+
+
+  BOOST_CHECK_EQUAL( p.well_depth, 100.0 );
+
+  unlink( filename.c_str() );
+}
+
+// load a config file via simulated command line
+// plus extra arguments
+BOOST_AUTO_TEST_CASE( config_test5 )
+{
+  std::string filename = "config_test5.conf";
+  std::ofstream f( filename, std::ios::out );
+  if ( f.is_open() )
+  {
+    f << "# Test config file" << std::endl;
+    f << "WELL_DEPTH=100.0" << std::endl;
+  }
+  else
+  {
+    BOOST_CHECK( false );
+  }
+  f.close();
+
+  // setup parameters
+  char **argv_test;
+  int    argc;
+
+  argv_test = (char**) malloc( sizeof( void * ) * 4);
+  argv_test[0] = strdup( "Program_name_test" );
+  argv_test[1] = strdup( "-c" );
+  argv_test[2] = strdup( filename.c_str() );
+  argv_test[3] = strdup( "foo" );
+  argc = 4;
+
+  params_fits p;
+
+  p.well_depth = 1234.5;
+
+  p.set_args( &argc, &argv_test );
+
+  free( argv_test[2] );
+  free( argv_test[1] );
+  free( argv_test[0] );
+  free( argv_test );
+
+
+  BOOST_CHECK_EQUAL( p.well_depth, 100.0 );
+
+  BOOST_CHECK_EQUAL( argc, 2 );
+
+
+
+  unlink( filename.c_str() );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()

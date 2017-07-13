@@ -4,6 +4,9 @@
 
 #include "params.hh"
 
+// written by: Oliver Cordes 2017-01-06
+// chnaged by: Oliver Cordes 2017-07-13
+
 
 BOOST_AUTO_TEST_SUITE( params_test_suite )
 
@@ -50,43 +53,6 @@ BOOST_AUTO_TEST_CASE( params_test_str2array )
 
 }
 
-BOOST_AUTO_TEST_CASE( params_test_str2array_long )
-{
-  params p;
-
-  std::string test_str1 = "10,25,8";
-  std::valarray<long> res_array1 {10, 25, 8};
-
-  std::string test_str2 = "";
-  std::valarray<long> res_array2 {};
-
-  std::string test_str3 = "42";
-  std::valarray<long> res_array3 {42};
-
-  std::string test_str4 = ",-01,";
-  std::valarray<long> res_array4 {-1};
-
-  // check this:
-  // str2array_long is removed from the main code OC 2017-05-17
-  // // we cannot evaluate std::valarray with boost directly, so project it down into a single bool
-  // std::valarray<bool> a1 = p.str2array_long(test_str1) == res_array1;
-  // bool is_equal1 = std::all_of(begin(a1), end(a1), [](bool b){return b;});
-  //
-  // std::valarray<bool> a2 = p.str2array_long(test_str2) == res_array2;
-  // bool is_equal2 = std::all_of(begin(a2), end(a2), [](bool b){return b;});
-  //
-  // std::valarray<bool> a3 = p.str2array_long(test_str3) == res_array3;
-  // bool is_equal3 = std::all_of(begin(a3), end(a3), [](bool b){return b;});
-  //
-  // std::valarray<bool> a4 = p.str2array_long(test_str4) == res_array4;
-  // bool is_equal4 = std::all_of(begin(a4), end(a4), [](bool b){return b;});
-  //
-  // BOOST_CHECK_EQUAL(is_equal1, true);
-  // BOOST_CHECK_EQUAL(is_equal2, true);
-  // BOOST_CHECK_EQUAL(is_equal3, true);
-  // BOOST_CHECK_EQUAL(is_equal4, true);
-
-}
 
 BOOST_AUTO_TEST_CASE( get_working_mode_test )
 {
@@ -112,31 +78,99 @@ BOOST_AUTO_TEST_CASE( get_working_mode_test )
   BOOST_CHECK_EQUAL( get_working_mode( 3, argv_test ), WORKING_MODE_FITS );
   free( argv_test[2] );
 
+  // no argument given
+  BOOST_CHECK_EQUAL( get_working_mode( 2, argv_test ), WORKING_MODE_FITS );
+
   free( argv_test[1] );
   free( argv_test[0] );
 
   free( argv_test );
 }
 
+// check the tobool function
 BOOST_AUTO_TEST_CASE( tobool_test )
 {
+  params p;
+
   std::string s = "";
-  BOOST_CHECK_EQUAL( tobool( s, true ), true );
-  BOOST_CHECK_EQUAL( tobool( s, false ), false);
+  int error;
+  BOOST_CHECK_EQUAL( p.tobool( s, true, error ), true );
+  BOOST_CHECK_EQUAL( error, PARSE_UNKNOWN );
+  BOOST_CHECK_EQUAL( p.tobool( s, false, error ), false);
+  BOOST_CHECK_EQUAL( error, PARSE_UNKNOWN );
   s = "Y";
-  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  BOOST_CHECK_EQUAL( p.tobool( s, false, error ), true );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
   s = "J";
-  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  BOOST_CHECK_EQUAL( p.tobool( s, false, error ), true );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
   s = "T";
-  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  BOOST_CHECK_EQUAL( p.tobool( s, false, error ), true );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
   s = "1";
-  BOOST_CHECK_EQUAL( tobool( s, false ), true );
+  BOOST_CHECK_EQUAL( p.tobool( s, false, error ), true );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
   s = "N";
-  BOOST_CHECK_EQUAL( tobool( s, false ), false );
+  BOOST_CHECK_EQUAL( p.tobool( s, true, error ), false );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
   s = "F";
-  BOOST_CHECK_EQUAL( tobool( s, false ), false );
+  BOOST_CHECK_EQUAL( p.tobool( s, true, error ), false );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
   s = "0";
-  BOOST_CHECK_EQUAL( tobool( s, false ), false );
+  BOOST_CHECK_EQUAL( p.tobool( s, true, error ), false );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+  s = "a";
+  BOOST_CHECK_EQUAL( p.tobool( s, true, error ), true );
+  BOOST_CHECK_EQUAL( error, PARSE_UNKNOWN );
 }
+
+// check the val2int rouint
+BOOST_AUTO_TEST_CASE( val2int_test )
+{
+  params p;
+
+  std::string s = "";
+  int error;
+
+  p.val2int( s, error );
+  BOOST_CHECK_EQUAL( error, PARSE_UNKNOWN );
+
+  s = "1234";
+  BOOST_CHECK_EQUAL( p.val2int( s, error ), 1234 );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+
+  s = "-1234";
+  BOOST_CHECK_EQUAL( p.val2int( s, error ), -1234 );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+
+  s = "a";
+  BOOST_CHECK_EQUAL( p.val2int( s, error ), 0 );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+}
+
+// check the val2int rouint
+BOOST_AUTO_TEST_CASE( val2double_test )
+{
+  params p;
+
+  std::string s = "";
+  int error;
+
+  p.val2double( s, error );
+  BOOST_CHECK_EQUAL( error, PARSE_UNKNOWN );
+
+  s = "1234.5";
+  BOOST_CHECK_EQUAL( p.val2double( s, error ), 1234.5 );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+
+  s = "-1234.5";
+  BOOST_CHECK_EQUAL( p.val2double( s, error ), -1234.5 );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+
+  s = "a";
+  BOOST_CHECK_EQUAL( p.val2double( s, error ), 0.0 );
+  BOOST_CHECK_EQUAL( error, PARSE_OK );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
