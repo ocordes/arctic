@@ -15,7 +15,7 @@
 #include "output.hh"
 
 // written by: Oliver Cordes 2017-05-31
-// changed by: Oliver Cordes 2017-07-12
+// changed by: Oliver Cordes 2017-07-14
 
 
 BOOST_AUTO_TEST_SUITE( output_test_suite )
@@ -55,7 +55,7 @@ std::string timestamp( time_t seconds, char *msg )
 
 
 // test parsing debug arguments
-BOOST_AUTO_TEST_CASE( debug_init_test )
+BOOST_AUTO_TEST_CASE( debug_init_test1 )
 {
   char **argv_test;
   argv_test = (char**) malloc( sizeof( void * ) * 3);
@@ -72,6 +72,25 @@ BOOST_AUTO_TEST_CASE( debug_init_test )
   free( argv_test[0] );
   free( argv_test[1] );
   free( argv_test[2] );
+  free( argv_test );
+}
+
+// test parsing debug arguments failure part!
+BOOST_AUTO_TEST_CASE( debug_init_test2 )
+{
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 2);
+  argv_test[0] = strdup( "Program_name_test" );
+  argv_test[1] = strdup( "-d" );
+
+  debug_level = -1;
+
+  debug_init( 2, argv_test );
+
+  BOOST_CHECK_EQUAL( debug_level, -1 );
+
+  free( argv_test[0] );
+  free( argv_test[1] );
   free( argv_test );
 }
 

@@ -2,16 +2,32 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <boost/test/output_test_stream.hpp>
+
 #include <iostream>
 #include <fstream>
 
 #include "params_fits.hh"
 
 // written by: Oliver Cordes 2017-05-30
-// changed by: Oliver Cordes 2017-07-13
+// changed by: Oliver Cordes 2017-07-14
 
 
 BOOST_AUTO_TEST_SUITE( params_fits_test_suite )
+
+struct cout_redirect {
+    cout_redirect( std::streambuf * new_buffer )
+        : old( std::cout.rdbuf( new_buffer ) )
+    { }
+
+    ~cout_redirect( ) {
+        std::cout.rdbuf( old );
+    }
+
+private:
+    std::streambuf * old;
+};
+
 
 BOOST_AUTO_TEST_CASE( constructor_destructor_test )
 {
@@ -520,6 +536,19 @@ BOOST_AUTO_TEST_CASE( config_test5 )
 
 
   unlink( filename.c_str() );
+}
+
+
+BOOST_AUTO_TEST_CASE( syntax_fits_test )
+{
+  boost::test_tools::output_test_stream soutput;
+  {
+      cout_redirect guard( soutput.rdbuf( ) );
+
+      syntax_fits();
+  }
+  std::string s = "";
+  BOOST_CHECK( soutput.check_length( 100, false ) );
 }
 
 

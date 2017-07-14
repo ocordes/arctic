@@ -18,7 +18,7 @@
 using namespace CCfits;
 
 // written by: Oliver Cordes 2017-05-31
-// changed by: Oliver Cordes 2017-07-11
+// changed by: Oliver Cordes 2017-07-14
 
 
 BOOST_AUTO_TEST_SUITE( image_test_suite )
@@ -293,7 +293,8 @@ BOOST_AUTO_TEST_CASE( write_test6 )
   free( argv_test );
 
   BOOST_CHECK_EQUAL( im2.read_file(), 0 );
-  // unlink( out_filename.c_str() );
+  BOOST_CHECK_EQUAL( im2.readkey<double>( "CTE_WELD", -1.234 ), 1234.5 );
+  unlink( out_filename.c_str() );
 }
 
 
