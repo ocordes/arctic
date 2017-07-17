@@ -21,7 +21,7 @@
 /* image_fits.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-05-11
+   changed by: Oliver Cordes 2017-07-17
 */
 
 //#define _GLIBCXX_USE_CXX11_ABI 0
@@ -55,7 +55,7 @@ fits_image::fits_image( int argc, char *argv[] ) : image( argc, argv )
   parameters->set_args( &argc, &argv);
 
 
-  if ( argc < 2 )
+  if ( argc < 3 )
   {
     output( 1, "Program needs <INPUTFILE> <OUTPUTFILE>! Abort\n" );
     throw "Not enough arguments!";

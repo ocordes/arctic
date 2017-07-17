@@ -2,12 +2,30 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <boost/test/output_test_stream.hpp>
+
+#include <iostream>
+
 #include "params_euclid.hh"
 
 // written by: Oliver Cordes 2017-05-30
-// changed by: Oliver Cordes 2017-07-13
+// changed by: Oliver Cordes 2017-07-17
 
 BOOST_AUTO_TEST_SUITE( params_euclid_test_suite )
+
+struct cout_redirect {
+    cout_redirect( std::streambuf * new_buffer )
+        : old( std::cout.rdbuf( new_buffer ) )
+    { }
+
+    ~cout_redirect( ) {
+        std::cout.rdbuf( old );
+    }
+
+private:
+    std::streambuf * old;
+};
+
 
 BOOST_AUTO_TEST_CASE( constructor_destructor_test )
 {
@@ -78,6 +96,21 @@ BOOST_AUTO_TEST_CASE( parameter_setting_test )
   p.parse_args( key, val, error );
   BOOST_CHECK_EQUAL( p.has_local_trap_density, true);
   BOOST_CHECK_EQUAL( error, PARSE_OK );
+}
+
+// test the syntax output
+BOOST_AUTO_TEST_CASE( syntax_euclid_test )
+{
+  //boost::test_tools::output_test_stream soutput( "test.dat", false );
+  boost::test_tools::output_test_stream soutput;
+  {
+      cout_redirect guard( soutput.rdbuf( ) );
+
+      syntax_euclid();
+  }
+  std::string s = "";
+  //soutput.match_pattern();
+  BOOST_CHECK( soutput.check_length( 9, false ) );
 }
 
 

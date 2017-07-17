@@ -2,12 +2,30 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <boost/test/output_test_stream.hpp>
+
+#include <iostream>
+
 #include "params_acs.hh"
 
 // written by: Oliver Cordes 2017-05-30
-// changed by: Oliver Cordes 2017-05-31
+// changed by: Oliver Cordes 2017-07-17
 
 BOOST_AUTO_TEST_SUITE( params_acs_test_suite )
+
+struct cout_redirect {
+    cout_redirect( std::streambuf * new_buffer )
+        : old( std::cout.rdbuf( new_buffer ) )
+    { }
+
+    ~cout_redirect( ) {
+        std::cout.rdbuf( old );
+    }
+
+private:
+    std::streambuf * old;
+};
+
 
 BOOST_AUTO_TEST_CASE( constructor_destructor_test )
 {
@@ -74,6 +92,21 @@ BOOST_AUTO_TEST_CASE( calc_trap_config_test )
     BOOST_CHECK_CLOSE( p.trap_lifetime[1], 7.7000000000000002, 1e-10 );
     BOOST_CHECK_CLOSE( p.trap_lifetime[2], 37.00, 1e-10 );
   }
+}
+
+// test the syntax output
+BOOST_AUTO_TEST_CASE( syntax_acs_test )
+{
+  //boost::test_tools::output_test_stream soutput( "test.dat", false );
+  boost::test_tools::output_test_stream soutput;
+  {
+      cout_redirect guard( soutput.rdbuf( ) );
+
+      syntax_acs();
+  }
+  std::string s = "";
+  //soutput.match_pattern();
+  BOOST_CHECK( soutput.check_length( 9, false ) );
 }
 
 

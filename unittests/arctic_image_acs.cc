@@ -171,6 +171,51 @@ BOOST_AUTO_TEST_CASE( clock_charge_prepare_test3 )
 }
 
 
+BOOST_AUTO_TEST_CASE( clock_charge_test )
+{
+  std::string in_filename = "image_read_test.fits";
+
+  long naxes[2] = { 10, 10 };
+
+  {
+    std::unique_ptr<FITS> pFits;
+
+    int naxis = 2;
+
+    std::string filename( "!"+in_filename );
+    pFits.reset( new FITS( filename , FLOAT_IMG , naxis, naxes ) );
+
+    PHDU& hdu = pFits->pHDU();
+
+    hdu.addKey( "DATE", "2003-01-01", "" );
+    hdu.addKey( "BUNIT", "ELECTRONS", "" );
+  }
+  //  FITS file is now written
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+  argv_test[1] = strdup( in_filename.c_str() );
+  argv_test[2] = strdup( "outputfile" );
+
+  acs_image im( 3, argv_test );
+  im.parameters = std::shared_ptr<params>( new params() );
+  im.parameters->algorithm = ALGORITHM_NEO;
+
+  free( argv_test[2] );
+  free( argv_test[1] );
+  free( argv_test[0] );
+  free( argv_test );
+
+  //im.infilename = in_filename;
+
+  //BOOST_CHECK_EQUAL( im.read_file(), 0 );
+  //BOOST_CHECK_EQUAL( im.clock_charge(), 0 );
+
+  unlink( in_filename.c_str() );
+}
+
+
 
 BOOST_AUTO_TEST_CASE( date2double_test )
 {

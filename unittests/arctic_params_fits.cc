@@ -542,9 +542,10 @@ BOOST_AUTO_TEST_CASE( config_test5 )
   unlink( filename.c_str() );
 }
 
-
+// test the syntax output
 BOOST_AUTO_TEST_CASE( syntax_fits_test )
 {
+  //boost::test_tools::output_test_stream soutput( "test.dat", false );
   boost::test_tools::output_test_stream soutput;
   {
       cout_redirect guard( soutput.rdbuf( ) );
@@ -552,7 +553,8 @@ BOOST_AUTO_TEST_CASE( syntax_fits_test )
       syntax_fits();
   }
   std::string s = "";
-  //BOOST_CHECK( soutput.check_length( 100, false ) );
+  //soutput.match_pattern();
+  BOOST_CHECK( soutput.check_length( 1828, false ) );
 }
 
 

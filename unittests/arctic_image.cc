@@ -543,6 +543,7 @@ BOOST_AUTO_TEST_CASE( correct_units_test5 )
   unlink( in_filename.c_str() );
 }
 
+
 // should be the öast test, since we change the current working directory
 BOOST_AUTO_TEST_CASE( get_working_path_test )
 {
