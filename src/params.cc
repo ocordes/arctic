@@ -105,16 +105,13 @@ void params::load_config( std::string filename )
 
   config_filename = filename;
 
-  std::ifstream f;
-
   std::CString  s;
 
+  std::ifstream f( filename, std::ifstream::in );
 
-  //f.exceptions ( std::ifstream::failbit | std::ifstream::badbit );
-  f.exceptions ( std::ifstream::failbit );
-  try {
-    f.open( filename, std::ifstream::in );
-
+  if ( f.is_open() )
+  {
+    // file is open -> read all content
     while ( f.eof() == false )
     {
       getline(f, s);
@@ -149,8 +146,10 @@ void params::load_config( std::string filename )
     }
     f.close();
   }
-  catch (const std::ifstream::failure& e) {
-    std::cout << "Error '" << e.what() << "' during opening/reading config file '"
+  else
+  {
+    // some  error during the opening occured
+    std::cout << "Error during opening config file '"
               << filename << "'! Config file will be ignored!" << std::endl;
   }
 

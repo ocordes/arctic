@@ -352,7 +352,7 @@ int image::write_file( void )
 
       long naxes[2] = { image_width, image_height };
       int naxis = 2;
-      pFits.reset( new FITS( fileName, FLOAT_IMG , naxis, naxes ) );
+      pFits.reset( new FITS( fileName, FLOAT_IMG, naxis, naxes ) );
     }
   }
   catch (FITS::CantCreate)

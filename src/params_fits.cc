@@ -22,7 +22,7 @@
 /* params_fits.cc
 
    written by: Oliver Cordes 2015-06-18
-   changed by: Oliver Cordes 2017-06-22
+   changed by: Oliver Cordes 2017-07-17
 */
 
 #include <cstdlib>
@@ -35,11 +35,11 @@
 #include "strstr.hh"
 
 
-#define min_limit( x ) if ( ( x ) < 0 ) x = 0
+#define min_limit( x ) if ( ( x ) < 0 ) { x = 0; }
 
 
 // helper output function
-void output_range( std::valarray<double> & x )
+void output_range( std::valarray<double> & x)
 {
   for (unsigned int n=0;n<x.size();++n)
   {

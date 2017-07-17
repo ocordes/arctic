@@ -21,7 +21,7 @@
 /* cte_image_neo.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-10
+   changed by: Oliver Cordes 2017-07-17
 */
 
 #include <cstdlib>
@@ -566,7 +566,7 @@ void cte_image_neo::clock_charge_pixel_capture_full( void )
 
   #ifdef __debug
   output( 10, "h,nr_trapl,d: %i %i %.15f\n", h, nr_trapl, dheight );
-  output( 10, "skip        : %i\n" ,skip );
+  output( 10, "skip        : %i\n", skip );
   #endif
 
 

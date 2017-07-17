@@ -507,26 +507,30 @@ BOOST_AUTO_TEST_CASE( config_test5 )
   f.close();
 
   // setup parameters
-  char **argv_test;
+  char **argv_test, **dummy;
   int    argc;
 
   argv_test = (char**) malloc( sizeof( void * ) * 4);
+  dummy     = (char**) malloc( sizeof( void * ) * 4);
   argv_test[0] = strdup( "Program_name_test" );
   argv_test[1] = strdup( "-c" );
   argv_test[2] = strdup( filename.c_str() );
   argv_test[3] = strdup( "foo" );
+  memcpy( dummy, argv_test, sizeof( void * ) * 4 );
   argc = 4;
 
   params_fits p;
 
   p.well_depth = 1234.5;
 
-  p.set_args( &argc, &argv_test );
+  p.set_args( &argc, &dummy );
 
+  free( argv_test[3] );
   free( argv_test[2] );
   free( argv_test[1] );
   free( argv_test[0] );
   free( argv_test );
+  free( dummy );
 
 
   BOOST_CHECK_EQUAL( p.well_depth, 100.0 );
