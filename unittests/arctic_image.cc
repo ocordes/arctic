@@ -18,7 +18,7 @@
 using namespace CCfits;
 
 // written by: Oliver Cordes 2017-05-31
-// changed by: Oliver Cordes 2017-07-14
+// changed by: Oliver Cordes 2017-07-18
 
 
 BOOST_AUTO_TEST_SUITE( image_test_suite )
@@ -38,9 +38,9 @@ BOOST_AUTO_TEST_CASE( constructor )
 }
 
 
-BOOST_AUTO_TEST_CASE( read_test )
+BOOST_AUTO_TEST_CASE( read_test1 )
 {
-  std::string in_filename = "image_read_test.fits";
+  std::string in_filename = "image_read_test1.fits";
 
   long naxes[2] = { 10, 10 };
 
@@ -73,6 +73,41 @@ BOOST_AUTO_TEST_CASE( read_test )
   BOOST_CHECK_EQUAL( im.image_height, naxes[1] );
 
   im.infilename = "";
+  BOOST_CHECK_EQUAL( im.read_file(), 1 );
+
+  unlink( in_filename.c_str() );
+}
+
+
+BOOST_AUTO_TEST_CASE( read_test2 )
+{
+  std::string in_filename = "image_read_test2.fits";
+
+  long naxes[1] = { 10 };
+
+  {
+    std::unique_ptr<FITS> pFits;
+
+    int naxis = 1;
+
+    std::string filename( "!"+in_filename );
+    pFits.reset( new FITS( filename , FLOAT_IMG , naxis, naxes ) );
+
+    //PHDU& hdu = pFits->pHDU();
+  }
+  //  FITS file is now written
+
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  free( argv_test[0] );
+  free( argv_test );
+
+  im.infilename = in_filename;
+
   BOOST_CHECK_EQUAL( im.read_file(), 1 );
 
   unlink( in_filename.c_str() );
@@ -541,6 +576,22 @@ BOOST_AUTO_TEST_CASE( correct_units_test5 )
   BOOST_CHECK_CLOSE( im.image_data[0], 1.0, 1e-10 );
 
   unlink( in_filename.c_str() );
+}
+
+
+// dummy test to check if this routine is not implemneted
+BOOST_AUTO_TEST_CASE( clock_charge_prepare_test )
+{
+  char **argv_test;
+  argv_test = (char**) malloc( sizeof( void * ) * 3);
+  argv_test[0] = strdup( "Program_name_test" );
+
+  image im( 1, argv_test );
+
+  free( argv_test[0] );
+  free( argv_test );
+
+  BOOST_CHECK_THROW( im.clock_charge_prepare(), char const* );
 }
 
 

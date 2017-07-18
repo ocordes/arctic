@@ -22,7 +22,7 @@
 /* params.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-13
+   changed by: Oliver Cordes 2017-07-18
 */
 
 #include <cstdlib>
@@ -99,7 +99,7 @@ params::~params()
 }
 
 
-void params::load_config( std::string filename )
+int params::load_config( std::string filename )
 {
   output( 1, "Loading config file '%s' ...\n", filename.c_str() );
 
@@ -151,9 +151,12 @@ void params::load_config( std::string filename )
     // some  error during the opening occured
     std::cout << "Error during opening config file '"
               << filename << "'! Config file will be ignored!" << std::endl;
+    return 1;
   }
 
   output( 1, "Done.\n" );
+
+  return 0;
 }
 
 

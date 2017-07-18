@@ -10,7 +10,7 @@
 #include "params_fits.hh"
 
 // written by: Oliver Cordes 2017-05-30
-// changed by: Oliver Cordes 2017-07-14
+// changed by: Oliver Cordes 2017-07-18
 
 
 BOOST_AUTO_TEST_SUITE( params_fits_test_suite )
@@ -385,7 +385,7 @@ BOOST_AUTO_TEST_CASE( config_test1 )
   params_fits p;
 
   p.well_depth = 1234.5;
-  p.load_config( filename );
+  BOOST_CHECK_EQUAL( p.load_config( filename ), 0 );
 
   BOOST_CHECK_EQUAL( p.well_depth, 100.0 );
 
@@ -412,7 +412,7 @@ BOOST_AUTO_TEST_CASE( config_test2 )
   params_fits p;
 
   p.well_depth = 1234.5;
-  p.load_config( filename );
+  BOOST_CHECK_EQUAL( p.load_config( filename ), 0 );
 
   BOOST_CHECK_EQUAL( p.well_depth, 0.0 );
 
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_CASE( config_test3 )
   params_fits p;
 
   p.well_depth = 1234.5;
-  p.load_config( filename );
+  BOOST_CHECK_EQUAL( p.load_config( filename ), 0 );
 
   BOOST_CHECK_EQUAL( p.well_depth, 1234.5 ); // test make no sense ...
 

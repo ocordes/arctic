@@ -5,7 +5,7 @@
 #include "params.hh"
 
 // written by: Oliver Cordes 2017-01-06
-// chnaged by: Oliver Cordes 2017-07-13
+// chnaged by: Oliver Cordes 2017-07-18
 
 
 BOOST_AUTO_TEST_SUITE( params_test_suite )
@@ -170,6 +170,36 @@ BOOST_AUTO_TEST_CASE( val2double_test )
   s = "a";
   BOOST_CHECK_EQUAL( p.val2double( s, error ), 0.0 );
   BOOST_CHECK_EQUAL( error, PARSE_OK );
+}
+
+
+// check if params::parse_args is not implemented
+BOOST_AUTO_TEST_CASE( parse_args_test )
+{
+  params p;
+
+  std::string s = "";
+  int         i = 0;
+
+  BOOST_CHECK_THROW( p.parse_args( s, s, i ), char const* );
+}
+
+// check if params::check_params is not implemented
+BOOST_AUTO_TEST_CASE( check_params_test )
+{
+  params p;
+
+  BOOST_CHECK_THROW( p.check_params(), char const* );
+}
+
+// load non existing config file
+BOOST_AUTO_TEST_CASE( load_config_fail_test )
+{
+  params p;
+
+  std::string s = "/tmp/blubbler.blah";
+
+  BOOST_CHECK_EQUAL( p.load_config( s ), 1 );
 }
 
 

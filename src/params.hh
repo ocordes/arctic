@@ -22,7 +22,7 @@
 /* param.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-06-21
+   changed by: Oliver Cordes 2017-07-18
 */
 
 #ifndef __params_h
@@ -107,7 +107,7 @@ public:
   params();
   virtual ~params();
 
-  void load_config( std::string filename );
+  int load_config( std::string filename );
   virtual void parse_args( std::string &, std::string &, int & );
   virtual void check_params ( void );
 
