@@ -21,7 +21,7 @@
 /* cte_image.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-04
+   changed by: Oliver Cordes 2017-07-19
 */
 
 #include <cstdlib>
@@ -87,7 +87,7 @@ cte_image::cte_image( std::shared_ptr<params> & p )
 
 
 cte_image::cte_image( void )
-  : parameters( std::shared_ptr<params>( new( params ) ) )
+  : parameters( std::shared_ptr<params>( new ( params ) ) )
 {
   image_width = 0;
   image_height = 0;
