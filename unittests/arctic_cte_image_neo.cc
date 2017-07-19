@@ -497,9 +497,9 @@ BOOST_AUTO_TEST_CASE( correction10 )
    //debug_level = 11;
    im.clock_charge( in_data );
 
-   for (unsigned int i=0;i<in_data.size();++i)
-     std::cout << std::fixed << std::setprecision(9) << in_data[i] << ", ";
-   std::cout << std::endl;
+   //for (unsigned int i=0;i<in_data.size();++i)
+   //   std::cout << std::fixed << std::setprecision(9) << in_data[i] << ", ";
+   //std::cout << std::endl;
 
    BOOST_CHECK_EQUAL( check_array( in_data, out_data, 1e-5), true );
 }
@@ -733,7 +733,7 @@ BOOST_AUTO_TEST_CASE( correction11 )
    // std::cout << std::fixed << std::setprecision(9) << in_data[i] << ", ";
    // std::cout << std::endl;
 
-   //BOOST_CHECK_EQUAL( check_array( in_data, out_data, 1e-5), true );
+   BOOST_CHECK_EQUAL( check_array( in_data, out_data, 1e-5), true );
 }
 
 

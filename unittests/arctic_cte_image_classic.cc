@@ -11,7 +11,7 @@
 #include "output.hh"
 
 // written by: Oliver Cordes 2017-06-01
-// changed by: Oliver Cordes 2017-07-10
+// changed by: Oliver Cordes 2017-07-19
 
 
 bool check_array( std::valarray<double> & a, std::valarray<double> & b, double limits )
@@ -422,6 +422,48 @@ BOOST_AUTO_TEST_CASE( correction8 )
    //for (unsigned int i=0;i<in_data.size();++i)
    //    std::cout << std::fixed << std::setprecision(9) << in_data[i] << ", ";
    //std::cout << std::endl;
+
+   BOOST_CHECK_EQUAL( check_array( in_data, out_data, 1e-5), true );
+}
+
+// check the following parameters
+//  - clocking !!
+//  - no rotation
+//  - direction forward
+//  - express = 1
+//  - n_iteration = 1
+//  - cut_upper_limits = false
+//  - high signal to noise
+//  - dark_mode = false
+//  - charge_injection = false
+// try to check the clean trap routine
+BOOST_AUTO_TEST_CASE( correction12 )
+{
+   std::shared_ptr<params_acs> p = std::shared_ptr<params_acs>( new params_acs() );
+
+   double jd = +2452334.5 + 3506.238668981474;
+
+   p->calc_trap_config( jd );
+   p->unclock = false;
+
+   cte_image_classic im( (std::shared_ptr<params> &) p );
+
+   std::valarray<double> in_data =  { 40.787811279, 0.0, 0.0,
+                                      0.0, 0.0, 0.0,
+                                      0.0, 0.0, 0.0,
+                                      0.0 };
+   std::valarray<double> out_data = { 40.738149536, 0.008275011, 0.003813674,
+                                      0.002518718, 0.001932498, 0.001603306,
+                                      0.000203536, 0.000051516, -0.000067765,
+                                      -0.000185849 };
+
+   im.setup( 1, in_data.size() );
+   im.parameters->empty_trap_limit = 1e-4;  // rather hight, but good for testing ...
+   im.clock_charge( in_data );
+
+  //  for (unsigned int i=0;i<in_data.size();++i)
+  //     std::cout << std::fixed << std::setprecision(9) << in_data[i] << ", ";
+  //  std::cout << std::endl;
 
    BOOST_CHECK_EQUAL( check_array( in_data, out_data, 1e-5), true );
 }

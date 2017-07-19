@@ -21,7 +21,7 @@
 /* cte_image_classic.cc
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-10
+   changed by: Oliver Cordes 2017-07-19
 */
 
 #include <cstdlib>
@@ -137,7 +137,6 @@ void cte_image_classic::print_traps( void )
 
 void   cte_image_classic::clock_charge_setup( void )
 {
-  output( 1, "setup\n");
   output( 1, "Using n_levels=%i\n", parameters->n_levels );
 
   // setup variables
