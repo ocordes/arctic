@@ -21,7 +21,7 @@
 /* cte_image.hh
 
    written by: Oliver Cordes 2015-01-05
-   changed by: Oliver Cordes 2017-07-10
+   changed by: Oliver Cordes 2017-07-19
 */
 
 #ifndef CTE_IMAGE_H
@@ -42,6 +42,10 @@ class cte_image
 {
 public:
   std::shared_ptr<params>              parameters;
+  unsigned int                         image_width;
+  unsigned int                         image_height;
+  unsigned int                         width;
+  unsigned int                         height;
 
   cte_image ( void );
   cte_image( std::shared_ptr<params> & );
@@ -72,11 +76,6 @@ public:
   void   create_exponential_factor( void );
 
 protected:
-  unsigned int                         image_width;
-  unsigned int                         image_height;
-  unsigned int                         width;
-  unsigned int                         height;
-
   std::image_slice                     is;
 
   // CTE local parameters

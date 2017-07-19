@@ -87,7 +87,7 @@ cte_image::cte_image( std::shared_ptr<params> & p )
 
 
 cte_image::cte_image( void )
-  : parameters()
+  : parameters( std::shared_ptr<params>( new( params ) ) )
 {
   image_width = 0;
   image_height = 0;
