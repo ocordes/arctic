@@ -47,6 +47,8 @@
 
 #define uint_0  (unsigned int)0
 
+//#define __debug
+
 // use to activate the comparison code
 //#define compariaon
 
@@ -355,6 +357,9 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
     {
       double i_pixelp1 = i_pixel + 1;
 
+      if ( parameters->charge_injection == 1 )
+        i_pixelp1 = height;
+
       // the low signal mode produces some error with express > 1
       // the problem is that in the express loop for express values > 1
       // the first lines have a multiplier =0 and therefor empty traps
@@ -372,7 +377,7 @@ void cte_image::clock_charge_column( std::valarray<double> & image,
       express_factor_pixel = express_multiplier[p_express_multiplier];
 
 
-      // correcttion factor
+      // correction factor
       express_correct = (double) express_factor_pixel / i_pixelp1;
 
       #ifdef __debug
