@@ -1,8 +1,8 @@
-#define BOOST_TEST_MODULE MyTest
+//#define BOOST_TEST_MODULE MyTest
 
 #include <boost/test/unit_test.hpp>
 
-#include "julian.hh" 
+#include "julian.hh"
 
 
 BOOST_AUTO_TEST_SUITE( julian_test_suite )
