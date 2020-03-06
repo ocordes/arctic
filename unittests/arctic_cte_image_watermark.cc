@@ -11,7 +11,7 @@
 #include "output.hh"
 
 // written by: Oliver Cordes 2017-06-01
-// changed by: Oliver Cordes 2017-07-19
+// changed by: Oliver Cordes 2020-03-06
 
 
 bool check_array( std::valarray<double> & a, std::valarray<double> & b, double limits )
@@ -455,10 +455,10 @@ BOOST_AUTO_TEST_CASE( correction9 )
                                       34.036590576, 28.182380676, 33.998012543,
                                       16.299722672, 32.821144104, 30.215837479,
                                       30.543056488 };
-   std::valarray<double> out_data = { 41.284428712, 43.257230766, 36.252698642,
-                                      34.147234930, 28.258635979, 34.084275248,
-                                      16.323851217, 32.909549451, 30.260278339,
-                                      30.585410199 };
+   std::valarray<double> out_data = { 41.284428712, 43.009182203, 36.093636050,
+                                      34.030583084, 28.171539424, 34.002535416,
+                                      16.272294569, 32.842116107, 30.210347981,
+                                      30.540123590 };
 
    im.setup( 1, in_data.size() );
    im.clock_charge( in_data );
