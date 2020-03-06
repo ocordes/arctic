@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project( arctic )
 
 # written by: Oliver Cordes 2016-06-07
-# changed by: Oliver Cordes 2018-01-22
+# changed by: Oliver Cordes 2020-03-06
 
 # add local cmake modules
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
@@ -12,7 +12,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Modules")
 include( UnitTestHelpers )
 
 
-set(VERSION 1.3.5)
+set(VERSION 1.3.6)
 
 
 if(UNIX AND NOT APPLE)
